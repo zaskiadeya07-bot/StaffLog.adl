@@ -261,44 +261,79 @@
         });
     }
     
-    function showDetail(tgl, hari, jamMasuk, jamPulang, status, keterangan, latMasuk, lngMasuk, latPulang, lngPulang) {
-        document.getElementById('detailTglHari').innerHTML = `${formatTanggal(tgl)} (${hari})`;
-        document.getElementById('detailStatusBadge').innerHTML = getStatusBadge(status);
-        document.getElementById('detailKeterangan').innerHTML = keterangan !== '-' ? keterangan : 'Tidak ada keterangan';
-        document.getElementById('detailTimeMasuk').innerHTML = jamMasuk !== '-' ? jamMasuk : '--:--';
-        document.getElementById('detailTimePulang').innerHTML = jamPulang !== '-' ? jamPulang : '--:--';
-        
-        setTimeout(() => {
-            if (mapMasuk) mapMasuk.remove();
-            if (mapPulang) mapPulang.remove();
-            
-            const mapMasukDiv = document.getElementById('detailMapMasuk');
-            const mapPulangDiv = document.getElementById('detailMapPulang');
-            
-            if (latMasuk && lngMasuk) {
-                mapMasukDiv.innerHTML = '';
-                mapMasuk = L.map('detailMapMasuk').setView([latMasuk, lngMasuk], 15);
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(mapMasuk);
-                L.marker([latMasuk, lngMasuk]).addTo(mapMasuk).bindPopup(`<b>Check-In</b><br>Jam: ${jamMasuk}`);
-            } else {
-                mapMasukDiv.innerHTML = '<div class="flex items-center justify-center h-full text-slate-400"><i class="bi bi-geo-alt-fill text-2xl"></i><span class="ml-2">Lokasi tidak tersedia</span></div>';
-            }
-            
-            if (latPulang && lngPulang) {
-                mapPulangDiv.innerHTML = '';
-                mapPulang = L.map('detailMapPulang').setView([latPulang, lngPulang], 15);
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(mapPulang);
-                L.marker([latPulang, lngPulang]).addTo(mapPulang).bindPopup(`<b>Check-Out</b><br>Jam: ${jamPulang}`);
-            } else {
-                mapPulangDiv.innerHTML = '<div class="flex items-center justify-center h-full text-slate-400"><i class="bi bi-geo-alt-fill text-2xl"></i><span class="ml-2">Lokasi tidak tersedia</span></div>';
-            }
-        }, 100);
-        
-        document.getElementById('detailModal').classList.remove('hidden');
-        document.getElementById('detailModal').classList.add('flex');
+   function showDetail(tgl, hari, jamMasuk, jamPulang, status, keterangan, latMasuk, lngMasuk, latPulang, lngPulang) {
+    document.getElementById('detailTglHari').innerHTML = `${formatTanggal(tgl)} (${hari})`;
+    document.getElementById('detailStatusBadge').innerHTML = getStatusBadge(status);
+    document.getElementById('detailKeterangan').innerHTML = keterangan !== '-' ? keterangan : 'Tidak ada keterangan';
+    document.getElementById('detailTimeMasuk').innerHTML = jamMasuk !== '-' ? jamMasuk : '--:--';
+    document.getElementById('detailTimePulang').innerHTML = jamPulang !== '-' ? jamPulang : '--:--';
+    
+    // 1. Hapus instance map jika sudah ada
+    if (mapMasuk) {
+        mapMasuk.off();
+        mapMasuk.remove();
+        mapMasuk = null;
+    }
+    if (mapPulang) {
+        mapPulang.off();
+        mapPulang.remove();
+        mapPulang = null;
     }
     
-    function closeDetailModal() {
+    // 2. Paksa reset innerHTML kontainer agar bersih total
+    const mapMasukDiv = document.getElementById('detailMapMasuk');
+    const mapPulangDiv = document.getElementById('detailMapPulang');
+    mapMasukDiv.innerHTML = '';
+    mapPulangDiv.innerHTML = '';
+
+    // Munculkan modal dulu agar dimensi div terbaca oleh Leaflet
+    document.getElementById('detailModal').classList.remove('hidden');
+    document.getElementById('detailModal').classList.add('flex');
+    
+    // 3. Gunakan setTimeout agar Leaflet me-render setelah modal tampil sempurna
+    setTimeout(() => {
+        // Logika Map Masuk
+        if (latMasuk && lngMasuk) {
+            mapMasuk = L.map('detailMapMasuk').setView([latMasuk, lngMasuk], 15);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(mapMasuk);
+            L.marker([latMasuk, lngMasuk]).addTo(mapMasuk);
+            mapMasuk.invalidateSize();
+        } else {
+            mapMasukDiv.innerHTML = '<div class="flex items-center justify-center h-full text-slate-400">Lokasi tidak tersedia</div>';
+        }
+        
+        // Logika Map Pulang
+        if (latPulang && lngPulang) {
+            mapPulang = L.map('detailMapPulang').setView([latPulang, lngPulang], 15);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(mapPulang);
+            L.marker([latPulang, lngPulang]).addTo(mapPulang);
+            mapPulang.invalidateSize();
+        } else {
+            mapPulangDiv.innerHTML = '<div class="flex items-center justify-center h-full text-slate-400">Lokasi tidak tersedia</div>';
+        }
+    }, 300); // Jeda sedikit lebih lama agar animasi modal selesai
+}
+
+function closeDetailModal() {
+    // Sembunyikan modal
+    document.getElementById('detailModal').classList.add('hidden');
+    document.getElementById('detailModal').classList.remove('flex');
+
+    // Bersihkan map saat modal tutup agar memori lega
+    if (mapMasuk) {
+        mapMasuk.remove();
+        mapMasuk = null;
+    }
+    if (mapPulang) {
+        mapPulang.remove();
+        mapPulang = null;
+    }
+}
+        const mapMasukDiv = document.getElementById('detailMapMasuk');
+        const mapPulangDiv = document.getElementById('detailMapPulang');
+        if (mapMasukDiv) mapMasukDiv.innerHTML = '';
+        if (mapPulangDiv) mapPulangDiv.innerHTML = '';
+        
         document.getElementById('detailModal').classList.add('hidden');
         document.getElementById('detailModal').classList.remove('flex');
     }

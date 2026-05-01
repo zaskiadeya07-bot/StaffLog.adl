@@ -1,327 +1,343 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StaffLog - @yield('title')</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f1f5f9;
-            min-height: 100vh;
-        }
-        
-        /* Flex wrapper untuk sticky footer */
-        .app-wrapper {
-            display: flex;
-            min-height: 100vh;
-        }
-        
-        /* Sidebar Styles */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 280px;
-            height: 100%;
-            background: #1e293b;
-            z-index: 1040;
-            transform: translateX(-100%);
-            transition: transform 0.3s ease;
-            overflow-y: auto;
-        }
-        
-        .sidebar.show {
-            transform: translateX(0);
-        }
-        
-        .sidebar-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1039;
-            display: none;
-        }
-        
-        .sidebar-backdrop.show {
-            display: block;
-        }
-        
-        @media (min-width: 768px) {
-            .sidebar {
-                transform: translateX(0);
-            }
-        }
-        
-        /* Main Content Wrapper - Flex Column untuk Sticky Footer */
-        .main-wrapper {
-            flex: 1;
-            margin-left: 0;
-            transition: margin-left 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        
-        @media (min-width: 768px) {
-            .main-wrapper {
-                margin-left: 280px;
-            }
-        }
-        
-        /* Content grows to fill space, pushing footer down */
-        .main-content {
-            flex: 1;
-        }
-        
-        .sidebar-link {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            color: #cbd5e1;
-            border-radius: 8px;
-            transition: all 0.2s;
-            text-decoration: none;
-        }
-        
-        .sidebar-link:hover {
-            background: #334155;
-            color: white;
-        }
-        
-        .sidebar-link.active {
-            background: #2563eb;
-            color: white;
-        }
-        
-        .btn-primary {
-            background: #1e293b;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .btn-primary:hover {
-            background: #334155;
-        }
-        
-        .btn-secondary {
-            background: #f1f5f9;
-            color: #475569;
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        
-        .header {
-            background: white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            padding: 12px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        /* Footer - akan selalu di bawah karena flex */
-        .footer {
-            background: white;
-            border-top: 1px solid #e2e8f0;
-            padding: 20px 24px;
-            text-align: center;
-            margin-top: auto;
-        }
-        
-        .footer p {
-            color: #64748b;
-            font-size: 14px;
-            margin: 0;
-        }
-        
-        .container-custom {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px 24px;
-        }
-        
-        /* Tombol toggle sidebar di mobile */
-        .sidebar-toggle-btn {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #475569;
-            padding: 8px 12px;
-            border-radius: 8px;
-        }
-        
-        .sidebar-toggle-btn:hover {
-            background: #f1f5f9;
-        }
-        
-        @media (max-width: 767px) {
-            .sidebar-toggle-btn {
-                display: inline-flex !important;
-            }
-        }
-        
-        @media (min-width: 768px) {
-            .sidebar-toggle-btn {
-                display: none !important;
-            }
-        }
-        
-        .logout-btn {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #dc2626;
-            text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            transition: all 0.2s;
-            background: white;
-            border: 1px solid #fee2e2;
-        }
-        
-        .logout-btn:hover {
-            background: #fee2e2;
-        }
-    </style>
-</head>
-<body>
+ @extends('layouts.admin-layout')
 
-<div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+@section('title', 'Detail Rekap Kehadiran')
 
-<!-- Sidebar -->
-<div id="adminSidebar" class="sidebar">
-    <div class="p-5 border-b border-slate-700 text-center">
-        <div class="text-xs font-semibold text-slate-400 mt-2">StaffLog.adl</div>
+@section('content')
+<div>
+    <div class="flex justify-between items-center flex-wrap gap-3 mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800" id="employeeName">Detail Rekap Kehadiran</h1>
+            <p class="text-slate-500 text-sm" id="employeeInfo">Periode: April 2024</p>
+        </div>
+        <div class="flex gap-2">
+            <button id="exportPdfBtn" class="bg-red-600 text-white px-4 py-2 rounded-xl hover:bg-red-700 transition flex items-center gap-2">
+                <i class="bi bi-file-pdf"></i> Export PDF
+            </button>
+            <a href="{{ route('admin.rekap-karyawan') }}" class="btn-secondary inline-flex items-center gap-2">
+                <i class="bi bi-arrow-left"></i> Kembali
+            </a>
+        </div>
     </div>
-    <nav class="p-4">
-        <a href="{{ route('admin.rekap-karyawan') }}" class="sidebar-link" id="menuRekap">
-            <i class="bi bi-people"></i> Rekap Karyawan
-        </a>
-        <a href="{{ route('admin.tambah-karyawan') }}" class="sidebar-link" id="menuTambah">
-            <i class="bi bi-person-plus"></i> Tambah Karyawan
-        </a>
-        <a href="{{ route('admin.notifikasi') }}" class="sidebar-link" id="menuNotif">
-            <i class="bi bi-bell"></i> Notifikasi
-        </a>
-    </nav>
+    
+    <!-- Filter -->
+    <div class="card mb-6">
+        <div class="p-4">
+            <div class="flex flex-wrap items-end gap-4">
+                <div class="flex items-center gap-2">
+                    <span class="font-semibold">Filter:</span>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-500 mb-1">Bulan</label>
+                    <select id="bulanSelect" class="input-field">
+                        <option value="1">Januari</option>
+                        <option value="2">Februari</option>
+                        <option value="3">Maret</option>
+                        <option value="4" selected>April</option>
+                        <option value="5">Mei</option>
+                        <option value="6">Juni</option>
+                        <option value="7">Juli</option>
+                        <option value="8">Agustus</option>
+                        <option value="9">September</option>
+                        <option value="10">Oktober</option>
+                        <option value="11">November</option>
+                        <option value="12">Desember</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-500 mb-1">Tahun</label>
+                    <select id="tahunSelect" class="input-field">
+                        <option value="2022">2022</option>
+                        <option value="2023">2023</option>
+                        <option value="2024" selected>2024</option>
+                        <option value="2025">2025</option>
+                    </select>
+                </div>
+                <div>
+                    <button id="filterBtn" class="btn-primary py-2.5">
+                        <i class="bi bi-search"></i> Tampilkan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Statistik Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <div class="bg-emerald-600 text-white rounded-xl p-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h6 class="text-sm opacity-90 mb-1">Hadir</h6>
+                    <h2 class="text-3xl font-bold" id="statHadir">0</h2>
+                </div>
+                <i class="bi bi-check-circle text-3xl opacity-50"></i>
+            </div>
+        </div>
+        <div class="bg-amber-500 text-white rounded-xl p-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h6 class="text-sm opacity-90 mb-1">Izin</h6>
+                    <h2 class="text-3xl font-bold" id="statIzin">0</h2>
+                </div>
+                <i class="bi bi-pencil-square text-3xl opacity-50"></i>
+            </div>
+        </div>
+        <div class="bg-sky-500 text-white rounded-xl p-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h6 class="text-sm opacity-90 mb-1">Sakit</h6>
+                    <h2 class="text-3xl font-bold" id="statSakit">0</h2>
+                </div>
+                <i class="bi bi-thermometer-half text-3xl opacity-50"></i>
+            </div>
+        </div>
+        <div class="bg-slate-500 text-white rounded-xl p-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h6 class="text-sm opacity-90 mb-1">Alpha</h6>
+                    <h2 class="text-3xl font-bold" id="statAlpha">0</h2>
+                </div>
+                <i class="bi bi-x-circle text-3xl opacity-50"></i>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Table -->
+    <div class="card">
+        <div class="p-0">
+            <div class="table-responsive overflow-x-auto">
+                <table id="rekapTable" class="min-w-full divide-y divide-slate-200">
+                    <thead class="bg-slate-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">Tanggal</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">Hari</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">Jam Masuk</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">Jam Pulang</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">Status</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rekapTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- Main Wrapper dengan Flex Column -->
-<div class="main-wrapper">
-    <!-- Header -->
-    <div class="header">
-        <div>
-            <button id="sidebarToggleBtn" class="sidebar-toggle-btn">
-                <i class="bi bi-list"></i>
-            </button>
+<!-- Modal Detail Absensi -->
+<div id="detailModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+    <div class="bg-white rounded-3xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="bg-slate-800 p-5 rounded-t-3xl sticky top-0">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xl font-bold text-white">Detail Absensi</h3>
+                <button class="close-modal text-slate-400 hover:text-white text-2xl">&times;</button>
+            </div>
         </div>
-        <a href="{{ route('login') }}" class="logout-btn">
-            <i class="bi bi-box-arrow-right"></i> Logout
-        </a>
-    </div>
-    
-    <!-- Content - flex:1 agar mengisi ruang -->
-    <div class="main-content">
-        <div class="container-custom">
-            @yield('content')
+        <div class="p-6">
+            <div class="bg-slate-50 rounded-xl p-4 mb-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-xs text-slate-500">Tanggal & Hari</p>
+                        <p class="font-semibold" id="detailTglHari">-</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-500">Status Kehadiran</p>
+                        <div id="detailStatusBadge">-</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Lokasi Check-In</label>
+                    <div id="detailMapMasuk" class="h-48 bg-slate-100 rounded-xl overflow-hidden relative">
+                        <div class="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
+                            <i class="bi bi-clock"></i> <span id="detailTimeMasuk">--:--</span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Lokasi Check-Out</label>
+                    <div id="detailMapPulang" class="h-48 bg-slate-100 rounded-xl overflow-hidden relative">
+                        <div class="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
+                            <i class="bi bi-clock"></i> <span id="detailTimePulang">--:--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-semibold mb-2">Keterangan</label>
+                <div class="bg-slate-50 rounded-xl p-3" id="detailKeterangan">-</div>
+            </div>
         </div>
-    </div>
-    
-    <!-- Footer - akan selalu di bawah karena margin-top: auto -->
-    <div class="footer">
-        <p>&copy; {{ date('Y') }} StaffLog.adl - Sistem Manajemen Kehadiran Karyawan</p>
+        <div class="p-5 border-t border-slate-100 flex justify-center">
+            <button class="close-modal btn-secondary px-6">Tutup</button>
+        </div>
     </div>
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const sidebar = document.getElementById('adminSidebar');
-        const backdrop = document.getElementById('sidebarBackdrop');
-        const toggleBtn = document.getElementById('sidebarToggleBtn');
-        
-        function toggleSidebar() {
-            sidebar.classList.toggle('show');
-            backdrop.classList.toggle('show');
-        }
-        
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', toggleSidebar);
-        }
-        
-        if (backdrop) {
-            backdrop.addEventListener('click', function() {
-                sidebar.classList.remove('show');
-                backdrop.classList.remove('show');
-            });
-        }
-        
-        // Set active menu based on current URL
-        const currentPath = window.location.pathname;
-        document.querySelectorAll('.sidebar-link').forEach(function(link) {
-            if (currentPath.includes(link.getAttribute('href'))) {
-                link.classList.add('active');
+    let currentEmployee = null;
+    let mapMasuk, mapPulang;
+    
+    function getNamaBulan(bulan) {
+        const nama = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        return nama[parseInt(bulan) - 1];
+    }
+    
+    function formatTanggal(tgl) {
+        return new Date(tgl).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+    }
+    
+    function getStatusBadge(status) {
+        const badges = {
+            'Hadir': '<span class="badge-success"><i class="bi bi-check-circle"></i> Hadir</span>',
+            'Izin': '<span class="badge-warning"><i class="bi bi-pencil-square"></i> Izin</span>',
+            'Sakit': '<span class="badge-info"><i class="bi bi-thermometer-half"></i> Sakit</span>',
+            'Alpha': '<span class="badge-secondary"><i class="bi bi-x-circle"></i> Alpha</span>'
+        };
+        return badges[status] || badges.Alpha;
+    }
+    
+    function getAbsensiData(employeeId, bulan, tahun) {
+        const allData = {
+            1: {
+                nama: 'Aulia Pramesti',
+                divisi: 'Engineering',
+                absensi: [
+                    { tgl: `${tahun}-${String(bulan).padStart(2,'0')}-01`, hari: 'Senin', jamMasuk: '08:00', jamPulang: '17:00', status: 'Hadir', keterangan: '-', latMasuk: -6.200000, lngMasuk: 106.816666, latPulang: -6.200000, lngPulang: 106.816666 },
+                    { tgl: `${tahun}-${String(bulan).padStart(2,'0')}-02`, hari: 'Selasa', jamMasuk: '08:15', jamPulang: '17:00', status: 'Hadir', keterangan: '-', latMasuk: -6.200000, lngMasuk: 106.816666, latPulang: -6.200000, lngPulang: 106.816666 },
+                    { tgl: `${tahun}-${String(bulan).padStart(2,'0')}-03`, hari: 'Rabu', jamMasuk: '08:00', jamPulang: '17:00', status: 'Hadir', keterangan: '-', latMasuk: -6.200000, lngMasuk: 106.816666, latPulang: -6.200000, lngPulang: 106.816666 },
+                    { tgl: `${tahun}-${String(bulan).padStart(2,'0')}-04`, hari: 'Kamis', jamMasuk: '-', jamPulang: '-', status: 'Izin', keterangan: 'Acara keluarga', latMasuk: null, lngMasuk: null, latPulang: null, lngPulang: null },
+                    { tgl: `${tahun}-${String(bulan).padStart(2,'0')}-05`, hari: 'Jumat', jamMasuk: '08:30', jamPulang: '17:00', status: 'Hadir', keterangan: '-', latMasuk: -6.200000, lngMasuk: 106.816666, latPulang: -6.200000, lngPulang: 106.816666 }
+                ]
+            },
+            2: {
+                nama: 'Bimo Santoso',
+                divisi: 'Marketing',
+                absensi: [
+                    { tgl: `${tahun}-${String(bulan).padStart(2,'0')}-01`, hari: 'Senin', jamMasuk: '08:00', jamPulang: '17:00', status: 'Hadir', keterangan: '-', latMasuk: -6.210000, lngMasuk: 106.820000, latPulang: -6.210000, lngPulang: 106.820000 }
+                ]
             }
+        };
+        return allData[employeeId] || allData[1];
+    }
+    
+    function updateStats(data) {
+        let hadir = 0, izin = 0, sakit = 0, alpha = 0;
+        data.forEach(item => {
+            if (item.status === 'Hadir') hadir++;
+            else if (item.status === 'Izin') izin++;
+            else if (item.status === 'Sakit') sakit++;
+            else alpha++;
         });
+        document.getElementById('statHadir').innerText = hadir;
+        document.getElementById('statIzin').innerText = izin;
+        document.getElementById('statSakit').innerText = sakit;
+        document.getElementById('statAlpha').innerText = alpha;
+    }
+    
+    function renderTable(data) {
+        const tbody = document.getElementById('rekapTableBody');
+        tbody.innerHTML = '';
+        updateStats(data);
         
-        // Desktop: sidebar always visible
-        if (window.innerWidth >= 768) {
-            sidebar.classList.add('show');
-        }
+        data.forEach(item => {
+            const row = `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="px-4 py-3 text-sm text-slate-600">${formatTanggal(item.tgl)}</td>
+                    <td class="px-4 py-3 text-sm text-slate-600">${item.hari}</td>
+                    <td class="px-4 py-3 text-sm text-slate-600">${item.jamMasuk}</td>
+                    <td class="px-4 py-3 text-sm text-slate-600">${item.jamPulang}</td>
+                    <td class="px-4 py-3">${getStatusBadge(item.status)}</td>
+                    <td class="px-4 py-3">
+                        <button onclick="showDetail('${item.tgl}', '${item.hari}', '${item.jamMasuk}', '${item.jamPulang}', '${item.status}', '${item.keterangan}', ${item.latMasuk || null}, ${item.lngMasuk || null}, ${item.latPulang || null}, ${item.lngPulang || null})" class="bg-blue-50 text-blue-600 p-2 rounded-lg hover:bg-blue-100 transition">
+                            <i class="bi bi-eye"></i> Detail
+                        </button>
+                    </td>
+                </tr>
+            `;
+            tbody.insertAdjacentHTML('beforeend', row);
+        });
+    }
+    
+    function showDetail(tgl, hari, jamMasuk, jamPulang, status, keterangan, latMasuk, lngMasuk, latPulang, lngPulang) {
+        document.getElementById('detailTglHari').innerHTML = `${formatTanggal(tgl)} (${hari})`;
+        document.getElementById('detailStatusBadge').innerHTML = getStatusBadge(status);
+        document.getElementById('detailKeterangan').innerHTML = keterangan !== '-' ? keterangan : 'Tidak ada keterangan';
+        document.getElementById('detailTimeMasuk').innerHTML = jamMasuk !== '-' ? jamMasuk : '--:--';
+        document.getElementById('detailTimePulang').innerHTML = jamPulang !== '-' ? jamPulang : '--:--';
         
-        window.addEventListener('resize', function() {
-            if (window.innerWidth >= 768) {
-                sidebar.classList.add('show');
-                backdrop.classList.remove('show');
+        setTimeout(() => {
+            if (mapMasuk) mapMasuk.remove();
+            if (mapPulang) mapPulang.remove();
+            
+            const mapMasukDiv = document.getElementById('detailMapMasuk');
+            const mapPulangDiv = document.getElementById('detailMapPulang');
+            
+            if (latMasuk && lngMasuk) {
+                mapMasukDiv.innerHTML = '';
+                mapMasuk = L.map('detailMapMasuk').setView([latMasuk, lngMasuk], 15);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(mapMasuk);
+                L.marker([latMasuk, lngMasuk]).addTo(mapMasuk).bindPopup(`<b>Check-In</b><br>Jam: ${jamMasuk}`);
             } else {
-                sidebar.classList.remove('show');
-                backdrop.classList.remove('show');
+                mapMasukDiv.innerHTML = '<div class="flex items-center justify-center h-full text-slate-400"><i class="bi bi-geo-alt-fill text-2xl"></i><span class="ml-2">Lokasi tidak tersedia</span></div>';
             }
-        });
+            
+            if (latPulang && lngPulang) {
+                mapPulangDiv.innerHTML = '';
+                mapPulang = L.map('detailMapPulang').setView([latPulang, lngPulang], 15);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(mapPulang);
+                L.marker([latPulang, lngPulang]).addTo(mapPulang).bindPopup(`<b>Check-Out</b><br>Jam: ${jamPulang}`);
+            } else {
+                mapPulangDiv.innerHTML = '<div class="flex items-center justify-center h-full text-slate-400"><i class="bi bi-geo-alt-fill text-2xl"></i><span class="ml-2">Lokasi tidak tersedia</span></div>';
+            }
+        }, 100);
+        
+        document.getElementById('detailModal').classList.remove('hidden');
+        document.getElementById('detailModal').classList.add('flex');
+    }
+    
+    function closeDetailModal() {
+        document.getElementById('detailModal').classList.add('hidden');
+        document.getElementById('detailModal').classList.remove('flex');
+    }
+    
+    function loadData() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const employeeId = urlParams.get('id') || '1';
+        const bulan = document.getElementById('bulanSelect').value;
+        const tahun = document.getElementById('tahunSelect').value;
+        
+        const dataAbsen = getAbsensiData(parseInt(employeeId), bulan, tahun);
+        currentEmployee = dataAbsen;
+        document.getElementById('employeeName').innerHTML = `${dataAbsen.nama}`;
+        document.getElementById('employeeInfo').innerHTML = `<i class="bi bi-building"></i> ${dataAbsen.divisi} | Periode: ${getNamaBulan(bulan)} ${tahun}`;
+        renderTable(dataAbsen.absensi);
+    }
+    
+    function filterData() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const employeeId = urlParams.get('id') || '1';
+        const bulan = document.getElementById('bulanSelect').value;
+        const tahun = document.getElementById('tahunSelect').value;
+        
+        const dataAbsen = getAbsensiData(parseInt(employeeId), bulan, tahun);
+        currentEmployee = dataAbsen;
+        renderTable(dataAbsen.absensi);
+        document.getElementById('employeeInfo').innerHTML = `<i class="bi bi-building"></i> ${dataAbsen.divisi} | Periode: ${getNamaBulan(bulan)} ${tahun}`;
+    }
+    
+    function exportToPDF() {
+        alert('Fitur export PDF akan segera hadir');
+    }
+    
+    document.getElementById('filterBtn')?.addEventListener('click', filterData);
+    document.getElementById('exportPdfBtn')?.addEventListener('click', exportToPDF);
+    document.querySelectorAll('.close-modal').forEach(btn => {
+        btn.addEventListener('click', closeDetailModal);
     });
+    
+    loadData();
 </script>
-
-@stack('scripts')
-</body>
-</html>
+@endsection      . ini kan aku refresh dulu baru bisa pencet detail  baru muncul ... jangan ada yang dikurangkan kodenya, perbaiki saja yang salah
