@@ -1,5 +1,7 @@
 /* Tailwind CSS v4 - syntax terbaru */
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Custom styles yang tidak bisa menggunakan @apply di sini */
 @layer base {
