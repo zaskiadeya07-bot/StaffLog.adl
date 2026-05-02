@@ -1,8 +1,6 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Landing Page'); ?>
 
-@section('title', 'Landing Page')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="min-h-screen flex flex-col">
     <!-- Header - Tombol Masuk lebih ke kanan -->
     <header class="bg-slate-800 sticky top-0 z-50 shadow-lg">
@@ -13,7 +11,7 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
         <div class="flex justify-end px-6 py-4">
-            <a href="{{ route('login') }}" class="bg-amber-400 text-slate-800 px-6 py-2 rounded-full font-semibold hover:bg-amber-500 transition flex items-center gap-2 mr-2">
+            <a href="<?php echo e(route('login')); ?>" class="bg-amber-400 text-slate-800 px-6 py-2 rounded-full font-semibold hover:bg-amber-500 transition flex items-center gap-2 mr-2">
                 <i class="bi bi-box-arrow-in-right"></i>
                 Masuk
             </a>
@@ -85,7 +83,7 @@
                 <div class="flex gap-6">
                     <button id="tentangBtn" class="text-slate-300 hover:text-amber-400 transition cursor-pointer">Tentang Kami</button>
                     <button id="bantuanBtn" class="text-slate-300 hover:text-amber-400 transition cursor-pointer">Bantuan</button>
-                    <a href="{{ route('login') }}" class="text-slate-300 hover:text-amber-400 transition">Masuk ke Akun</a>
+                    <a href="<?php echo e(route('login')); ?>" class="text-slate-300 hover:text-amber-400 transition">Masuk ke Akun</a>
                 </div>
             </div>
             <div class="border-t border-slate-700 pt-6 text-center">
@@ -170,4 +168,5 @@
         if (e.target === bantuanModal) closeModal(bantuanModal);
     });
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\stafflog-app\resources\views/landing/index.blade.php ENDPATH**/ ?>
