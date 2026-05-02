@@ -17,7 +17,7 @@
                 <i class="bi bi-arrow-left"></i> Kembali
             </a>
         </div>
-    </div>
+        </div>
     
     <!-- Filter -->
     <div class="card mb-6">
