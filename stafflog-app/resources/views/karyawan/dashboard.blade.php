@@ -15,7 +15,6 @@
         </div>
     </div>
     
-    <!-- Quick Actions -->
     <div class="card p-5 mb-6">
         <h3 class="font-semibold text-slate-800 mb-4 flex items-center gap-2">
             <i class="bi bi-lightning-charge text-amber-500"></i> Fitur Absen
@@ -39,7 +38,6 @@
         </div>
     </div>
     
-    <!-- Stats -->
     <div class="card p-5">
         <h3 class="font-semibold text-slate-800 mb-4 flex items-center gap-2">
             <i class="bi bi-pie-chart text-blue-500"></i> Total Absensi Bulan Ini
