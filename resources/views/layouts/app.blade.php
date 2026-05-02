@@ -18,13 +18,8 @@
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
     
-<<<<<<< HEAD
     <!-- Tailwind CSS -->
     @vite('resources/css/app.css')
-=======
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
->>>>>>> fdee2d0c5d28df0dfbab0c6f2708b8b33d2639d4
     
     @stack('styles')
 </head>

@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>StaffLog.adl - @yield('title', 'Sistem Manajemen Kehadiran')</title>
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+    <title>StaffLog.adl - <?php echo $__env->yieldContent('title', 'Sistem Manajemen Kehadiran'); ?></title>
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
@@ -18,18 +18,13 @@
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
     
-<<<<<<< HEAD
     <!-- Tailwind CSS -->
-    @vite('resources/css/app.css')
-=======
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
->>>>>>> fdee2d0c5d28df0dfbab0c6f2708b8b33d2639d4
+    <?php echo app('Illuminate\Foundation\Vite')('resources/css/app.css'); ?>
     
-    @stack('styles')
+    <?php echo $__env->yieldPushContent('styles'); ?>
 </head>
 <body class="font-sans antialiased bg-slate-50">
-    @yield('content')
+    <?php echo $__env->yieldContent('content'); ?>
     
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -39,6 +34,6 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
-    @stack('scripts')
+    <?php echo $__env->yieldPushContent('scripts'); ?>
 </body>
-</html>
+</html><?php /**PATH C:\laragon\www\rekapkehadiran\resources\views/layouts/app.blade.php ENDPATH**/ ?>
