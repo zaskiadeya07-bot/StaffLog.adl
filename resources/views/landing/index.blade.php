@@ -4,18 +4,15 @@
 
 @section('content')
 <div class="min-h-screen flex flex-col">
-    <!-- Header -->
-    <header class="bg-slate-800 sticky top-0 z-50 shadow-lg">
-        <div class="container mx-auto px-6 py-4">
-            <div class="flex justify-end">
-                <a href="{{ route('login') }}" class="bg-amber-400 text-slate-800 px-6 py-2 rounded-full font-semibold hover:bg-amber-500 transition flex items-center gap-2">
-                    <i class="bi bi-box-arrow-in-right"></i>
-                    Masuk
-                </a>
-            </div>
-        </div>
-    </header>
-
+    <!-- Header (lebih ke kanan) -->
+<header class="bg-slate-800 sticky top-0 z-50 shadow-lg">
+    <div class="flex justify-end px-6 py-4">
+        <a href="{{ route('login') }}" class="bg-amber-400 text-slate-800 px-6 py-2 rounded-full font-semibold hover:bg-amber-500 transition flex items-center gap-2 mr-4">
+            <i class="bi bi-box-arrow-in-right"></i>
+            Masuk
+        </a>
+    </div>
+</header>
     <!-- Hero Section -->
     <main class="grow">
         <div class="container mx-auto px-6 py-16">
