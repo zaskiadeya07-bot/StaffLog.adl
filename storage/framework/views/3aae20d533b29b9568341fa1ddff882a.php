@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StaffLog Admin - @yield('title', 'Admin Panel')</title>
+    <title>StaffLog Admin - <?php echo $__env->yieldContent('title', 'Admin Panel'); ?></title>
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -213,26 +213,26 @@
         <p class="text-slate-400 text-xs mt-1">Admin Panel</p>
     </div>
     <nav class="p-3 space-y-1 mt-2">
-        <a href="{{ route('admin.rekap-karyawan') }}" class="sidebar-link">
+        <a href="<?php echo e(route('admin.rekap-karyawan')); ?>" class="sidebar-link">
             <i class="bi bi-people text-lg"></i>
             <span>Rekap Karyawan</span>
         </a>
-        <a href="{{ route('admin.tambah-karyawan') }}" class="sidebar-link">
+        <a href="<?php echo e(route('admin.tambah-karyawan')); ?>" class="sidebar-link">
             <i class="bi bi-person-plus text-lg"></i>
             <span>Tambah Karyawan</span>
         </a>
-        <a href="{{ route('admin.notifikasi') }}" class="sidebar-link">
+        <a href="<?php echo e(route('admin.notifikasi')); ?>" class="sidebar-link">
             <i class="bi bi-bell text-lg"></i>
             <span>Notifikasi & Izin</span>
         </a>
-        <a href="{{ route('admin.pengaturan-kantor') }}" class="sidebar-link">
+        <a href="<?php echo e(route('admin.pengaturan-kantor')); ?>" class="sidebar-link">
             <i class="bi bi-building-gear text-lg"></i>
             <span>Pengaturan Kantor</span>
         </a>
     </nav>
     <div class="p-3 mt-auto border-t border-slate-700 absolute bottom-0 w-full">
-        <form action="{{ route('logout') }}" method="POST">
-            @csrf
+        <form action="<?php echo e(route('logout')); ?>" method="POST">
+            <?php echo csrf_field(); ?>
             <button type="submit" class="logout-btn w-full justify-center">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Logout</span>
@@ -250,14 +250,14 @@
             <button id="sidebarToggleBtn" class="sidebar-toggle-btn">
                 <i class="bi bi-list"></i>
             </button>
-            <span class="text-slate-700 font-semibold text-sm">@yield('title', 'Admin Panel')</span>
+            <span class="text-slate-700 font-semibold text-sm"><?php echo $__env->yieldContent('title', 'Admin Panel'); ?></span>
         </div>
         <div class="flex items-center gap-3">
             <span class="text-sm text-slate-500 hidden sm:block">
-                Halo, <strong>{{ session('pengguna_nama', 'Admin') }}</strong>
+                Halo, <strong><?php echo e(session('pengguna_nama', 'Admin')); ?></strong>
             </span>
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
+            <form action="<?php echo e(route('logout')); ?>" method="POST">
+                <?php echo csrf_field(); ?>
                 <button type="submit" class="logout-btn">
                     <i class="bi bi-box-arrow-right"></i>
                     <span class="hidden sm:inline">Logout</span>
@@ -268,12 +268,12 @@
 
     <!-- Content -->
     <div class="main-content">
-        @yield('content')
+        <?php echo $__env->yieldContent('content'); ?>
     </div>
 
     <!-- Footer -->
     <div class="footer">
-        &copy; {{ date('Y') }} StaffLog.adl — Sistem Manajemen Kehadiran Karyawan
+        &copy; <?php echo e(date('Y')); ?> StaffLog.adl — Sistem Manajemen Kehadiran Karyawan
     </div>
 
 </div>
@@ -307,6 +307,7 @@
     });
 </script>
 
-@stack('scripts')
+<?php echo $__env->yieldPushContent('scripts'); ?>
 </body>
 </html>
+<?php /**PATH C:\laragon\www\NEW\StaffLog.adl\resources\views/layouts/admin-layout.blade.php ENDPATH**/ ?>

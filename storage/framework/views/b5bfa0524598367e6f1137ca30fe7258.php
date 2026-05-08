@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StaffLog - @yield('title', 'Karyawan Panel')</title>
+    <title>StaffLog - <?php echo $__env->yieldContent('title', 'Karyawan Panel'); ?></title>
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -385,19 +385,19 @@
         <div class="text-xs font-semibold text-slate-400 mt-2">StaffLog.adl</div>
     </div>
     <nav class="p-4">
-        <a href="{{ url('/karyawan/dashboard') }}" class="sidebar-link">
+        <a href="<?php echo e(url('/karyawan/dashboard')); ?>" class="sidebar-link">
             <i class="bi bi-speedometer2 text-xl"></i>
             <span>Dashboard</span>
         </a>
-        <a href="{{ url('/karyawan/rekap-absen') }}" class="sidebar-link">
+        <a href="<?php echo e(url('/karyawan/rekap-absen')); ?>" class="sidebar-link">
             <i class="bi bi-calendar-check text-xl"></i>
             <span>Rekap Kehadiran</span>
         </a>
-        <a href="{{ url('/karyawan/izin-cuti') }}" class="sidebar-link">
+        <a href="<?php echo e(url('/karyawan/izin-cuti')); ?>" class="sidebar-link">
             <i class="bi bi-file-text text-xl"></i>
             <span>Izin & Cuti</span>
         </a>
-        <a href="{{ url('/karyawan/profile') }}" class="sidebar-link">
+        <a href="<?php echo e(url('/karyawan/profile')); ?>" class="sidebar-link">
             <i class="bi bi-person-circle text-xl"></i>
             <span>Profile</span>
         </a>
@@ -413,9 +413,9 @@
             </button>
         </div>
         <div class="flex items-center gap-4">
-            <span class="text-sm text-slate-600 hidden sm:block">Halo, <span id="userName">{{ session('pengguna_nama', 'Karyawan') }}</span></span>
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
+            <span class="text-sm text-slate-600 hidden sm:block">Halo, <span id="userName"><?php echo e(session('pengguna_nama', 'Karyawan')); ?></span></span>
+            <form action="<?php echo e(route('logout')); ?>" method="POST">
+                <?php echo csrf_field(); ?>
                 <button type="submit" class="logout-btn">
                     <i class="bi bi-box-arrow-right"></i>
                     <span>Logout</span>
@@ -425,11 +425,11 @@
     </div>
 
     <div class="main-content">
-        @yield('content')
+        <?php echo $__env->yieldContent('content'); ?>
     </div>
 
     <div class="footer">
-        <p>&copy; {{ date('Y') }} StaffLog.adl - Sistem Manajemen Kehadiran Karyawan</p>
+        <p>&copy; <?php echo e(date('Y')); ?> StaffLog.adl - Sistem Manajemen Kehadiran Karyawan</p>
     </div>
 </div>
 
@@ -481,6 +481,7 @@
     });
 </script>
 
-@stack('scripts')
+<?php echo $__env->yieldPushContent('scripts'); ?>
 </body>
 </html>
+<?php /**PATH C:\laragon\www\NEW\StaffLog.adl\resources\views/layouts/karyawan-layout.blade.php ENDPATH**/ ?>

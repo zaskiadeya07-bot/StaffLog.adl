@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
+use App\Models\Pengguna;
 
 class LoginController extends Controller
 {
@@ -13,7 +15,12 @@ class LoginController extends Controller
      */
     public function index()
     {
-        return view('login'); // Pastikan file blade Anda ada di resources/views/auth/login.blade.php
+        // Jika sudah login, redirect langsung sesuai role
+        if (Session::has('pengguna_id')) {
+            return $this->redirectByRole(Session::get('pengguna_role'));
+        }
+
+        return view('auth.login');
     }
 
     /**
@@ -21,28 +28,33 @@ class LoginController extends Controller
      */
     public function authenticate(Request $request): RedirectResponse
     {
-        // 1. Validasi input
-        $credentials = $request->validate([
-            'name' => ['required'],
-            'password' => ['required'],
+        $request->validate([
+            'username' => ['required', 'string'],
+            'password' => ['required', 'string'],
+        ], [
+            'username.required' => 'Username harus diisi.',
+            'password.required' => 'Password harus diisi.',
         ]);
 
-        // 2. Coba login (Attempt)
-        // 'remember' diambil dari checkbox di form
-        $remember = $request->has('remember');
+        // Cari pengguna berdasarkan username
+        $pengguna = Pengguna::where('username', $request->username)->first();
 
-        if (Auth::attempt($credentials, $remember)) {
-            // 3. Regenerasi session untuk keamanan (mencegah session fixation)
-            $request->session()->regenerate();
-
-            // 4. Redirect ke halaman yang dituju sebelumnya atau ke dashboard
-            return redirect()->intended('dashboard');
+        // Cek pengguna ada dan password cocok
+        if (!$pengguna || !Hash::check($request->password, $pengguna->password)) {
+            return back()
+                ->withErrors(['username' => 'Username atau password yang Anda masukkan salah.'])
+                ->onlyInput('username');
         }
 
-        // 5. Jika gagal, kembalikan ke login dengan pesan error
-        return back()->withErrors([
-            'name' => 'Name atau password yang Anda masukkan salah.',
-        ])->onlyInput('name');
+        // Simpan data sesi
+        Session::put('pengguna_id',       $pengguna->id_pengguna);
+        Session::put('pengguna_nama',     $pengguna->nama_lengkap);
+        Session::put('pengguna_username', $pengguna->username);
+        Session::put('pengguna_role',     $pengguna->role);
+        Session::put('pengguna_divisi',   $pengguna->divisi);
+
+        // Redirect otomatis sesuai role
+        return $this->redirectByRole($pengguna->role);
     }
 
     /**
@@ -50,11 +62,21 @@ class LoginController extends Controller
      */
     public function logout(Request $request): RedirectResponse
     {
-        Auth::logout();
-
-        $request->session()->invalidate();
+        Session::flush();
         $request->session()->regenerateToken();
 
-        return redirect('/login');
+        return redirect()->route('login')->with('success', 'Anda berhasil keluar.');
+    }
+
+    /**
+     * Redirect ke halaman sesuai role.
+     */
+    private function redirectByRole(string $role): RedirectResponse
+    {
+        return match ($role) {
+            'admin'    => redirect()->route('admin.rekap-karyawan'),
+            'karyawan' => redirect()->route('karyawan.dashboard'),
+            default    => redirect()->route('login'),
+        };
     }
 }

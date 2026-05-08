@@ -15,47 +15,49 @@
     <div class="w-full max-w-md px-4">
         <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-xl">
 
-            {{-- Header --}}
+            
             <div class="text-center mb-8">
                 <h1 class="text-3xl font-bold text-slate-800">StaffLog</h1>
                 <p class="text-slate-500 text-sm">Masuk ke akun Anda</p>
             </div>
 
-            {{-- Pesan error dari server --}}
-            @if ($errors->any())
+            
+            <?php if($errors->any()): ?>
                 <div class="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4 flex items-center gap-2">
                     <i class="bi bi-exclamation-triangle-fill"></i>
-                    {{ $errors->first() }}
-                </div>
-            @endif
+                    <?php echo e($errors->first()); ?>
 
-            {{-- Pesan sukses (misal setelah logout) --}}
-            @if (session('success'))
+                </div>
+            <?php endif; ?>
+
+            
+            <?php if(session('success')): ?>
                 <div class="bg-green-50 text-green-600 p-3 rounded-lg text-sm mb-4 flex items-center gap-2">
                     <i class="bi bi-check-circle-fill"></i>
-                    {{ session('success') }}
+                    <?php echo e(session('success')); ?>
+
                 </div>
-            @endif
+            <?php endif; ?>
 
-            {{-- Form login — POST ke server, role dicek otomatis --}}
-            <form action="{{ route('login.post') }}" method="POST">
-                @csrf
+            
+            <form action="<?php echo e(route('login.post')); ?>" method="POST">
+                <?php echo csrf_field(); ?>
 
-                {{-- Username --}}
+                
                 <div class="mb-4">
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Username</label>
                     <input
                         type="text"
                         name="username"
-                        value="{{ old('username') }}"
+                        value="<?php echo e(old('username')); ?>"
                         autocomplete="username"
                         autofocus
                         class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 transition
-                               {{ $errors->has('username') ? 'border-red-400 focus:ring-red-200' : 'border-slate-200 focus:ring-slate-200' }}"
+                               <?php echo e($errors->has('username') ? 'border-red-400 focus:ring-red-200' : 'border-slate-200 focus:ring-slate-200'); ?>"
                         placeholder="Masukkan username">
                 </div>
 
-                {{-- Password --}}
+                
                 <div class="mb-6">
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Password</label>
                     <div class="relative">
@@ -73,7 +75,7 @@
                     </div>
                 </div>
 
-                {{-- Submit --}}
+                
                 <button type="submit"
                     class="w-full bg-slate-800 text-white py-3 rounded-xl font-semibold hover:bg-slate-700 active:scale-[0.98] transition">
                     <i class="bi bi-box-arrow-in-right mr-2"></i>Masuk
@@ -98,3 +100,4 @@
     </script>
 </body>
 </html>
+<?php /**PATH C:\laragon\www\NEW\StaffLog.adl\resources\views/auth/login.blade.php ENDPATH**/ ?>
