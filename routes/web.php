@@ -3,6 +3,12 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MasterDataController;
+use App\Http\Controllers\Admin\tambah_karyawan; 
+use App\Http\Controllers\Admin\PengaturanKantorController;
+use App\Http\Controllers\Admin\DetailRekapKehadiranController;
+use App\Http\Controllers\Karyawan\absen_masuk;
+use App\Http\Controllers\Karyawan\absen_keluar;
+use Illuminate\Support\Facades\DB;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,28 +31,43 @@ Route::get('/api/setting', [MasterDataController::class, 'apiSetting'])->name('a
 
 // Admin Routes
 Route::prefix('admin')->name('admin.')->group(function () {
+
+     // Rekap Karyawan
     Route::get('/rekap-karyawan', function () {
-        return view('admin.rekap-karyawan');
+        $karyawan = DB::table('pengguna')
+            ->where('role', 'karyawan')
+            ->leftJoin('devisi', 'pengguna.divisi', '=', 'devisi.id_devisi')
+            ->select('pengguna.*', 'devisi.nama_devisi as divisi_nama')
+            ->orderBy('pengguna.nama_lengkap', 'asc')
+            ->get();
+        return view('admin.rekap-karyawan', compact('karyawan'));
     })->name('rekap-karyawan');
-
-    Route::get('/tambah-karyawan', function () {
-        return view('admin.tambah-karyawan');
-    })->name('tambah-karyawan');
-
-    Route::get('/edit-karyawan', function () {
-        return view('admin.edit-karyawan');
-    })->name('edit-karyawan');
-
+    
+    // Tambah Karyawan
+    Route::get('/tambah-karyawan', [tambah_karyawan::class, 'index'])->name('tambah-karyawan');
+    Route::post('/tambah-karyawan', [tambah_karyawan::class, 'store'])->name('tambah-karyawan.store');
+    
+    // Edit Karyawan
+    Route::get('/edit-karyawan/{id}', [tambah_karyawan::class, 'edit'])->name('edit-karyawan');
+    Route::put('/edit-karyawan/{id}', [tambah_karyawan::class, 'update'])->name('edit-karyawan.update');
+    
+    // Hapus Karyawan
+    Route::delete('/hapus-karyawan/{id}', [tambah_karyawan::class, 'destroy'])->name('hapus-karyawan');
+    
+    // Notifikasi
     Route::get('/notifikasi', function () {
         return view('admin.notifikasi');
     })->name('notifikasi');
-
-    Route::get('/detail-rekap-kehadiran', function () {
-        return view('admin.detail-rekap-kehadiran');
-    })->name('detail-rekap-kehadiran');
-
-    Route::get('/pengaturan-kantor',  [MasterDataController::class, 'index'])->name('pengaturan-kantor');
-    Route::post('/pengaturan-kantor', [MasterDataController::class, 'update'])->name('pengaturan-kantor.update');
+    
+    // Detail Rekap Kehadiran
+    Route::get('/detail-rekap-kehadiran/{id}', [DetailRekapKehadiranController::class, 'index'])
+    ->name('detail-rekap-kehadiran');
+    
+     // Pengaturan Kantor   
+    Route::get('/pengaturan-kantor', [PengaturanKantorController::class, 'index'])
+        ->name('pengaturan-kantor');
+    Route::post('/pengaturan-kantor', [PengaturanKantorController::class, 'update'])
+        ->name('pengaturan-kantor.update');
 });
 
 // Karyawan Routes
@@ -93,13 +114,11 @@ Route::prefix('karyawan')->name('karyawan.')->group(function () {
         return back()->with('password_success', 'Password berhasil diubah!');
     })->name('password.update');
 
-    Route::get('/check-in', function () {
-        $setting = \App\Models\MasterData::first();
-        return view('karyawan.check-in', compact('setting'));
-    })->name('check-in');
+    Route::get('/check-in', [absen_masuk::class, 'index'])->name('check-in');
+    Route::get('/checkin/status', [absen_masuk::class, 'status'])->name('checkin.status');
+    Route::post('/checkin/store', [absen_masuk::class, 'store'])->name('checkin.store');
 
-    Route::get('/check-out', function () {
-        $setting = \App\Models\MasterData::first();
-        return view('karyawan.check-out', compact('setting'));
-    })->name('check-out');
+    Route::get('/check-out', [absen_keluar::class, 'index'])->name('check-out');
+    Route::get('/checkout/status', [absen_keluar::class, 'status'])->name('checkout.status');
+    Route::post('/checkout/store', [absen_keluar::class, 'store'])->name('checkout.store');
 });
