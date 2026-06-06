@@ -1,8 +1,6 @@
-@extends('layouts.karyawan-layout')
+<?php $__env->startSection('title', 'Izin & Cuti'); ?>
 
-@section('title', 'Izin & Cuti')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div>
     <div class="flex justify-between items-center flex-wrap gap-3 mb-6">
         <div>
@@ -423,4 +421,5 @@
         color: #dc2626;
     }
 </style>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.karyawan-layout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\StaffLog.adl\resources\views/karyawan/izin-cuti.blade.php ENDPATH**/ ?>

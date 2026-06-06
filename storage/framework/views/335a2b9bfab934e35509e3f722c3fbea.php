@@ -1,8 +1,6 @@
-@extends('layouts.admin-layout')
+<?php $__env->startSection('title', 'Notifikasi Perizinan'); ?>
 
-@section('title', 'Notifikasi Perizinan')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div>
     <div class="flex justify-between items-center flex-wrap gap-3 mb-6">
         <div>
@@ -204,7 +202,7 @@ function updateStatus(status) {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
         },
         body: JSON.stringify({
             status: status,
@@ -261,4 +259,5 @@ document.getElementById('rejectBtn')?.addEventListener('click', () => updateStat
 // Load data pertama kali
 loadData();
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.admin-layout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\StaffLog.adl\resources\views/admin/notifikasi.blade.php ENDPATH**/ ?>

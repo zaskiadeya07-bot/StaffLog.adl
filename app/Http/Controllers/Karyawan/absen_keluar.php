@@ -210,7 +210,7 @@ class absen_keluar extends Controller
             
             return response()->json([
                 'success' => true,
-                'message' => '✅ Check Out Berhasil! Istirahat yang cukup!',
+                'message' => 'Check Out Berhasil! Selamat Beristirahat!',
                 'code' => 'SUCCESS',
                 'data' => [
                     'check_out_time' => $presensi->check_out,

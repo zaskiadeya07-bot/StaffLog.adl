@@ -122,21 +122,24 @@
                                 {{ \Carbon\Carbon::parse($p->tanggal)->locale('id')->isoFormat('dddd') }}
                             </td>
                             <td class="px-4 py-3 text-sm text-slate-600 font-mono">
-                                {{ $p->jam_masuk ?? '-' }}
+                                {{ $p->check_in ?? '-' }}
                             </td>
                             <td class="px-4 py-3 text-sm text-slate-600 font-mono">
-                                {{ $p->jam_keluar ?? '-' }}
+                                {{ $p->check_out ?? '-' }}
                             </td>
                             <td class="px-4 py-3">
-                                @if($p->status_kehadiran == 'hadir')
+                                @php
+                                    $status = $p->status ?? 'alpha';
+                                @endphp
+                                @if($status == 'hadir')
                                     <span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs">
                                         <i class="bi bi-check-circle"></i> Hadir
                                     </span>
-                                @elseif($p->status_kehadiran == 'terlambat')
+                                @elseif($status == 'terlambat')
                                     <span class="bg-amber-100 text-amber-700 px-2 py-1 rounded-full text-xs">
                                         <i class="bi bi-clock-history"></i> Terlambat
                                     </span>
-                                @elseif($p->status_kehadiran == 'izin')
+                                @elseif($status == 'izin')
                                     <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs">
                                         <i class="bi bi-pencil-square"></i> Izin
                                     </span>
@@ -147,7 +150,7 @@
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-sm text-slate-600">
-                                {{ $p->menit_terlambat > 0 ? $p->menit_terlambat . ' menit' : '-' }}
+                                {{ ($p->menit_terlambat ?? 0) > 0 ? ($p->menit_terlambat ?? 0) . ' menit' : '-' }}
                             </td>
                         </tr>
                         @empty

@@ -6,8 +6,10 @@ use App\Http\Controllers\MasterDataController;
 use App\Http\Controllers\Admin\tambah_karyawan; 
 use App\Http\Controllers\Admin\PengaturanKantorController;
 use App\Http\Controllers\Admin\DetailRekapKehadiranController;
+use App\Http\Controllers\Admin\NotifikasiController;
 use App\Http\Controllers\Karyawan\absen_masuk;
 use App\Http\Controllers\Karyawan\absen_keluar;
+use App\Http\Controllers\Karyawan\IzinCutiController;
 use Illuminate\Support\Facades\DB;
 
 /*
@@ -29,10 +31,12 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 // API Publik — pengaturan kantor (dipakai oleh view karyawan via fetch/axios)
 Route::get('/api/setting', [MasterDataController::class, 'apiSetting'])->name('api.setting');
 
-// Admin Routes
+// =========================================================================
+// ADMIN ROUTES
+// =========================================================================
 Route::prefix('admin')->name('admin.')->group(function () {
 
-     // Rekap Karyawan
+    // Rekap Karyawan
     Route::get('/rekap-karyawan', function () {
         $karyawan = DB::table('pengguna')
             ->where('role', 'karyawan')
@@ -54,42 +58,47 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Hapus Karyawan
     Route::delete('/hapus-karyawan/{id}', [tambah_karyawan::class, 'destroy'])->name('hapus-karyawan');
     
-    // Notifikasi
-    Route::get('/notifikasi', function () {
-        return view('admin.notifikasi');
-    })->name('notifikasi');
+    // NOTIFIKASI PERIZINAN (sudah diperbaiki)
+    Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi');
+    Route::get('/notifikasi/data', [NotifikasiController::class, 'getData'])->name('notifikasi.data');
+    Route::put('/notifikasi/{id}', [NotifikasiController::class, 'updateStatus'])->name('notifikasi.update');
     
     // Detail Rekap Kehadiran
-    Route::get('/detail-rekap-kehadiran/{id}', [DetailRekapKehadiranController::class, 'index'])
-    ->name('detail-rekap-kehadiran');
+    Route::get('/detail-rekap-kehadiran/{id}', [DetailRekapKehadiranController::class, 'index'])->name('detail-rekap-kehadiran');
     
-     // Pengaturan Kantor   
-    Route::get('/pengaturan-kantor', [PengaturanKantorController::class, 'index'])
-        ->name('pengaturan-kantor');
-    Route::post('/pengaturan-kantor', [PengaturanKantorController::class, 'update'])
-        ->name('pengaturan-kantor.update');
+    // Pengaturan Kantor   
+    Route::get('/pengaturan-kantor', [PengaturanKantorController::class, 'index'])->name('pengaturan-kantor');
+    Route::post('/pengaturan-kantor', [PengaturanKantorController::class, 'update'])->name('pengaturan-kantor.update');
 });
 
-// Karyawan Routes
+// =========================================================================
+// KARYAWAN ROUTES
+// =========================================================================
 Route::prefix('karyawan')->name('karyawan.')->group(function () {
+    
+    // Dashboard
     Route::get('/dashboard', function () {
         return view('karyawan.dashboard');
     })->name('dashboard');
 
+    // Rekap Absen
     Route::get('/rekap-absen', function () {
         return view('karyawan.rekap-absen');
     })->name('rekap-absen');
 
-    Route::get('/izin-cuti', function () {
-        return view('karyawan.izin-cuti');
-    })->name('izin-cuti');
+    // IZIN CUTI (sudah diperbaiki)
+    Route::get('/izin-cuti', [IzinCutiController::class, 'index'])->name('izin-cuti');
+    Route::post('/izin-cuti/store', [IzinCutiController::class, 'store'])->name('izin-cuti.store');
+    Route::get('/izin-cuti/data', [IzinCutiController::class, 'getData'])->name('izin-cuti.data');
 
+    // Profile
     Route::get('/profile', function () {
         $pengguna = \App\Models\Pengguna::with('devisi')
             ->find(session('pengguna_id'));
         return view('karyawan.profile', compact('pengguna'));
     })->name('profile');
 
+    // Ganti Password
     Route::put('/profile/password', function (\Illuminate\Http\Request $request) {
         $request->validate([
             'password_lama'              => ['required'],
@@ -114,10 +123,12 @@ Route::prefix('karyawan')->name('karyawan.')->group(function () {
         return back()->with('password_success', 'Password berhasil diubah!');
     })->name('password.update');
 
+    // CHECK IN
     Route::get('/check-in', [absen_masuk::class, 'index'])->name('check-in');
     Route::get('/checkin/status', [absen_masuk::class, 'status'])->name('checkin.status');
     Route::post('/checkin/store', [absen_masuk::class, 'store'])->name('checkin.store');
 
+    // CHECK OUT
     Route::get('/check-out', [absen_keluar::class, 'index'])->name('check-out');
     Route::get('/checkout/status', [absen_keluar::class, 'status'])->name('checkout.status');
     Route::post('/checkout/store', [absen_keluar::class, 'store'])->name('checkout.store');

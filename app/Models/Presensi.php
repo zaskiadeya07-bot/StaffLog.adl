@@ -28,17 +28,18 @@ class Presensi extends Model
         'id_pengaturan',
         'id_izin',
         'tanggal',
-        'jam_masuk',
-        'lat_masuk',
-        'long_masuk',
-        'jam_keluar',
-        'lat_keluar',
-        'long_keluar',
-        'status_kehadiran',
+        'hari',
+        'check_in',
+        'check_in_lat',
+        'check_in_lng',
+        'check_out',
+        'check_out_lat',
+        'check_out_lng',
+        'status',
+        'keterangan',
         'menit_terlambat',
         'catatan_keterlambatan',
     ];
-
     /*
     |--------------------------------------------------------------------------
     | Attribute Casting
@@ -46,13 +47,12 @@ class Presensi extends Model
     */
 
     protected $casts = [
-        'tanggal'          => 'date',
-        'lat_masuk'        => 'decimal:8',
-        'long_masuk'       => 'decimal:8',
-        'lat_keluar'       => 'decimal:8',
-        'long_keluar'      => 'decimal:8',
-        'menit_terlambat'  => 'integer',
-        'status_kehadiran' => 'string',
+        'tanggal' => 'date',
+        'check_in_lat' => 'decimal:8',
+        'check_in_lng' => 'decimal:8',
+        'check_out_lat' => 'decimal:8',
+        'check_out_lng' => 'decimal:8',
+        'menit_terlambat' => 'integer',
     ];
 
     /*
