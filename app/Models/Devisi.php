@@ -37,9 +37,4 @@ class Devisi extends Model
     {
         return $this->hasMany(Pengguna::class, 'divisi', 'id_devisi');
     }
-
-    public function karyawan(): HasMany
-    {
-        return $this->hasMany(Pengguna::class, 'divisi', 'id_devisi');
-    }
 }

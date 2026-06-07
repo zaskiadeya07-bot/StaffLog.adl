@@ -188,14 +188,14 @@
                         </label>
                         <div class="relative">
                             <input type="password" name="password_lama" id="passwordLama"
-                                class="w-full px-4 py-2.5 pr-10 border {{ isset($errors) && $errors->has('password_lama') ? 'border-red-400' : 'border-slate-200' }} rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-200"
+                                class="w-full px-4 py-2.5 pr-10 border {{ $errors->has('password_lama') ? 'border-red-400' : 'border-slate-200' }} rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-200"
                                 placeholder="Masukkan password saat ini" autocomplete="current-password">
                             <button type="button" onclick="togglePass('passwordLama', 'eyeLama')"
                                 class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                                 <i class="bi bi-eye" id="eyeLama"></i>
                             </button>
                         </div>
-                        @if (isset($errors) && $errors->has('password_lama'))
+                        @if ($errors->has('password_lama'))
                             <p class="text-xs text-red-500 mt-1">{{ $errors->first('password_lama') }}</p>
                         @endif
                     </div>
@@ -207,14 +207,14 @@
                         </label>
                         <div class="relative">
                             <input type="password" name="password_baru" id="passwordBaru"
-                                class="w-full px-4 py-2.5 pr-10 border {{ isset($errors) && $errors->has('password_baru') ? 'border-red-400' : 'border-slate-200' }} rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-200"
+                                class="w-full px-4 py-2.5 pr-10 border {{ $errors->has('password_baru') ? 'border-red-400' : 'border-slate-200' }} rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-200"
                                 placeholder="Minimal 6 karakter" autocomplete="new-password">
                             <button type="button" onclick="togglePass('passwordBaru', 'eyeBaru')"
                                 class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                                 <i class="bi bi-eye" id="eyeBaru"></i>
                             </button>
                         </div>
-                        @if (isset($errors) && $errors->has('password_baru'))
+                        @if ($errors->has('password_baru'))
                             <p class="text-xs text-red-500 mt-1">{{ $errors->first('password_baru') }}</p>
                         @endif
                     </div>
@@ -226,14 +226,14 @@
                         </label>
                         <div class="relative">
                             <input type="password" name="password_baru_confirmation" id="passwordKonfirmasi"
-                                class="w-full px-4 py-2.5 pr-10 border {{ isset($errors) && $errors->has('password_baru_confirmation') ? 'border-red-400' : 'border-slate-200' }} rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-200"
+                                class="w-full px-4 py-2.5 pr-10 border {{ $errors->has('password_baru_confirmation') ? 'border-red-400' : 'border-slate-200' }} rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-200"
                                 placeholder="Ulangi password baru" autocomplete="new-password">
                             <button type="button" onclick="togglePass('passwordKonfirmasi', 'eyeKonfirmasi')"
                                 class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                                 <i class="bi bi-eye" id="eyeKonfirmasi"></i>
                             </button>
                         </div>
-                        @if (isset($errors) && $errors->has('password_baru_confirmation'))
+                        @if ($errors->has('password_baru_confirmation'))
                             <p class="text-xs text-red-500 mt-1">{{ $errors->first('password_baru_confirmation') }}</p>
                         @endif
                     </div>

@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\MasterData;
 use App\Models\Presensi;
-use Illuminate\Support\Facades\Log;
 
 class PresensiService
 {

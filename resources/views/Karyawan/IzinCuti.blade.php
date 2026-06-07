@@ -120,7 +120,6 @@
 
 <script>
     const CSRF_TOKEN = '{{ csrf_token() }}';
-    const PENGGUNA = @json($pengguna);
     const STORAGE_URL = '{{ asset('storage') }}';
 
     let izinData = [];

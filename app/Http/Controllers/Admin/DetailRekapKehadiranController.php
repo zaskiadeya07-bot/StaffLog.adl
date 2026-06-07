@@ -11,7 +11,7 @@ class DetailRekapKehadiranController extends Controller
 {
     public function index(Request $request, $id)
     {
-        $karyawan = Pengguna::find($id);
+        $karyawan = Pengguna::with('devisi')->find($id);
 
         if (!$karyawan) {
             return redirect()
