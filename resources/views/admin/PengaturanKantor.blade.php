@@ -1,4 +1,4 @@
-@extends('layouts.admin-layout')
+@extends('layouts.AdminLayout')
 
 @section('title', 'Pengaturan Kantor')
 
@@ -553,3 +553,4 @@
     @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 @endpush
+

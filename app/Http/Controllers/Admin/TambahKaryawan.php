@@ -7,24 +7,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
-class tambah_karyawan extends Controller
+class TambahKaryawan extends Controller
 {
-    /**
-     * Menampilkan form tambah karyawan
-     */
     public function index()
     {
-        // Ambil data divisi, alias id_devisi menjadi id
         $divisis = DB::table('devisi')->select('id_devisi as id', 'nama_devisi')->get();
-        return view('admin.tambah-karyawan', compact('divisis'));
+        return view('admin.TambahKaryawan', compact('divisis'));
     }
     
-    /**
-     * Menyimpan data karyawan baru
-     */
     public function store(Request $request)
     {
-        // Validasi input
         $validated = $request->validate([
             'nama_lengkap' => 'required|string|max:100',
             'id_karyawan' => 'required|string|max:20|unique:pengguna,id_karyawan',
@@ -37,7 +29,6 @@ class tambah_karyawan extends Controller
         ]);
         
         try {
-            // Insert data ke tabel pengguna (HAPUS created_at & updated_at)
             DB::table('pengguna')->insert([
                 'nama_lengkap' => $request->nama_lengkap,
                 'id_karyawan' => $request->id_karyawan,
@@ -48,8 +39,6 @@ class tambah_karyawan extends Controller
                 'divisi' => $request->divisi,
                 'password' => Hash::make($request->password),
                 'role' => 'karyawan',
-                // 'created_at' => now(),  // HAPUS - kolom tidak ada
-                // 'updated_at' => now(),  // HAPUS - kolom tidak ada
             ]);
             
             return redirect()
@@ -64,33 +53,22 @@ class tambah_karyawan extends Controller
         }
     }
     
-    /**
-     * Menampilkan form edit karyawan
-     */
     public function edit($id)
     {
-        // Ambil data karyawan berdasarkan id_pengguna
         $karyawan = DB::table('pengguna')->where('id_pengguna', $id)->first();
-        
-        // Ambil data divisi
         $divisis = DB::table('devisi')->select('id_devisi as id', 'nama_devisi')->get();
         
-        // Jika karyawan tidak ditemukan
         if (!$karyawan) {
             return redirect()
                 ->route('admin.rekap-karyawan')
                 ->with('error', 'Karyawan tidak ditemukan');
         }
         
-        return view('admin.edit-karyawan', compact('karyawan', 'divisis'));
+        return view('admin.EditKaryawan', compact('karyawan', 'divisis'));
     }
     
-    /**
-     * Update data karyawan
-     */
     public function update(Request $request, $id)
     {
-        // Validasi input
         $request->validate([
             'nama_lengkap' => 'required|string|max:100',
             'id_karyawan' => 'required|string|max:20|unique:pengguna,id_karyawan,' . $id . ',id_pengguna',
@@ -102,7 +80,6 @@ class tambah_karyawan extends Controller
         ]);
         
         try {
-            // Data yang akan diupdate
             $updateData = [
                 'nama_lengkap' => $request->nama_lengkap,
                 'id_karyawan' => $request->id_karyawan,
@@ -113,7 +90,6 @@ class tambah_karyawan extends Controller
                 'divisi' => $request->divisi,
             ];
             
-            // Jika password diisi, update password
             if ($request->filled('password')) {
                 $request->validate([
                     'password' => 'min:6|confirmed'
@@ -121,7 +97,6 @@ class tambah_karyawan extends Controller
                 $updateData['password'] = Hash::make($request->password);
             }
             
-            // Update data ke database
             DB::table('pengguna')->where('id_pengguna', $id)->update($updateData);
             
             return redirect()
@@ -135,45 +110,38 @@ class tambah_karyawan extends Controller
                 ->withInput();
         }
     }
-    /**
- * Hapus karyawan
- */
-public function destroy($id)
-{
-    try {
-        // Cek apakah karyawan memiliki data di tabel perizinan
-        $perizinan = DB::table('perizinan')
-            ->where('id_pengguna_pengaju', $id)
-            ->orWhere('id_admin_validator', $id)
-            ->exists();
-        
-        if ($perizinan) {
-            // Hapus data perizinan terkait terlebih dahulu
-            DB::table('perizinan')
+    
+    public function destroy($id)
+    {
+        try {
+            $perizinan = DB::table('perizinan')
                 ->where('id_pengguna_pengaju', $id)
                 ->orWhere('id_admin_validator', $id)
-                ->delete();
-        }
-        
-        // Cek apakah karyawan memiliki data presensi
-        $presensi = DB::table('presensi')->where('id_pengguna', $id)->exists();
-        
-        if ($presensi) {
-            // Hapus data presensi terkait
-            DB::table('presensi')->where('id_pengguna', $id)->delete();
-        }
-        
-        // Setelah data terkait dihapus, baru hapus karyawan
-        DB::table('pengguna')->where('id_pengguna', $id)->delete();
-        
-        return redirect()
-            ->route('admin.rekap-karyawan')
-            ->with('success', 'Karyawan berhasil dihapus!');
+                ->exists();
             
-    } catch (\Exception $e) {
-        return redirect()
-            ->back()
-            ->with('error', 'Gagal menghapus karyawan: ' . $e->getMessage());
+            if ($perizinan) {
+                DB::table('perizinan')
+                    ->where('id_pengguna_pengaju', $id)
+                    ->orWhere('id_admin_validator', $id)
+                    ->delete();
+            }
+            
+            $presensi = DB::table('presensi')->where('id_pengguna', $id)->exists();
+            
+            if ($presensi) {
+                DB::table('presensi')->where('id_pengguna', $id)->delete();
+            }
+            
+            DB::table('pengguna')->where('id_pengguna', $id)->delete();
+            
+            return redirect()
+                ->route('admin.rekap-karyawan')
+                ->with('success', 'Karyawan berhasil dihapus!');
+                
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Gagal menghapus karyawan: ' . $e->getMessage());
+        }
     }
-}
 }

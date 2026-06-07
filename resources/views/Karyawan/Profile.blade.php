@@ -1,4 +1,4 @@
-@extends('layouts.karyawan-layout')
+@extends('layouts.KaryawanLayout')
 
 @section('title', 'Profil Saya')
 
@@ -266,3 +266,4 @@ function togglePass(inputId, iconId) {
 </script>
 
 @endsection
+

@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
-class absen_masuk extends Controller
+class AbsenMasuk extends Controller
 {
     public function index()
     {
@@ -27,7 +27,7 @@ class absen_masuk extends Controller
             return redirect()->route('login')->with('error', 'Akun tidak ditemukan.');
         }
         
-        return view('karyawan.check-in', compact('setting', 'pengguna'));
+        return view('karyawan.CheckIn', compact('setting', 'pengguna'));
     }
     
     public function status()
@@ -78,7 +78,6 @@ class absen_masuk extends Controller
                 return response()->json(['success' => false, 'message' => 'Data pengguna tidak ditemukan.'], 404);
             }
             
-            // Cek sudah check in hari ini
             $existingPresensi = Presensi::where('id_pengguna', $penggunaId)
                 ->whereDate('tanggal', today())
                 ->first();
@@ -88,7 +87,6 @@ class absen_masuk extends Controller
                 return response()->json(['success' => false, 'message' => 'Anda sudah melakukan check in hari ini!'], 400);
             }
             
-            // Validasi radius
             $setting = MasterData::first();
             $jarak = null;
             
@@ -106,12 +104,9 @@ class absen_masuk extends Controller
                 }
             }
             
-            // PERBAIKAN: Format waktu yang benar (HH:MM:SS) bukan HH.MM.SS
             $jamMasukRaw = $request->jam_masuk ?? now()->format('H:i:s');
-            // Bersihkan format: ganti titik menjadi titik dua
             $jamMasuk = str_replace('.', ':', $jamMasukRaw);
             
-            // Hitung keterlambatan
             $menitTerlambat = 0;
             if ($setting && $jamMasuk) {
                 $jamStandar = strtotime($setting->jam_masuk_std);
@@ -120,11 +115,10 @@ class absen_masuk extends Controller
                 $menitTerlambat = max(0, $menitTerlambat - ($setting->toleransi ?? 0));
             }
             
-            // Simpan dengan format yang benar
             $presensi = Presensi::create([
                 'id_pengguna' => $penggunaId,
                 'tanggal' => today()->toDateString(),
-                'check_in' => $jamMasuk,  // Sekarang formatnya 19:06:54 (bukan 19.06.54)
+                'check_in' => $jamMasuk,
                 'check_in_lat' => $request->latitude,
                 'check_in_lng' => $request->longitude,
                 'status' => $menitTerlambat > 0 ? 'terlambat' : 'hadir',

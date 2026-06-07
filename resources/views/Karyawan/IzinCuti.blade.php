@@ -1,4 +1,4 @@
-@extends('layouts.karyawan-layout')
+@extends('layouts.KaryawanLayout')
 
 @section('title', 'Izin & Cuti')
 

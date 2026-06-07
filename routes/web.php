@@ -3,12 +3,12 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MasterDataController;
-use App\Http\Controllers\Admin\tambah_karyawan; 
+use App\Http\Controllers\Admin\TambahKaryawan; 
 use App\Http\Controllers\Admin\PengaturanKantorController;
 use App\Http\Controllers\Admin\DetailRekapKehadiranController;
 use App\Http\Controllers\Admin\NotifikasiController;
-use App\Http\Controllers\Karyawan\absen_masuk;
-use App\Http\Controllers\Karyawan\absen_keluar;
+use App\Http\Controllers\Karyawan\AbsenMasuk;
+use App\Http\Controllers\Karyawan\AbsenKeluar;
 use App\Http\Controllers\Karyawan\IzinCutiController;
 use Illuminate\Support\Facades\DB;
 
@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\DB;
 
 // Landing Page
 Route::get('/', function () {
-    return view('landing.index');
+    return view('landing.Index');
 })->name('landing');
 
 // Login
@@ -44,19 +44,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
             ->select('pengguna.*', 'devisi.nama_devisi as divisi_nama')
             ->orderBy('pengguna.nama_lengkap', 'asc')
             ->get();
-        return view('admin.rekap-karyawan', compact('karyawan'));
+        return view('admin.RekapKaryawan', compact('karyawan'));
     })->name('rekap-karyawan');
     
     // Tambah Karyawan
-    Route::get('/tambah-karyawan', [tambah_karyawan::class, 'index'])->name('tambah-karyawan');
-    Route::post('/tambah-karyawan', [tambah_karyawan::class, 'store'])->name('tambah-karyawan.store');
+    Route::get('/tambah-karyawan', [TambahKaryawan::class, 'index'])->name('tambah-karyawan');
+    Route::post('/tambah-karyawan', [TambahKaryawan::class, 'store'])->name('tambah-karyawan.store');
     
     // Edit Karyawan
-    Route::get('/edit-karyawan/{id}', [tambah_karyawan::class, 'edit'])->name('edit-karyawan');
-    Route::put('/edit-karyawan/{id}', [tambah_karyawan::class, 'update'])->name('edit-karyawan.update');
+    Route::get('/edit-karyawan/{id}', [TambahKaryawan::class, 'edit'])->name('edit-karyawan');
+    Route::put('/edit-karyawan/{id}', [TambahKaryawan::class, 'update'])->name('edit-karyawan.update');
     
     // Hapus Karyawan
-    Route::delete('/hapus-karyawan/{id}', [tambah_karyawan::class, 'destroy'])->name('hapus-karyawan');
+    Route::delete('/hapus-karyawan/{id}', [TambahKaryawan::class, 'destroy'])->name('hapus-karyawan');
     
     // NOTIFIKASI PERIZINAN (sudah diperbaiki)
     Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi');
@@ -78,12 +78,12 @@ Route::prefix('karyawan')->name('karyawan.')->group(function () {
     
     // Dashboard
     Route::get('/dashboard', function () {
-        return view('karyawan.dashboard');
+        return view('karyawan.Dashboard');
     })->name('dashboard');
 
     // Rekap Absen
     Route::get('/rekap-absen', function () {
-        return view('karyawan.rekap-absen');
+        return view('karyawan.RekapAbsen');
     })->name('rekap-absen');
 
     // IZIN CUTI (sudah diperbaiki)
@@ -95,7 +95,7 @@ Route::prefix('karyawan')->name('karyawan.')->group(function () {
     Route::get('/profile', function () {
         $pengguna = \App\Models\Pengguna::with('devisi')
             ->find(session('pengguna_id'));
-        return view('karyawan.profile', compact('pengguna'));
+        return view('karyawan.Profile', compact('pengguna'));
     })->name('profile');
 
     // Ganti Password
@@ -124,12 +124,12 @@ Route::prefix('karyawan')->name('karyawan.')->group(function () {
     })->name('password.update');
 
     // CHECK IN
-    Route::get('/check-in', [absen_masuk::class, 'index'])->name('check-in');
-    Route::get('/checkin/status', [absen_masuk::class, 'status'])->name('checkin.status');
-    Route::post('/checkin/store', [absen_masuk::class, 'store'])->name('checkin.store');
+    Route::get('/check-in', [AbsenMasuk::class, 'index'])->name('check-in');
+    Route::get('/checkin/status', [AbsenMasuk::class, 'status'])->name('checkin.status');
+    Route::post('/checkin/store', [AbsenMasuk::class, 'store'])->name('checkin.store');
 
     // CHECK OUT
-    Route::get('/check-out', [absen_keluar::class, 'index'])->name('check-out');
-    Route::get('/checkout/status', [absen_keluar::class, 'status'])->name('checkout.status');
-    Route::post('/checkout/store', [absen_keluar::class, 'store'])->name('checkout.store');
+    Route::get('/check-out', [AbsenKeluar::class, 'index'])->name('check-out');
+    Route::get('/checkout/status', [AbsenKeluar::class, 'status'])->name('checkout.status');
+    Route::post('/checkout/store', [AbsenKeluar::class, 'store'])->name('checkout.store');
 });

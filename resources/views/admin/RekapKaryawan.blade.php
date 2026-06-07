@@ -1,4 +1,4 @@
-@extends('layouts.admin-layout')
+@extends('layouts.AdminLayout')
 
 @section('title', 'Rekap Karyawan')
 

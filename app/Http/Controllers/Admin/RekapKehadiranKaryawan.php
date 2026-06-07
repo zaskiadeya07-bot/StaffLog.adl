@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Karyawan;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class detail_kehadiran extends Controller
+class RekapKehadiranKaryawan extends Controller
 {
     //
 }

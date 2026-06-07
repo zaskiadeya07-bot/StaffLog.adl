@@ -11,46 +11,30 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
-class absen_keluar extends Controller
+class AbsenKeluar extends Controller
 {
-    /**
-     * ===================================================================
-     * INDEX - Menampilkan Halaman Check Out
-     * ===================================================================
-     */
     public function index()
     {
-        // Kemungkinan : Session tidak ada (belum login)
         if (!session()->has('pengguna_id')) {
             return redirect()->route('login')
                 ->with('error', 'Silakan login terlebih dahulu.');
         }
         
-        // Kemungkinan : Data setting mungkin kosong
         $setting = MasterData::first();
-        
-        // Kemungkinan : Pengguna tidak ditemukan
         $pengguna = Pengguna::find(session('pengguna_id'));
         
         if (!$pengguna) {
-            // Logout jika pengguna tidak ditemukan
             session()->flush();
             return redirect()->route('login')
                 ->with('error', 'Akun tidak ditemukan. Silakan login kembali.');
         }
         
-        return view('karyawan.check-out', compact('setting', 'pengguna'));
+        return view('karyawan.CheckOut', compact('setting', 'pengguna'));
     }
     
-    /**
-     * ===================================================================
-     * STATUS - Cek Status Check Out Hari Ini
-     * ===================================================================
-     */
     public function status()
     {
         try {
-            // Kemungkinan : Session tidak ada
             if (!session()->has('pengguna_id')) {
                 return response()->json([
                     'hasCheckedOut' => false,
@@ -60,12 +44,10 @@ class absen_keluar extends Controller
             
             $penggunaId = session('pengguna_id');
             
-            // Kemungkinan : Query database
             $todayPresensi = Presensi::where('id_pengguna', $penggunaId)
                 ->whereDate('tanggal', today())
                 ->first();
             
-            // Cek apakah sudah check out
             $hasCheckedOut = $todayPresensi && !is_null($todayPresensi->check_out);
             
             return response()->json([
@@ -78,7 +60,6 @@ class absen_keluar extends Controller
             ]);
             
         } catch (\Exception $e) {
-            // Kemungkinan : Error database/koneksi
             Log::error('Error cek status check out: ' . $e->getMessage());
             
             return response()->json([
@@ -88,20 +69,11 @@ class absen_keluar extends Controller
         }
     }
     
-    /**
-     * ===================================================================
-     * STORE - Menyimpan Data Check Out
-     * ===================================================================
-     */
     public function store(Request $request)
     {
-        // Mulai transaction untuk rollback jika error
         DB::beginTransaction();
         
         try {
-            // ===========================================================
-            // KEMUNGKINAN : Validasi Input Gagal
-            // ===========================================================
             $validated = $request->validate([
                 'latitude' => 'required|numeric|between:-90,90',
                 'longitude' => 'required|numeric|between:-180,180'
@@ -114,9 +86,6 @@ class absen_keluar extends Controller
                 'longitude.between' => 'Longitude harus antara -180 dan 180'
             ]);
             
-            // ===========================================================
-            // KEMUNGKINAN : Session Tidak Ada (Belum Login)
-            // ===========================================================
             if (!session()->has('pengguna_id')) {
                 DB::rollBack();
                 return response()->json([
@@ -128,9 +97,6 @@ class absen_keluar extends Controller
             
             $penggunaId = session('pengguna_id');
             
-            // ===========================================================
-            // KEMUNGKINAN : Pengguna Tidak Ditemukan di Database
-            // ===========================================================
             $pengguna = Pengguna::find($penggunaId);
             
             if (!$pengguna) {
@@ -142,9 +108,6 @@ class absen_keluar extends Controller
                 ], 404);
             }
             
-            // ===========================================================
-            // KEMUNGKINAN : Belum Check In Hari Ini
-            // ===========================================================
             $presensi = Presensi::where('id_pengguna', $penggunaId)
                 ->whereDate('tanggal', today())
                 ->first();
@@ -158,9 +121,6 @@ class absen_keluar extends Controller
                 ], 400);
             }
             
-            // ===========================================================
-            // KEMUNGKINAN : Sudah Check Out Hari Ini
-            // ===========================================================
             if (!is_null($presensi->check_out)) {
                 DB::rollBack();
                 return response()->json([
@@ -170,9 +130,6 @@ class absen_keluar extends Controller
                 ], 400);
             }
             
-            // ===========================================================
-            // KEMUNGKINAN : Validasi Radius Kantor (Server Side)
-            // ===========================================================
             $setting = MasterData::first();
             
             if ($setting) {
@@ -197,9 +154,6 @@ class absen_keluar extends Controller
                 }
             }
             
-            // ===========================================================
-            // KEMUNGKINAN : Update Data Check Out (SUKSES)
-            // ===========================================================
             $presensi->update([
                 'check_out' => now()->toTimeString(),
                 'check_out_lat' => $request->latitude,
@@ -221,9 +175,6 @@ class absen_keluar extends Controller
             ]);
             
         } catch (ValidationException $e) {
-            // ===========================================================
-            // KEMUNGKINAN : Validasi Gagal
-            // ===========================================================
             DB::rollBack();
             
             return response()->json([
@@ -234,9 +185,6 @@ class absen_keluar extends Controller
             ], 422);
             
         } catch (\Illuminate\Database\QueryException $e) {
-            // ===========================================================
-            // KEMUNGKINAN : Error Database
-            // ===========================================================
             DB::rollBack();
             
             Log::error('Database error saat check out: ' . $e->getMessage());
@@ -248,9 +196,6 @@ class absen_keluar extends Controller
             ], 500);
             
         } catch (\Exception $e) {
-            // ===========================================================
-            // KEMUNGKINAN : Error Tidak Terduga
-            // ===========================================================
             DB::rollBack();
             
             Log::error('Error check out: ' . $e->getMessage());
@@ -264,22 +209,9 @@ class absen_keluar extends Controller
         }
     }
     
-    /**
-     * ===================================================================
-     * calculateDistance - Menghitung Jarak (Haversine Formula)
-     * ===================================================================
-     * Digunakan untuk validasi radius di server side
-     * 
-     * @param float $lat1 Latitude titik 1
-     * @param float $lon1 Longitude titik 1
-     * @param float $lat2 Latitude titik 2 (kantor)
-     * @param float $lon2 Longitude titik 2 (kantor)
-     * @return float Jarak dalam meter
-     * ===================================================================
-     */
     private function calculateDistance(float $lat1, float $lon1, float $lat2, float $lon2): float
     {
-        $earthRadius = 6371000; // Meter
+        $earthRadius = 6371000;
         
         $dLat = deg2rad($lat2 - $lat1);
         $dLon = deg2rad($lon2 - $lon1);
