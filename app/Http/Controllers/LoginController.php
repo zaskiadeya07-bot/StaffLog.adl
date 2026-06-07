@@ -46,6 +46,9 @@ class LoginController extends Controller
                 ->onlyInput('username');
         }
 
+        // Regenerasi session untuk cegah session fixation
+        $request->session()->regenerate();
+
         // Simpan data sesi
         Session::put('pengguna_id',       $pengguna->id_pengguna);
         Session::put('pengguna_nama',     $pengguna->nama_lengkap);

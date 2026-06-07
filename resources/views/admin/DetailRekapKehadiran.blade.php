@@ -11,10 +11,7 @@
             </h1>
             <p class="text-slate-500 text-sm" id="employeeInfo">
                 <i class="bi bi-building"></i> 
-                @php
-                    $divisiName = DB::table('devisi')->where('id_devisi', $karyawan->divisi)->first();
-                @endphp
-                {{ $divisiName->nama_devisi ?? '-' }} | Periode: {{ $bulanNama ?? date('F') }} {{ $tahun ?? date('Y') }}
+                {{ $karyawan->devisi->nama_devisi ?? '-' }} | Periode: {{ $bulanNama ?? date('F') }} {{ $tahun ?? date('Y') }}
             </p>
         </div>
         <div class="flex gap-2">

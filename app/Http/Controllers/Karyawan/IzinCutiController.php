@@ -27,33 +27,37 @@ class IzinCutiController extends Controller
                 'tgl_mulai' => 'required|date',
                 'tgl_selesai' => 'required|date|after_or_equal:tgl_mulai',
                 'keterangan' => 'required|string|min:5',
+                'file_surat' => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:5120',
             ]);
 
             if (!session()->has('pengguna_id')) {
                 return response()->json(['success' => false, 'message' => 'Sesi login habis'], 401);
             }
 
-            // Konversi jenis_izin dari display ke database
-            $jenisDb = $this->konversiJenisIzin($request->jenis_izin);
+            $jenisDb = $this->konversiJenisIzin($validated['jenis_izin']);
 
-            // PERBAIKAN: Sesuaikan dengan struktur tabel perizinan
+            $filePath = null;
+            if ($request->hasFile('file_surat')) {
+                $filePath = $request->file('file_surat')->store('perizinan', 'public');
+            }
+
             $perizinan = Perizinan::create([
-                'id_pengguna_pengaju' => session('pengguna_id'),  // kolom yang benar
+                'id_pengguna_pengaju' => session('pengguna_id'),
                 'id_admin_validator' => null,
-                'jenis_izin' => $jenisDb,                         // cuti_tahunan / cuti_sakit / izin
+                'jenis_izin' => $jenisDb,
                 'tgl_pengajuan' => now()->toDateString(),
-                'tgl_mulai' => $request->tgl_mulai,               // kolom yang benar
-                'tgl_selesai' => $request->tgl_selesai,           // kolom yang benar
-                'keterangan' => $request->keterangan,
-                'file_surat' => null,
+                'tgl_mulai' => $validated['tgl_mulai'],
+                'tgl_selesai' => $validated['tgl_selesai'],
+                'keterangan' => $validated['keterangan'],
+                'file_surat' => $filePath,
                 'status_approval' => 'pending',
                 'catatan_admin' => null,
                 'tgl_validasi' => null,
             ]);
 
             return response()->json([
-                'success' => true, 
-                'message' => 'Permohonan berhasil dikirim', 
+                'success' => true,
+                'message' => 'Permohonan berhasil dikirim',
                 'data' => $perizinan
             ]);
 
@@ -66,21 +70,14 @@ class IzinCutiController extends Controller
         }
     }
 
-    /**
-     * Konversi jenis izin dari display ke database
-     */
     private function konversiJenisIzin($jenis)
     {
-        switch ($jenis) {
-            case 'Cuti Tahunan':
-                return 'cuti_tahunan';
-            case 'Cuti Sakit':
-                return 'cuti_sakit';
-            case 'Izin':
-                return 'izin';
-            default:
-                return 'izin';
-        }
+        return match ($jenis) {
+            'Cuti Tahunan' => 'cuti_tahunan',
+            'Cuti Sakit' => 'cuti_sakit',
+            'Izin' => 'izin',
+            default => 'izin',
+        };
     }
 
     public function getData()
@@ -88,11 +85,11 @@ class IzinCutiController extends Controller
         if (!session()->has('pengguna_id')) {
             return response()->json([]);
         }
-        
+
         $perizinan = Perizinan::where('id_pengguna_pengaju', session('pengguna_id'))
             ->orderBy('tgl_pengajuan', 'desc')
             ->get();
-        
+
         return response()->json($perizinan);
     }
 }

@@ -99,7 +99,7 @@ function getStatusBadge(status) {
 }
 
 function loadData() {
-    let url = '/admin/notifikasi/data';
+    let url = '{{ route('admin.notifikasi.data') }}';
     if (currentTab !== 'semua') {
         url += '?jenis=' + currentTab;
     }
@@ -200,7 +200,7 @@ function updateStatus(status) {
     
     const catatan = document.getElementById('catatanAdmin')?.value || '';
     
-    fetch(`/admin/notifikasi/${currentPerizinanId}`, {
+    fetch('{{ route('admin.notifikasi.update', ':id') }}'.replace(':id', currentPerizinanId), {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',

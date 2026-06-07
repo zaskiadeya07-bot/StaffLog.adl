@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Karyawan;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pengguna;
+use App\Rules\CurrentPassword;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -18,8 +19,8 @@ class ProfileController extends Controller
     public function updatePassword(Request $request)
     {
         $request->validate([
-            'password_lama'              => ['required'],
-            'password_baru'              => ['required', 'min:6', 'confirmed'],
+            'password_lama' => ['required', new CurrentPassword(session('pengguna_id'))],
+            'password_baru' => ['required', 'min:6', 'confirmed'],
         ], [
             'password_baru.confirmed' => 'Konfirmasi password tidak cocok.',
             'password_baru.min'       => 'Password baru minimal 6 karakter.',
@@ -29,14 +30,25 @@ class ProfileController extends Controller
 
         $pengguna = Pengguna::find(session('pengguna_id'));
 
-        if (!Hash::check($request->password_lama, $pengguna->password)) {
-            return back()->with('password_error', 'Password saat ini tidak sesuai.');
-        }
-
         $pengguna->update([
             'password' => Hash::make($request->password_baru),
         ]);
 
         return back()->with('password_success', 'Password berhasil diubah!');
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $pengguna = Pengguna::findOrFail(session('pengguna_id'));
+
+        $validated = $request->validate([
+            'nama_lengkap' => 'required|string|max:100',
+            'nomor_hp' => 'nullable|string|max:15',
+            'alamat' => 'nullable|string',
+        ]);
+
+        $pengguna->update($validated);
+
+        return back()->with('success', 'Profil berhasil diupdate!');
     }
 }

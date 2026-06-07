@@ -15,7 +15,7 @@ class Presensi extends Model
 
     protected $table      = 'presensi';
     protected $primaryKey = 'id_presensi';
-    public    $timestamps = false;
+    public    $timestamps = true;
 
     /*
     |--------------------------------------------------------------------------

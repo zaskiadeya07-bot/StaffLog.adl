@@ -71,7 +71,8 @@
                                        title="Edit Karyawan">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <button onclick="showDeleteModal({{ $k->id_pengguna }}, '{{ $k->nama_lengkap }}')" 
+                                    <button data-id="{{ $k->id_pengguna }}" data-name="{{ $k->nama_lengkap }}" 
+                                            onclick="showDeleteModal(this.dataset.id, this.dataset.name)" 
                                             class="bg-red-50 text-red-600 p-2 rounded-lg hover:bg-red-100 transition"
                                             title="Hapus Karyawan">
                                         <i class="bi bi-trash"></i>
@@ -130,7 +131,7 @@
     function showDeleteModal(id, name) {
         document.getElementById('deleteName').innerText = name;
         const deleteForm = document.getElementById('deleteForm');
-        deleteForm.action = '/admin/hapus-karyawan/' + id;
+        deleteForm.action = '{{ route('admin.hapus-karyawan', ':id') }}'.replace(':id', id);
         document.getElementById('deleteModal').classList.remove('hidden');
         document.getElementById('deleteModal').classList.add('flex');
     }
