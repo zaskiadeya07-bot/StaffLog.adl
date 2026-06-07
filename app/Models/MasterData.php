@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MasterData extends Model
 {
@@ -45,17 +44,4 @@ class MasterData extends Model
         'toleransi'   => 'integer',
     ];
 
-    /*
-    |--------------------------------------------------------------------------
-    | Relationships
-    |--------------------------------------------------------------------------
-    */
-
-    /**
-     * Satu pengaturan master data digunakan oleh banyak record presensi.
-     */
-    public function presensi(): HasMany
-    {
-        return $this->hasMany(Presensi::class, 'id_pengaturan', 'id_pengaturan');
-    }
 }
