@@ -16,7 +16,7 @@ class IzinCutiController extends Controller
             return redirect()->route('login');
         }
         $pengguna = Pengguna::find(session('pengguna_id'));
-        return view('karyawan.izin-cuti', compact('pengguna'));
+        return view('karyawan.IzinCuti', compact('pengguna'));
     }
 
     public function store(Request $request)
@@ -60,8 +60,8 @@ class IzinCutiController extends Controller
         } catch (\Exception $e) {
             Log::error('Error simpan izin: ' . $e->getMessage());
             return response()->json([
-                'success' => false, 
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menyimpan permohonan.'
             ], 500);
         }
     }

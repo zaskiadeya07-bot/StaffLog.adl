@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\MasterData;
 use App\Models\Pengguna;
 use App\Models\Presensi;
+use App\Services\PresensiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -13,25 +14,29 @@ use Illuminate\Validation\ValidationException;
 
 class AbsenKeluar extends Controller
 {
+    public function __construct(
+        protected PresensiService $presensiService
+    ) {}
+
     public function index()
     {
         if (!session()->has('pengguna_id')) {
             return redirect()->route('login')
                 ->with('error', 'Silakan login terlebih dahulu.');
         }
-        
+
         $setting = MasterData::first();
         $pengguna = Pengguna::find(session('pengguna_id'));
-        
+
         if (!$pengguna) {
             session()->flush();
             return redirect()->route('login')
                 ->with('error', 'Akun tidak ditemukan. Silakan login kembali.');
         }
-        
+
         return view('karyawan.CheckOut', compact('setting', 'pengguna'));
     }
-    
+
     public function status()
     {
         try {
@@ -41,38 +46,24 @@ class AbsenKeluar extends Controller
                     'error' => 'Session tidak valid'
                 ], 401);
             }
-            
-            $penggunaId = session('pengguna_id');
-            
-            $todayPresensi = Presensi::where('id_pengguna', $penggunaId)
-                ->whereDate('tanggal', today())
-                ->first();
-            
-            $hasCheckedOut = $todayPresensi && !is_null($todayPresensi->check_out);
-            
-            return response()->json([
-                'hasCheckedOut' => $hasCheckedOut,
-                'data' => $todayPresensi ? [
-                    'check_in_time' => $todayPresensi->check_in,
-                    'check_out_time' => $todayPresensi->check_out,
-                    'tanggal' => $todayPresensi->tanggal
-                ] : null
-            ]);
-            
+
+            return response()->json(
+                PresensiService::statusCheckOut(session('pengguna_id'))
+            );
         } catch (\Exception $e) {
             Log::error('Error cek status check out: ' . $e->getMessage());
-            
+
             return response()->json([
                 'hasCheckedOut' => false,
                 'error' => 'Terjadi kesalahan pada server'
             ], 500);
         }
     }
-    
+
     public function store(Request $request)
     {
         DB::beginTransaction();
-        
+
         try {
             $validated = $request->validate([
                 'latitude' => 'required|numeric|between:-90,90',
@@ -85,7 +76,7 @@ class AbsenKeluar extends Controller
                 'longitude.numeric' => 'Longitude harus berupa angka',
                 'longitude.between' => 'Longitude harus antara -180 dan 180'
             ]);
-            
+
             if (!session()->has('pengguna_id')) {
                 DB::rollBack();
                 return response()->json([
@@ -94,11 +85,11 @@ class AbsenKeluar extends Controller
                     'code' => 'SESSION_EXPIRED'
                 ], 401);
             }
-            
+
             $penggunaId = session('pengguna_id');
-            
+
             $pengguna = Pengguna::find($penggunaId);
-            
+
             if (!$pengguna) {
                 DB::rollBack();
                 return response()->json([
@@ -107,11 +98,11 @@ class AbsenKeluar extends Controller
                     'code' => 'USER_NOT_FOUND'
                 ], 404);
             }
-            
+
             $presensi = Presensi::where('id_pengguna', $penggunaId)
                 ->whereDate('tanggal', today())
                 ->first();
-            
+
             if (!$presensi) {
                 DB::rollBack();
                 return response()->json([
@@ -120,7 +111,7 @@ class AbsenKeluar extends Controller
                     'code' => 'NO_CHECK_IN'
                 ], 400);
             }
-            
+
             if (!is_null($presensi->check_out)) {
                 DB::rollBack();
                 return response()->json([
@@ -129,39 +120,38 @@ class AbsenKeluar extends Controller
                     'code' => 'ALREADY_CHECKED_OUT'
                 ], 400);
             }
-            
+
             $setting = MasterData::first();
-            
+
             if ($setting) {
-                $distance = $this->calculateDistance(
+                $radiusCheck = $this->presensiService->checkRadius(
                     (float)$request->latitude,
                     (float)$request->longitude,
-                    (float)$setting->lat_kantor,
-                    (float)$setting->long_kantor
+                    $setting
                 );
-                
-                if ($distance > $setting->radius) {
+
+                if (!$radiusCheck['di_dalam_radius']) {
                     DB::rollBack();
                     return response()->json([
                         'success' => false,
-                        'message' => 'Anda berada di luar radius kantor. Jarak: ' . round($distance) . ' meter (Maks: ' . $setting->radius . ' meter)',
+                        'message' => 'Anda berada di luar radius kantor. Jarak: ' . round($radiusCheck['jarak']) . ' meter (Maks: ' . $setting->radius . ' meter)',
                         'code' => 'OUT_OF_RADIUS',
                         'data' => [
-                            'distance' => round($distance),
+                            'distance' => round($radiusCheck['jarak']),
                             'max_radius' => $setting->radius
                         ]
                     ], 400);
                 }
             }
-            
+
             $presensi->update([
                 'check_out' => now()->toTimeString(),
                 'check_out_lat' => $request->latitude,
                 'check_out_lng' => $request->longitude
             ]);
-            
+
             DB::commit();
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Check Out Berhasil! Selamat Beristirahat!',
@@ -173,55 +163,38 @@ class AbsenKeluar extends Controller
                     'longitude' => $presensi->check_out_lng
                 ]
             ]);
-            
+
         } catch (ValidationException $e) {
             DB::rollBack();
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Validasi data gagal. Periksa kembali input Anda.',
                 'code' => 'VALIDATION_ERROR',
                 'errors' => $e->errors()
             ], 422);
-            
+
         } catch (\Illuminate\Database\QueryException $e) {
             DB::rollBack();
-            
+
             Log::error('Database error saat check out: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan pada database. Silakan coba lagi.',
                 'code' => 'DATABASE_ERROR'
             ], 500);
-            
+
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             Log::error('Error check out: ' . $e->getMessage());
-            Log::error('Stack trace: ' . $e->getTraceAsString());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan pada server. Silakan coba lagi nanti.',
                 'code' => 'SERVER_ERROR'
             ], 500);
         }
-    }
-    
-    private function calculateDistance(float $lat1, float $lon1, float $lat2, float $lon2): float
-    {
-        $earthRadius = 6371000;
-        
-        $dLat = deg2rad($lat2 - $lat1);
-        $dLon = deg2rad($lon2 - $lon1);
-        
-        $a = sin($dLat / 2) * sin($dLat / 2) +
-             cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
-             sin($dLon / 2) * sin($dLon / 2);
-        
-        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
-        
-        return $earthRadius * $c;
     }
 }
