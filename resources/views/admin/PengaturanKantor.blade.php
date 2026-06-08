@@ -91,7 +91,7 @@
                         id="jam_masuk_std"
                         name="jam_masuk_std"
                         class="input-field w-full"
-                        value="{{ old('jam_masuk_std', $setting->jam_masuk_std ?? '08:00') }}"
+                        value="{{ old('jam_masuk_std', substr($setting->jam_masuk_std ?? '08:00', 0, 5)) }}"
                         required
                     >
                     <p class="text-xs text-slate-400">Batas waktu karyawan dianggap hadir tepat waktu.</p>
@@ -108,7 +108,7 @@
                         id="jam_pulang_std"
                         name="jam_pulang_std"
                         class="input-field w-full"
-                        value="{{ old('jam_pulang_std', $setting->jam_pulang_std ?? '17:00') }}"
+                        value="{{ old('jam_pulang_std', substr($setting->jam_pulang_std ?? '17:00', 0, 5)) }}"
                         required
                     >
                     <p class="text-xs text-slate-400">Waktu normal karyawan diperbolehkan pulang.</p>
@@ -151,13 +151,12 @@
                         type="number"
                         id="latitude"
                         name="lat_kantor"
-                        class="input-field w-full bg-slate-50 cursor-not-allowed font-mono text-sm"
+                        class="input-field w-full font-mono text-sm"
                         step="any"
-                        readonly
                         value="{{ old('lat_kantor', $setting->lat_kantor ?? -6.20876500) }}"
                         required
                     >
-                    <p class="text-xs text-slate-400">Diperbarui otomatis saat marker dipindahkan.</p>
+                    <p class="text-xs text-slate-400">Bisa diisi manual atau otomatis dari peta.</p>
                 </div>
 
                 {{-- LONGITUDE --}}
@@ -173,13 +172,12 @@
                         type="number"
                         id="longitude"
                         name="long_kantor"
-                        class="input-field w-full bg-slate-50 cursor-not-allowed font-mono text-sm"
+                        class="input-field w-full font-mono text-sm"
                         step="any"
-                        readonly
                         value="{{ old('long_kantor', $setting->long_kantor ?? 106.84559300) }}"
                         required
                     >
-                    <p class="text-xs text-slate-400">Diperbarui otomatis saat marker dipindahkan.</p>
+                    <p class="text-xs text-slate-400">Bisa diisi manual atau otomatis dari peta.</p>
                 </div>
 
                 {{-- RADIUS --}}
@@ -367,7 +365,27 @@
     /* ── 8. EVENT: RADIUS INPUT ─────────────────────────────────────────── */
     document.getElementById('radius_meter').addEventListener('input', syncRadiusLabel);
 
-    /* ── 9. TOAST KOORDINAT ─────────────────────────────────────────────── */
+    /* ── 9. EVENT: INPUT MANUAL LAT/LNG ─────────────────────────────────── */
+    document.getElementById('latitude').addEventListener('input', function () {
+        var lat = parseFloat(this.value);
+        var lng = parseFloat(document.getElementById('longitude').value);
+        if (!isNaN(lat) && !isNaN(lng)) {
+            marker.setLatLng([lat, lng]);
+            circle.setLatLng([lat, lng]);
+            map.panTo([lat, lng], { animate: true });
+        }
+    });
+    document.getElementById('longitude').addEventListener('input', function () {
+        var lat = parseFloat(document.getElementById('latitude').value);
+        var lng = parseFloat(this.value);
+        if (!isNaN(lat) && !isNaN(lng)) {
+            marker.setLatLng([lat, lng]);
+            circle.setLatLng([lat, lng]);
+            map.panTo([lat, lng], { animate: true });
+        }
+    });
+
+    /* ── 10. TOAST KOORDINAT ─────────────────────────────────────────────── */
     let toastTimer = null;
     function showCoordToast(lat, lng) {
         let toast = document.getElementById('coordToast');
@@ -609,7 +627,23 @@
     /* ── 14. FIX: LEAFLET MAP SIZE ─────────────────────────────────────── */
     setTimeout(function () { map.invalidateSize(); }, 300);
 
-    /* ── 15. SEARCH LOKASI (Nominatim) ─────────────────────────────────── */
+    /* ── 15. AUTO DETECT LOKASI SAAT LOAD ──────────────────────────────── */
+    setTimeout(function () {
+        if (!navigator.geolocation) return;
+        navigator.geolocation.getCurrentPosition(
+            function (pos) {
+                var lat = pos.coords.latitude;
+                var lng = pos.coords.longitude;
+                updateCoords(lat, lng);
+                map.flyTo([lat, lng], 17, { animate: true, duration: 1.5 });
+                showCoordToast(lat, lng);
+            },
+            function () {},
+            { enableHighAccuracy: true, timeout: 8000 }
+        );
+    }, 500);
+
+    /* ── 16. SEARCH LOKASI (Nominatim) ─────────────────────────────────── */
     var adminSearchTimeout = null;
 
     function adminSearchLocation(query) {
@@ -715,12 +749,6 @@
     .leaflet-control-zoom a {
         font-size: 16px !important;
         border-radius: 8px !important;
-    }
-
-    /* Input readonly */
-    input[readonly] {
-        background-color: #f8fafc !important;
-        color: #475569 !important;
     }
 
     /* Swal toast tampil di atas map */

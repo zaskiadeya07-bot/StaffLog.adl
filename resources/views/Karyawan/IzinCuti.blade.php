@@ -256,25 +256,26 @@
         document.getElementById('fileInfo').classList.add('hidden');
     }
 
+    let dt = null;
+
     function renderTable() {
-        const tbody = document.getElementById('izinTableBody');
-        tbody.innerHTML = '';
-        const filtered = [...izinData].sort((a, b) => new Date(b.tanggalPengajuan + 'T00:00:00') - new Date(a.tanggalPengajuan + 'T00:00:00'));
-        if (filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-slate-400">Belum ada data permohonan</td></tr>'; return; }
-        filtered.forEach((item, index) => {
-            tbody.innerHTML += `<tr class="hover:bg-slate-50">
-                <td class="px-4 py-3 text-sm">${index+1}</td>
-                <td class="px-4 py-3 text-sm">${formatTanggal(item.tanggalPengajuan)}</td>
-                <td class="px-4 py-3 font-medium">${item.jenis}</td>
-                <td class="px-4 py-3 text-sm">${formatTanggal(item.tanggalMulai)} - ${formatTanggal(item.tanggalSelesai)}</td>
-                <td class="px-4 py-3 text-sm">${item.durasi} ${item.satuan}</td>
-                <td class="px-4 py-3">${getStatusBadgeFromStatus(item.status)}</td>
-                <td class="px-4 py-3">
-                    <button onclick="viewDetail(${item.id})" class="bg-blue-50 text-blue-600 p-2 rounded-lg hover:bg-blue-100 transition">
-                        <i class="bi bi-eye"></i>
-                    </button>
-                </td>
-            </tr>`;
+        if ($.fn.DataTable.isDataTable('#izinCutiTable')) {
+            $('#izinCutiTable').DataTable().clear().destroy();
+        }
+        dt = $('#izinCutiTable').DataTable({
+            language: { url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json' },
+            columnDefs: [{ orderable: false, targets: [0, 6] }],
+            data: izinData,
+            columns: [
+                { data: null, render: function (data, type, row, meta) { return meta.row + 1; } },
+                { data: 'tanggalPengajuan', render: function (d) { return formatTanggal(d); } },
+                { data: 'jenis' },
+                { data: null, render: function (d) { return formatTanggal(d.tanggalMulai) + ' - ' + formatTanggal(d.tanggalSelesai); } },
+                { data: null, render: function (d) { return d.durasi + ' ' + d.satuan; } },
+                { data: 'status', render: function (d) { return getStatusBadgeFromStatus(d); } },
+                { data: 'id', render: function (d) { return '<button onclick="viewDetail(' + d + ')" class="bg-blue-50 text-blue-600 p-2 rounded-lg hover:bg-blue-100 transition"><i class="bi bi-eye"></i></button>'; } }
+            ],
+            order: [[1, 'desc']]
         });
     }
 

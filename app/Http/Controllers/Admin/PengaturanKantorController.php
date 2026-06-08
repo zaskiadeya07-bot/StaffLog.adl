@@ -29,8 +29,8 @@ class PengaturanKantorController extends Controller
     public function update(Request $request)
     {
         $validated = $request->validate([
-            'jam_masuk_std' => 'required|date_format:H:i',
-            'jam_pulang_std' => 'required|date_format:H:i',
+            'jam_masuk_std' => 'required',
+            'jam_pulang_std' => 'required',
             'lat_kantor' => 'required|numeric|between:-90,90',
             'long_kantor' => 'required|numeric|between:-180,180',
             'radius' => 'required|integer|min:10|max:1000',
@@ -38,6 +38,9 @@ class PengaturanKantorController extends Controller
         ]);
 
         try {
+            $validated['jam_masuk_std']  = date('H:i:s', strtotime($validated['jam_masuk_std']));
+            $validated['jam_pulang_std'] = date('H:i:s', strtotime($validated['jam_pulang_std']));
+
             $setting = MasterData::first();
 
             if ($setting) {

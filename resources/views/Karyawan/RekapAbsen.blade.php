@@ -139,12 +139,12 @@
     }
 
     function formatTanggal(tgl) {
-        return new Date(tgl + 'T00:00:00').toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+        return new Date(tgl).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
     }
 
     function getHari(tgl) {
         const nama = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-        return nama[new Date(tgl + 'T00:00:00').getDay()];
+        return nama[new Date(tgl).getDay()];
     }
 
     function getStatusBadge(status) {
@@ -171,21 +171,33 @@
         document.getElementById('statTerlambat').innerText = terlambat;
     }
 
+    let dt = null;
+    let currentData = [];
+
     function renderTable(data) {
-        const tbody = document.getElementById('rekapTableBody');
-        tbody.innerHTML = '';
+        currentData = data;
         updateStats(data);
-        data.forEach(item => {
-            const row = `<tr class="hover:bg-slate-50 transition">
-                <td class="px-4 py-3 text-sm text-slate-600">${formatTanggal(item.tgl)}</td>
-                <td class="px-4 py-3 text-sm text-slate-600">${item.hari}</td>
-                <td class="px-4 py-3 text-sm text-slate-600">${item.jamMasuk}</td>
-                <td class="px-4 py-3 text-sm text-slate-600">${item.jamPulang}</td>
-                <td class="px-4 py-3">${getStatusBadge(item.status)}</td>
-                <td class="px-4 py-3"><button onclick='showDetail(${JSON.stringify(item)})' class="bg-blue-50 text-blue-600 p-2 rounded-lg hover:bg-blue-100 transition"><i class="bi bi-eye"></i> Detail</button></td>
-            </tr>`;
-            tbody.insertAdjacentHTML('beforeend', row);
+        if ($.fn.DataTable.isDataTable('#rekapTable')) {
+            $('#rekapTable').DataTable().clear().destroy();
+        }
+        dt = $('#rekapTable').DataTable({
+            language: { url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json' },
+            columnDefs: [{ orderable: false, targets: [5] }],
+            data: data,
+            columns: [
+                { data: 'tgl', render: function (d) { return formatTanggal(d); } },
+                { data: 'hari' },
+                { data: 'jamMasuk' },
+                { data: 'jamPulang' },
+                { data: 'status', render: function (d) { return getStatusBadge(d); } },
+                { data: null, render: function (d, t, row) { var idx = currentData.indexOf(row); return '<button onclick="showDetailByIndex(' + idx + ')" class="bg-blue-50 text-blue-600 p-2 rounded-lg hover:bg-blue-100 transition"><i class="bi bi-eye"></i> Detail</button>'; } }
+            ],
+            order: [[0, 'desc']]
         });
+    }
+
+    function showDetailByIndex(idx) {
+        showDetail(currentData[idx]);
     }
 
     function showDetail(item) {
