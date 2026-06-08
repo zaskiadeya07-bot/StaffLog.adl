@@ -79,6 +79,24 @@ Route::prefix('karyawan')->name('karyawan.')->group(function () {
     // Rekap Absen
     Route::get('/rekap-absen', [RekapAbsenController::class, 'index'])->name('rekap-absen');
 
+    // API data rekap absen (dipakai oleh view rekap-absen via fetch)
+    Route::get('/rekap/data', function (Illuminate\Http\Request $request) {
+        $penggunaId = session('pengguna_id');
+        if (!$penggunaId) {
+            return response()->json([], 401);
+        }
+        $bulan = $request->get('bulan', date('m'));
+        $tahun = $request->get('tahun', date('Y'));
+
+        $presensi = App\Models\Presensi::where('id_pengguna', $penggunaId)
+            ->whereMonth('tanggal', $bulan)
+            ->whereYear('tanggal', $tahun)
+            ->orderBy('tanggal', 'desc')
+            ->get();
+
+        return response()->json($presensi);
+    })->name('rekap.data');
+
     // IZIN CUTI (sudah diperbaiki)
     Route::get('/izin-cuti', [IzinCutiController::class, 'index'])->name('izin-cuti');
     Route::post('/izin-cuti/store', [IzinCutiController::class, 'store'])->name('izin-cuti.store');

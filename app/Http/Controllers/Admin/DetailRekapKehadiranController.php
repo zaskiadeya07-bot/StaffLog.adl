@@ -35,7 +35,6 @@ class DetailRekapKehadiranController extends Controller
             ->whereYear('tanggal', $tahun)
             ->orderBy('tanggal', 'desc')
             ->get();
-
         $statHadir = $presensi->where('status', 'hadir')->count();
         $statTerlambat = $presensi->where('status', 'terlambat')->count();
         $statIzin = $presensi->where('status', 'izin')->count();

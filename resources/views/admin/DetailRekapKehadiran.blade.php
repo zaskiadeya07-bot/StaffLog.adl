@@ -111,48 +111,51 @@
                             <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">Jam Keluar</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">Status</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">Keterlambatan</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         @if($presensi->count() > 0)
                         @foreach($presensi as $p)
+                        @php
+                            $status = $p->status ?? 'alpha';
+                            $tglFormatted = \Carbon\Carbon::parse($p->tanggal)->format('d/m/Y');
+                            $hariFormatted = \Carbon\Carbon::parse($p->tanggal)->locale('id')->isoFormat('dddd');
+                        @endphp
                         <tr class="hover:bg-slate-50 transition">
-                            <td class="px-4 py-3 text-sm text-slate-600">
-                                {{ \Carbon\Carbon::parse($p->tanggal)->format('d/m/Y') }}
-                            </td>
-                            <td class="px-4 py-3 text-sm text-slate-600">
-                                {{ \Carbon\Carbon::parse($p->tanggal)->locale('id')->isoFormat('dddd') }}
-                            </td>
-                            <td class="px-4 py-3 text-sm text-slate-600 font-mono">
-                                {{ $p->check_in ?? '-' }}
-                            </td>
-                            <td class="px-4 py-3 text-sm text-slate-600 font-mono">
-                                {{ $p->check_out ?? '-' }}
-                            </td>
+                            <td class="px-4 py-3 text-sm text-slate-600">{{ $tglFormatted }}</td>
+                            <td class="px-4 py-3 text-sm text-slate-600">{{ $hariFormatted }}</td>
+                            <td class="px-4 py-3 text-sm text-slate-600 font-mono">{{ $p->check_in ?? '-' }}</td>
+                            <td class="px-4 py-3 text-sm text-slate-600 font-mono">{{ $p->check_out ?? '-' }}</td>
                             <td class="px-4 py-3">
-                                @php
-                                    $status = $p->status ?? 'alpha';
-                                @endphp
                                 @if($status == 'hadir')
-                                    <span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs">
-                                        <i class="bi bi-check-circle"></i> Hadir
-                                    </span>
+                                    <span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs"><i class="bi bi-check-circle"></i> Hadir</span>
                                 @elseif($status == 'terlambat')
-                                    <span class="bg-amber-100 text-amber-700 px-2 py-1 rounded-full text-xs">
-                                        <i class="bi bi-clock-history"></i> Terlambat
-                                    </span>
+                                    <span class="bg-amber-100 text-amber-700 px-2 py-1 rounded-full text-xs"><i class="bi bi-clock-history"></i> Terlambat</span>
                                 @elseif($status == 'izin')
-                                    <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs">
-                                        <i class="bi bi-pencil-square"></i> Izin
-                                    </span>
+                                    <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs"><i class="bi bi-pencil-square"></i> Izin</span>
                                 @else
-                                    <span class="bg-slate-100 text-slate-600 px-2 py-1 rounded-full text-xs">
-                                        <i class="bi bi-x-circle"></i> Alpha
-                                    </span>
+                                    <span class="bg-slate-100 text-slate-600 px-2 py-1 rounded-full text-xs"><i class="bi bi-x-circle"></i> Alpha</span>
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-sm text-slate-600">
                                 {{ ($p->menit_terlambat ?? 0) > 0 ? ($p->menit_terlambat ?? 0) . ' menit' : '-' }}
+                            </td>
+                            <td class="px-4 py-3">
+                                <button onclick='showDetail({
+                                    tgl: "{{ $tglFormatted }}",
+                                    hari: "{{ $hariFormatted }}",
+                                    jamMasuk: "{{ $p->check_in ?? '-' }}",
+                                    jamPulang: "{{ $p->check_out ?? '-' }}",
+                                    status: "{{ $status }}",
+                                    keterangan: "{{ $p->catatan_keterlambatan ?? '-' }}",
+                                    latMasuk: {{ $p->check_in_lat ?? 'null' }},
+                                    lngMasuk: {{ $p->check_in_lng ?? 'null' }},
+                                    latPulang: {{ $p->check_out_lat ?? 'null' }},
+                                    lngPulang: {{ $p->check_out_lng ?? 'null' }}
+                                })' class="bg-blue-50 text-blue-600 p-2 rounded-lg hover:bg-blue-100 transition">
+                                    <i class="bi bi-eye"></i> Detail
+                                </button>
                             </td>
                         </tr>
                         @endforeach
@@ -231,8 +234,56 @@
     </div>
 </div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
     let mapMasuk, mapPulang;
+
+    function getStatusBadge(status) {
+        const map = {
+            'hadir': '<span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs"><i class="bi bi-check-circle"></i> Hadir</span>',
+            'terlambat': '<span class="bg-amber-100 text-amber-700 px-2 py-1 rounded-full text-xs"><i class="bi bi-clock-history"></i> Terlambat</span>',
+            'izin': '<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs"><i class="bi bi-pencil-square"></i> Izin</span>',
+            'alpha': '<span class="bg-slate-100 text-slate-600 px-2 py-1 rounded-full text-xs"><i class="bi bi-x-circle"></i> Alpha</span>'
+        };
+        return map[status] || map['alpha'];
+    }
+    
+    function showDetail(d) {
+        document.getElementById('detailTglHari').innerHTML = d.tgl + ' (' + d.hari + ')';
+        document.getElementById('detailStatusBadge').innerHTML = getStatusBadge(d.status);
+        document.getElementById('detailKeterangan').innerHTML = d.keterangan !== '-' ? d.keterangan : 'Tidak ada keterangan';
+        document.getElementById('detailTimeMasuk').innerHTML = d.jamMasuk !== '-' ? d.jamMasuk : '--:--';
+        document.getElementById('detailTimePulang').innerHTML = d.jamPulang !== '-' ? d.jamPulang : '--:--';
+        
+        setTimeout(() => {
+            if (mapMasuk) mapMasuk.remove();
+            if (mapPulang) mapPulang.remove();
+            
+            const divMasuk = document.getElementById('detailMapMasuk');
+            const divPulang = document.getElementById('detailMapPulang');
+            
+            if (d.latMasuk && d.lngMasuk) {
+                divMasuk.innerHTML = '<div class="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full z-[999]"><i class="bi bi-clock"></i> <span id="detailTimeMasuk">' + d.jamMasuk + '</span></div>';
+                mapMasuk = L.map('detailMapMasuk').setView([d.latMasuk, d.lngMasuk], 15);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(mapMasuk);
+                L.marker([d.latMasuk, d.lngMasuk]).addTo(mapMasuk);
+            } else {
+                divMasuk.innerHTML = '<div class="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full z-[999]"><i class="bi bi-clock"></i> --:--</div><div class="flex items-center justify-center h-full text-slate-400"><i class="bi bi-geo-alt-fill text-2xl"></i><span class="ml-2">Lokasi tidak tersedia</span></div>';
+            }
+            
+            if (d.latPulang && d.lngPulang) {
+                divPulang.innerHTML = '<div class="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full z-[999]"><i class="bi bi-clock"></i> <span id="detailTimePulang">' + d.jamPulang + '</span></div>';
+                mapPulang = L.map('detailMapPulang').setView([d.latPulang, d.lngPulang], 15);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(mapPulang);
+                L.marker([d.latPulang, d.lngPulang]).addTo(mapPulang);
+            } else {
+                divPulang.innerHTML = '<div class="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full z-[999]"><i class="bi bi-clock"></i> --:--</div><div class="flex items-center justify-center h-full text-slate-400"><i class="bi bi-geo-alt-fill text-2xl"></i><span class="ml-2">Lokasi tidak tersedia</span></div>';
+            }
+        }, 100);
+        
+        document.getElementById('detailModal').classList.remove('hidden');
+        document.getElementById('detailModal').classList.add('flex');
+    }
     
     function closeDetailModal() {
         document.getElementById('detailModal').classList.add('hidden');
