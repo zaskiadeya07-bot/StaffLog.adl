@@ -10,16 +10,16 @@ use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $pengguna = Pengguna::with('devisi')->find(session('pengguna_id'));
+        $pengguna = Pengguna::with('devisi')->find($request->session()->get('pengguna_id'));
         return view('karyawan.Profile', compact('pengguna'));
     }
 
     public function updatePassword(Request $request)
     {
         $request->validate([
-            'password_lama' => ['required', new CurrentPassword(session('pengguna_id'))],
+            'password_lama' => ['required', new CurrentPassword($request->session()->get('pengguna_id'))],
             'password_baru' => ['required', 'min:6', 'confirmed'],
         ], [
             'password_baru.confirmed' => 'Konfirmasi password tidak cocok.',
@@ -28,7 +28,7 @@ class ProfileController extends Controller
             'password_baru.required'  => 'Password baru wajib diisi.',
         ]);
 
-        $pengguna = Pengguna::find(session('pengguna_id'));
+        $pengguna = Pengguna::find($request->session()->get('pengguna_id'));
 
         $pengguna->update([
             'password' => Hash::make($request->password_baru),
@@ -39,7 +39,7 @@ class ProfileController extends Controller
 
     public function updateProfile(Request $request)
     {
-        $pengguna = Pengguna::findOrFail(session('pengguna_id'));
+        $pengguna = Pengguna::findOrFail($request->session()->get('pengguna_id'));
 
         $validated = $request->validate([
             'nama_lengkap' => 'required|string|max:100',

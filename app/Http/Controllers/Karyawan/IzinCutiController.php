@@ -10,12 +10,12 @@ use Illuminate\Support\Facades\Log;
 
 class IzinCutiController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        if (!session()->has('pengguna_id')) {
+        if (!$request->session()->has('pengguna_id')) {
             return redirect()->route('login');
         }
-        $pengguna = Pengguna::find(session('pengguna_id'));
+        $pengguna = Pengguna::find($request->session()->get('pengguna_id'));
         return view('karyawan.IzinCuti', compact('pengguna'));
     }
 
@@ -30,7 +30,7 @@ class IzinCutiController extends Controller
                 'file_surat' => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:5120',
             ]);
 
-            if (!session()->has('pengguna_id')) {
+            if (!$request->session()->has('pengguna_id')) {
                 return response()->json(['success' => false, 'message' => 'Sesi login habis'], 401);
             }
 
@@ -42,7 +42,7 @@ class IzinCutiController extends Controller
             }
 
             $perizinan = Perizinan::create([
-                'id_pengguna_pengaju' => session('pengguna_id'),
+                'id_pengguna_pengaju' => $request->session()->get('pengguna_id'),
                 'id_admin_validator' => null,
                 'jenis_izin' => $jenisDb,
                 'tgl_pengajuan' => now()->toDateString(),
@@ -80,13 +80,13 @@ class IzinCutiController extends Controller
         };
     }
 
-    public function getData()
+    public function getData(Request $request)
     {
-        if (!session()->has('pengguna_id')) {
+        if (!$request->session()->has('pengguna_id')) {
             return response()->json([]);
         }
 
-        $perizinan = Perizinan::where('id_pengguna_pengaju', session('pengguna_id'))
+        $perizinan = Perizinan::where('id_pengguna_pengaju', $request->session()->get('pengguna_id'))
             ->orderBy('tgl_pengajuan', 'desc')
             ->get();
 

@@ -18,18 +18,18 @@ class AbsenKeluar extends Controller
         protected PresensiService $presensiService
     ) {}
 
-    public function index()
+    public function index(Request $request)
     {
-        if (!session()->has('pengguna_id')) {
+        if (!$request->session()->has('pengguna_id')) {
             return redirect()->route('login')
                 ->with('error', 'Silakan login terlebih dahulu.');
         }
 
         $setting = MasterData::first();
-        $pengguna = Pengguna::find(session('pengguna_id'));
+        $pengguna = Pengguna::find($request->session()->get('pengguna_id'));
 
         if (!$pengguna) {
-            session()->flush();
+            $request->session()->flush();
             return redirect()->route('login')
                 ->with('error', 'Akun tidak ditemukan. Silakan login kembali.');
         }
@@ -37,10 +37,10 @@ class AbsenKeluar extends Controller
         return view('karyawan.CheckOut', compact('setting', 'pengguna'));
     }
 
-    public function status()
+    public function status(Request $request)
     {
         try {
-            if (!session()->has('pengguna_id')) {
+            if (!$request->session()->has('pengguna_id')) {
                 return response()->json([
                     'hasCheckedOut' => false,
                     'error' => 'Session tidak valid'
@@ -48,7 +48,7 @@ class AbsenKeluar extends Controller
             }
 
             return response()->json(
-                PresensiService::statusCheckOut(session('pengguna_id'))
+                $this->presensiService->statusCheckOut($request->session()->get('pengguna_id'))
             );
         } catch (\Exception $e) {
             Log::error('Error cek status check out: ' . $e->getMessage());
@@ -77,7 +77,7 @@ class AbsenKeluar extends Controller
                 'longitude.between' => 'Longitude harus antara -180 dan 180'
             ]);
 
-            if (!session()->has('pengguna_id')) {
+            if (!$request->session()->has('pengguna_id')) {
                 DB::rollBack();
                 return response()->json([
                     'success' => false,
@@ -86,7 +86,7 @@ class AbsenKeluar extends Controller
                 ], 401);
             }
 
-            $penggunaId = session('pengguna_id');
+            $penggunaId = $request->session()->get('pengguna_id');
 
             $pengguna = Pengguna::find($penggunaId);
 

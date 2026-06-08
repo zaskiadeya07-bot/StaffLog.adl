@@ -48,7 +48,7 @@ class PresensiService
             ->first();
     }
 
-    public static function statusCheckIn(int $penggunaId): array
+    public function statusCheckIn(int $penggunaId): array
     {
         $todayCheckIn = Presensi::where('id_pengguna', $penggunaId)
             ->whereDate('tanggal', today())
@@ -61,7 +61,7 @@ class PresensiService
         ];
     }
 
-    public static function statusCheckOut(int $penggunaId): array
+    public function statusCheckOut(int $penggunaId): array
     {
         $todayPresensi = Presensi::where('id_pengguna', $penggunaId)
             ->whereDate('tanggal', today())

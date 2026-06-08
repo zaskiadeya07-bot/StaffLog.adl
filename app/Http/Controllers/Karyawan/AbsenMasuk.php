@@ -18,32 +18,32 @@ class AbsenMasuk extends Controller
         protected PresensiService $presensiService
     ) {}
 
-    public function index()
+    public function index(Request $request)
     {
-        if (!session()->has('pengguna_id')) {
+        if (!$request->session()->has('pengguna_id')) {
             return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
         }
 
         $setting = MasterData::first();
-        $pengguna = Pengguna::find(session('pengguna_id'));
+        $pengguna = Pengguna::find($request->session()->get('pengguna_id'));
 
         if (!$pengguna) {
-            session()->flush();
+            $request->session()->flush();
             return redirect()->route('login')->with('error', 'Akun tidak ditemukan.');
         }
 
         return view('karyawan.CheckIn', compact('setting', 'pengguna'));
     }
 
-    public function status()
+    public function status(Request $request)
     {
         try {
-            if (!session()->has('pengguna_id')) {
+            if (!$request->session()->has('pengguna_id')) {
                 return response()->json(['sudah_check_in' => false, 'error' => 'Session tidak valid'], 401);
             }
 
             return response()->json(
-                PresensiService::statusCheckIn(session('pengguna_id'))
+                $this->presensiService->statusCheckIn($request->session()->get('pengguna_id'))
             );
         } catch (\Exception $e) {
             Log::error('Error cek status check in: ' . $e->getMessage());
@@ -62,12 +62,12 @@ class AbsenMasuk extends Controller
                 'jam_masuk' => 'nullable|string'
             ]);
 
-            if (!session()->has('pengguna_id')) {
+            if (!$request->session()->has('pengguna_id')) {
                 DB::rollBack();
                 return response()->json(['success' => false, 'message' => 'Sesi login Anda telah berakhir.'], 401);
             }
 
-            $penggunaId = session('pengguna_id');
+            $penggunaId = $request->session()->get('pengguna_id');
             $pengguna = Pengguna::find($penggunaId);
 
             if (!$pengguna) {

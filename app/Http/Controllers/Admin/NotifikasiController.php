@@ -115,7 +115,7 @@ class NotifikasiController extends Controller
             $perizinan->update([
                 'status_approval' => $statusDb,
                 'catatan_admin' => $request->catatan,
-                'id_admin_validator' => session('pengguna_id'),
+                'id_admin_validator' => $request->session()->get('pengguna_id'),
                 'tgl_validasi' => now(),
             ]);
             
