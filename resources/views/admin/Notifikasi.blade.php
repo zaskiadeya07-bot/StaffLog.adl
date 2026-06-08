@@ -49,6 +49,7 @@
                     <tbody id="notifikasiTableBody" class="divide-y divide-slate-100"></tbody>
                 </table>
             </div>
+            <div id="notifikasiEmpty" class="hidden py-8 text-center text-slate-500">Belum ada data perizinan</div>
         </div>
     </div>
 </div>
@@ -118,12 +119,18 @@ function loadData() {
 
 function renderTable() {
     const tbody = document.getElementById('notifikasiTableBody');
+    const table = document.getElementById('notifikasiTable');
+    const empty = document.getElementById('notifikasiEmpty');
     tbody.innerHTML = '';
     
     if (allData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-slate-500">Belum ada data perizinan</td></tr>';
+        table.classList.add('hidden');
+        empty.classList.remove('hidden');
         return;
     }
+    
+    table.classList.remove('hidden');
+    empty.classList.add('hidden');
     
     allData.forEach((item, index) => {
         const row = `
@@ -265,6 +272,7 @@ function initDataTable() {
     if ($.fn.DataTable.isDataTable('#notifikasiTable')) {
         $('#notifikasiTable').DataTable().destroy();
     }
+    if (allData.length === 0) return;
     $('#notifikasiTable').DataTable({
         language: {
             url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json'
@@ -275,10 +283,9 @@ function initDataTable() {
     });
 }
 
-// Inisialisasi DataTable setelah render tabel
-const originalRender3 = renderTable;
+const originalRender = renderTable;
 renderTable = function() {
-    originalRender3();
+    originalRender();
     initDataTable();
 };
 </script>

@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use App\Models\Pengguna;
 
 class DatabaseSeeder extends Seeder
 {
@@ -25,6 +27,16 @@ class DatabaseSeeder extends Seeder
             'long_kantor'    => 106.84559300,
             'radius'         => 100,
             'toleransi'      => 15,
+        ]);
+
+        Pengguna::create([
+            'nama_lengkap'   => 'Admin',
+            'username'       => 'admin',
+            'password'       => Hash::make('admin123'),
+            'role'           => 'admin',
+            'divisi'         => 5,
+            'id_karyawan'    => 'EMP-001',
+            'status'         => 'aktif',
         ]);
     }
 }
