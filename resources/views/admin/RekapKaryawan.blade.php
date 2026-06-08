@@ -31,7 +31,7 @@
     <div class="card">
         <div class="p-0">
             <div class="table-responsive overflow-x-auto">
-                <table class="min-w-full divide-y divide-slate-200">
+                <table id="rekapKaryawanTable" class="min-w-full divide-y divide-slate-200">
                     <thead class="bg-slate-50">
                         <tr>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">No</th>
@@ -140,6 +140,17 @@
         document.getElementById('deleteModal').classList.add('hidden');
         document.getElementById('deleteModal').classList.remove('flex');
     }
+
+    $(document).ready(function() {
+        $('#rekapKaryawanTable').DataTable({
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json'
+            },
+            columnDefs: [
+                { orderable: false, targets: [0, 6] }
+            ]
+        });
+    });
 </script>
 @endpush
 @endsection

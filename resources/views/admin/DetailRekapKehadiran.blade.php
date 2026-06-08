@@ -15,6 +15,10 @@
             </p>
         </div>
         <div class="flex gap-2">
+            <a href="{{ route('admin.detail-rekap-kehadiran.export-pdf', ['id' => $karyawan->id_pengguna, 'bulan' => $bulan, 'tahun' => $tahun]) }}"
+               class="btn-primary inline-flex items-center gap-2" style="background:#2563eb;">
+                <i class="bi bi-filetype-pdf"></i> Export PDF
+            </a>
             <a href="{{ route('admin.rekap-karyawan') }}" class="btn-secondary inline-flex items-center gap-2">
                 <i class="bi bi-arrow-left"></i> Kembali
             </a>
@@ -98,7 +102,7 @@
     <div class="card">
         <div class="p-0">
             <div class="table-responsive overflow-x-auto">
-                <table class="min-w-full divide-y divide-slate-200">
+                <table id="detailKehadiranTable" class="min-w-full divide-y divide-slate-200">
                     <thead class="bg-slate-50">
                         <tr>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">Tanggal</th>
@@ -236,6 +240,15 @@
     
     document.querySelectorAll('.close-modal').forEach(btn => {
         btn.addEventListener('click', closeDetailModal);
+    });
+
+    $(document).ready(function() {
+        $('#detailKehadiranTable').DataTable({
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json'
+            },
+            order: [[0, 'desc']]
+        });
     });
 </script>
 @endsection

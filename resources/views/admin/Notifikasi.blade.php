@@ -34,7 +34,7 @@
     <div class="card">
         <div class="p-0">
             <div class="table-responsive overflow-x-auto">
-                <table class="min-w-full divide-y divide-slate-200">
+                <table id="notifikasiTable" class="min-w-full divide-y divide-slate-200">
                     <thead class="bg-slate-50">
                         <tr>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">No</th>
@@ -260,5 +260,26 @@ document.getElementById('rejectBtn')?.addEventListener('click', () => updateStat
 
 // Load data pertama kali
 loadData();
+
+function initDataTable() {
+    if ($.fn.DataTable.isDataTable('#notifikasiTable')) {
+        $('#notifikasiTable').DataTable().destroy();
+    }
+    $('#notifikasiTable').DataTable({
+        language: {
+            url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json'
+        },
+        columnDefs: [
+            { orderable: false, targets: [0, 6] }
+        ]
+    });
+}
+
+// Inisialisasi DataTable setelah render tabel
+const originalRender3 = renderTable;
+renderTable = function() {
+    originalRender3();
+    initDataTable();
+};
 </script>
 @endsection

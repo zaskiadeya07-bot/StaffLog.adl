@@ -60,6 +60,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     
     // Detail Rekap Kehadiran
     Route::get('/detail-rekap-kehadiran/{id}', [DetailRekapKehadiranController::class, 'index'])->name('detail-rekap-kehadiran');
+    Route::get('/detail-rekap-kehadiran/{id}/export-pdf', [DetailRekapKehadiranController::class, 'exportPdf'])->name('detail-rekap-kehadiran.export-pdf');
     
     // Pengaturan Kantor   
     Route::get('/pengaturan-kantor', [PengaturanKantorController::class, 'index'])->name('pengaturan-kantor');

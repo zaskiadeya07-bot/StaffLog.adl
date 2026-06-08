@@ -36,13 +36,9 @@
 
     <!-- Table -->
     <div class="card">
-        <div class="p-4 border-b border-slate-100 flex flex-wrap justify-between items-center gap-3">
-            <div class="relative"><i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i><input type="text" id="searchInput" class="pl-9 input-field w-64" placeholder="Cari permohonan..."></div>
-            <div class="flex gap-2"><button class="filter-btn active px-3 py-1.5 rounded-full text-sm" data-status="all">Semua</button><button class="filter-btn px-3 py-1.5 rounded-full text-sm" data-status="pending">Menunggu</button><button class="filter-btn px-3 py-1.5 rounded-full text-sm" data-status="approved">Disetujui</button><button class="filter-btn px-3 py-1.5 rounded-full text-sm" data-status="rejected">Ditolak</button></div>
-        </div>
         <div class="p-0">
             <div class="table-responsive overflow-x-auto">
-                <table class="min-w-full divide-y divide-slate-200">
+                <table id="izinCutiTable" class="min-w-full divide-y divide-slate-200">
                     <thead class="bg-slate-50">
                         <tr>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">No</th>
@@ -123,7 +119,6 @@
     const STORAGE_URL = '{{ asset('storage') }}';
 
     let izinData = [];
-    let currentFilter = 'all';
     let selectedFile = null;
 
     const JENIS_MAP = {
@@ -264,10 +259,7 @@
     function renderTable() {
         const tbody = document.getElementById('izinTableBody');
         tbody.innerHTML = '';
-        const searchText = document.getElementById('searchInput').value.toLowerCase();
-        let filtered = izinData.filter(i => currentFilter === 'all' || i.status === currentFilter);
-        if (searchText) filtered = filtered.filter(i => i.jenis.toLowerCase().includes(searchText) || i.alasan.toLowerCase().includes(searchText));
-        filtered.sort((a, b) => new Date(b.tanggalPengajuan + 'T00:00:00') - new Date(a.tanggalPengajuan + 'T00:00:00'));
+        const filtered = [...izinData].sort((a, b) => new Date(b.tanggalPengajuan + 'T00:00:00') - new Date(a.tanggalPengajuan + 'T00:00:00'));
         if (filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-slate-400">Belum ada data permohonan</td></tr>'; return; }
         filtered.forEach((item, index) => {
             tbody.innerHTML += `<tr class="hover:bg-slate-50">
@@ -381,16 +373,28 @@
         document.getElementById('detailModal').classList.add('hidden');
     });
 
-    document.querySelectorAll('.filter-btn').forEach(btn => btn.onclick = function() {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        currentFilter = this.dataset.status;
-        renderTable();
-    });
-
-    document.getElementById('searchInput').onkeyup = () => renderTable();
-
     loadData();
+
+    function initDataTable() {
+        if ($.fn.DataTable.isDataTable('#izinCutiTable')) {
+            $('#izinCutiTable').DataTable().destroy();
+        }
+        $('#izinCutiTable').DataTable({
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json'
+            },
+            columnDefs: [
+                { orderable: false, targets: [0, 6] }
+            ]
+        });
+    }
+
+    // Inisialisasi DataTable setelah render tabel
+    const originalRender = renderTable;
+    renderTable = function() {
+        originalRender();
+        initDataTable();
+    };
 </script>
 
 <style>

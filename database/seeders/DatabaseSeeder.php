@@ -157,7 +157,7 @@ class DatabaseSeeder extends Seeder
             [
                 'id_pengguna_pengaju' => $penggunaIds[2], // Budi
                 'id_admin_validator'  => $adminId1,
-                'jenis_izin'          => 'sakit',
+                'jenis_izin'          => 'cuti_sakit',
                 'tgl_pengajuan'       => '2025-05-05',
                 'tgl_mulai'           => '2025-05-06',
                 'tgl_selesai'         => '2025-05-07',
@@ -170,7 +170,7 @@ class DatabaseSeeder extends Seeder
             [
                 'id_pengguna_pengaju' => $penggunaIds[3], // Dewi
                 'id_admin_validator'  => $adminId1,
-                'jenis_izin'          => 'cuti',
+                'jenis_izin'          => 'cuti_tahunan',
                 'tgl_pengajuan'       => '2025-05-10',
                 'tgl_mulai'           => '2025-05-15',
                 'tgl_selesai'         => '2025-05-17',
@@ -183,7 +183,7 @@ class DatabaseSeeder extends Seeder
             [
                 'id_pengguna_pengaju' => $penggunaIds[4], // Riko
                 'id_admin_validator'  => $adminId2,
-                'jenis_izin'          => 'dinas',
+                'jenis_izin'          => 'izin',
                 'tgl_pengajuan'       => '2025-06-01',
                 'tgl_mulai'           => '2025-06-05',
                 'tgl_selesai'         => '2025-06-07',
@@ -196,7 +196,7 @@ class DatabaseSeeder extends Seeder
             [
                 'id_pengguna_pengaju' => $penggunaIds[5], // Nurul
                 'id_admin_validator'  => null,
-                'jenis_izin'          => 'sakit',
+                'jenis_izin'          => 'cuti_sakit',
                 'tgl_pengajuan'       => '2025-06-10',
                 'tgl_mulai'           => '2025-06-10',
                 'tgl_selesai'         => '2025-06-11',
@@ -209,7 +209,7 @@ class DatabaseSeeder extends Seeder
             [
                 'id_pengguna_pengaju' => $penggunaIds[6], // Teguh
                 'id_admin_validator'  => $adminId1,
-                'jenis_izin'          => 'cuti',
+                'jenis_izin'          => 'cuti_tahunan',
                 'tgl_pengajuan'       => '2025-06-08',
                 'tgl_mulai'           => '2025-06-12',
                 'tgl_selesai'         => '2025-06-13',
@@ -247,13 +247,13 @@ class DatabaseSeeder extends Seeder
                         'id_pengaturan'         => $masterId,
                         'id_izin'               => $perizinanIds[3], // Nurul's izin
                         'tanggal'               => $tanggal,
-                        'jam_masuk'             => null,
-                        'lat_masuk'             => null,
-                        'long_masuk'            => null,
-                        'jam_keluar'            => null,
-                        'lat_keluar'            => null,
-                        'long_keluar'           => null,
-                        'status_kehadiran'      => 'izin',
+                        'check_in'             => null,
+                        'check_in_lat'             => null,
+                        'check_in_lng'            => null,
+                        'check_out'            => null,
+                        'check_out_lat'            => null,
+                        'check_out_lng'           => null,
+                        'status'      => 'izin',
                         'menit_terlambat'       => 0,
                         'catatan_keterlambatan' => null,
                     ];
@@ -267,13 +267,13 @@ class DatabaseSeeder extends Seeder
                         'id_pengaturan'         => $masterId,
                         'id_izin'               => null,
                         'tanggal'               => $tanggal,
-                        'jam_masuk'             => null,
-                        'lat_masuk'             => null,
-                        'long_masuk'            => null,
-                        'jam_keluar'            => null,
-                        'lat_keluar'            => null,
-                        'long_keluar'           => null,
-                        'status_kehadiran'      => 'alpha',
+                        'check_in'             => null,
+                        'check_in_lat'             => null,
+                        'check_in_lng'            => null,
+                        'check_out'            => null,
+                        'check_out_lat'            => null,
+                        'check_out_lng'           => null,
+                        'status'      => 'alpha',
                         'menit_terlambat'       => 0,
                         'catatan_keterlambatan' => null,
                     ];
@@ -291,13 +291,13 @@ class DatabaseSeeder extends Seeder
                     'id_pengaturan'         => $masterId,
                     'id_izin'               => null,
                     'tanggal'               => $tanggal,
-                    'jam_masuk'             => $jamMasuk,
-                    'lat_masuk'             => -6.20876500 + (rand(-50, 50) / 100000),
-                    'long_masuk'            => 106.84559300 + (rand(-50, 50) / 100000),
-                    'jam_keluar'            => $jamKeluar,
-                    'lat_keluar'            => $jamKeluar ? -6.20876500 + (rand(-50, 50) / 100000) : null,
-                    'long_keluar'           => $jamKeluar ? 106.84559300 + (rand(-50, 50) / 100000) : null,
-                    'status_kehadiran'      => 'hadir',
+                    'check_in'             => $jamMasuk,
+                    'check_in_lat'             => -6.20876500 + (rand(-50, 50) / 100000),
+                    'check_in_lng'            => 106.84559300 + (rand(-50, 50) / 100000),
+                    'check_out'            => $jamKeluar,
+                    'check_out_lat'            => $jamKeluar ? -6.20876500 + (rand(-50, 50) / 100000) : null,
+                    'check_out_lng'           => $jamKeluar ? 106.84559300 + (rand(-50, 50) / 100000) : null,
+                    'status'      => 'hadir',
                     'menit_terlambat'       => max(0, $terlambat - 15), // dikurangi toleransi 15 menit
                     'catatan_keterlambatan' => $terlambat > 0 ? 'Terlambat ' . $terlambat . ' menit dari jam masuk standar.' : null,
                 ];
