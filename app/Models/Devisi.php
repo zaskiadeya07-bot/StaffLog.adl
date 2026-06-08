@@ -33,22 +33,8 @@ class Devisi extends Model
     |--------------------------------------------------------------------------
     */
 
-    /**
-     * Satu divisi memiliki banyak pengguna (karyawan)
-     * 
-     * Asumsi: Di tabel pengguna ada kolom 'devisi_id' sebagai foreign key
-     */
     public function pengguna(): HasMany
     {
-        // Jika kolom foreign key di tabel pengguna adalah 'devisi_id'
-        return $this->hasMany(Pengguna::class, 'devisi_id', 'id_devisi');
-    }
-    
-    /**
-     * Alternative: Jika ingin lebih eksplisit
-     */
-    public function karyawan(): HasMany
-    {
-        return $this->hasMany(Pengguna::class, 'devisi_id', 'id_devisi');
+        return $this->hasMany(Pengguna::class, 'divisi', 'id_devisi');
     }
 }

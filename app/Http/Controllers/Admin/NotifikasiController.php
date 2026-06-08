@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Perizinan;
 use App\Models\Pengguna;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class NotifikasiController extends Controller
 {
@@ -15,7 +15,7 @@ class NotifikasiController extends Controller
      */
     public function index()
     {
-        return view('admin.notifikasi');
+        return view('admin.Notifikasi');
     }
 
     /**
@@ -124,9 +124,10 @@ class NotifikasiController extends Controller
                 'message' => 'Status perizinan berhasil diupdate'
             ]);
         } catch (\Exception $e) {
+            Log::error('Gagal update status perizinan: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal update: ' . $e->getMessage()
+                'message' => 'Gagal memperbarui status perizinan.'
             ], 500);
         }
     }

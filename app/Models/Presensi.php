@@ -15,7 +15,7 @@ class Presensi extends Model
 
     protected $table      = 'presensi';
     protected $primaryKey = 'id_presensi';
-    public    $timestamps = false;
+    public    $timestamps = true;
 
     /*
     |--------------------------------------------------------------------------
@@ -69,19 +69,5 @@ class Presensi extends Model
         return $this->belongsTo(Pengguna::class, 'id_pengguna', 'id_pengguna');
     }
 
-    /**
-     * Presensi ini mengacu pada satu konfigurasi master data (jam standar, lokasi, dll).
-     */
-    public function masterData(): BelongsTo
-    {
-        return $this->belongsTo(MasterData::class, 'id_pengaturan', 'id_pengaturan');
-    }
 
-    /**
-     * Presensi ini (opsional) terhubung ke satu data perizinan.
-     */
-    public function perizinan(): BelongsTo
-    {
-        return $this->belongsTo(Perizinan::class, 'id_izin', 'id_izin');
-    }
 }
