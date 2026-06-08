@@ -15,18 +15,12 @@
     </span>
 </div>
 
-{{-- ── FLASH MESSAGE ────────────────────────────────────────────────────────── --}}
+{{-- ── FLASH MESSAGE (hidden, digunakan oleh Swal toast) ──────────────────── --}}
 @if (session('success'))
-    <div id="flashSuccess"
-         class="flex items-center gap-3 bg-emerald-50 border border-emerald-200 text-emerald-700
-                rounded-xl px-4 py-3 mb-5 shadow-sm">
-        <i class="bi bi-check-circle-fill text-emerald-500 text-lg flex-shrink-0"></i>
-        <span class="text-sm font-medium">{{ session('success') }}</span>
-        <button onclick="document.getElementById('flashSuccess').remove()"
-                class="ml-auto text-emerald-500 hover:text-emerald-700 transition">
-            <i class="bi bi-x-lg"></i>
-        </button>
-    </div>
+    <div id="flashSuccess" data-type="success" data-message="{{ session('success') }}" class="hidden"></div>
+@endif
+@if (session('error'))
+    <div id="flashError" data-type="error" data-message="{{ session('error') }}" class="hidden"></div>
 @endif
 
 {{-- ── FORM ─────────────────────────────────────────────────────────────────── --}}
@@ -397,42 +391,225 @@
         toastTimer = setTimeout(() => { toast.style.opacity = '0'; }, 2500);
     }
 
-    /* ── 10. RESET TO DEFAULT ───────────────────────────────────────────── */
-    window.resetToDefault = function () {
-        if (!confirm('Reset koordinat ke lokasi default?')) return;
+    /* ── 10. FLASH MESSAGE → SWAL TOAST ──────────────────────────────────── */
+    var flashSuccess = document.getElementById('flashSuccess');
+    var flashError   = document.getElementById('flashError');
 
-        document.getElementById('latitude').value      = DEFAULTS.lat.toFixed(8);
-        document.getElementById('longitude').value     = DEFAULTS.lng.toFixed(8);
-        document.getElementById('radius_meter').value  = DEFAULTS.radius;
-        document.getElementById('radiusPreviewLabel').textContent = DEFAULTS.radius;
+    if (flashSuccess) {
+        Swal.fire({
+            icon: 'success',
+            title: flashSuccess.dataset.message,
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 4000,
+            timerProgressBar: true
+        });
+    }
+    if (flashError) {
+        Swal.fire({
+            icon: 'error',
+            title: flashError.dataset.message,
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 4000,
+            timerProgressBar: true
+        });
+    }
 
-        updateCoords(DEFAULTS.lat, DEFAULTS.lng);
-        circle.setRadius(DEFAULTS.radius);
-        map.flyTo([DEFAULTS.lat, DEFAULTS.lng], DEFAULTS.zoom, { animate: true, duration: 1 });
+    /* ── 11. NILAI AWAL UNTUK DETEKSI PERUBAHAN ─────────────────────────── */
+    var ORIGINAL = {
+        lat      : parseFloat(document.getElementById('latitude').value)      || DEFAULTS.lat,
+        lng      : parseFloat(document.getElementById('longitude').value)     || DEFAULTS.lng,
+        radius   : parseFloat(document.getElementById('radius_meter').value)  || DEFAULTS.radius,
+        jamMasuk : document.getElementById('jam_masuk_std').value             || '08:00',
+        jamPulang: document.getElementById('jam_pulang_std').value            || '17:00',
+        toleransi: parseInt(document.getElementById('toleransi_menit').value) || 15
     };
 
-    /* ── 11. VALIDASI FORM ──────────────────────────────────────────────── */
-    document.getElementById('formPengaturan').addEventListener('submit', function (e) {
-        const lat = parseFloat(document.getElementById('latitude').value);
-        const lng = parseFloat(document.getElementById('longitude').value);
-        const rad = parseFloat(document.getElementById('radius_meter').value);
+    /* ── 12. RESET TO DEFAULT ───────────────────────────────────────────── */
+    window.resetToDefault = function () {
+        Swal.fire({
+            icon: 'question',
+            title: 'Reset ke lokasi default?',
+            text: 'Koordinat akan kembali ke lokasi default Jakarta.',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, reset!',
+            cancelButtonText: 'Batal'
+        }).then(function (result) {
+            if (!result.isConfirmed) return;
 
+            document.getElementById('latitude').value      = DEFAULTS.lat.toFixed(8);
+            document.getElementById('longitude').value     = DEFAULTS.lng.toFixed(8);
+            document.getElementById('radius_meter').value  = DEFAULTS.radius;
+            document.getElementById('radiusPreviewLabel').textContent = DEFAULTS.radius;
+
+            updateCoords(DEFAULTS.lat, DEFAULTS.lng);
+            circle.setRadius(DEFAULTS.radius);
+            map.flyTo([DEFAULTS.lat, DEFAULTS.lng], DEFAULTS.zoom, { animate: true, duration: 1 });
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Lokasi direset ke default',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2500
+            });
+        });
+    };
+
+    /* ── 13. VALIDASI & KONFIRMASI FORM ─────────────────────────────────── */
+    function getChanges() {
+        var latNow = parseFloat(document.getElementById('latitude').value);
+        var lngNow = parseFloat(document.getElementById('longitude').value);
+        var radNow = parseFloat(document.getElementById('radius_meter').value);
+        var jamMasukNow = document.getElementById('jam_masuk_std').value;
+        var jamPulangNow = document.getElementById('jam_pulang_std').value;
+        var toleransiNow = parseInt(document.getElementById('toleransi_menit').value);
+
+        var changes = [];
+        if (latNow !== ORIGINAL.lat || lngNow !== ORIGINAL.lng) {
+            changes.push('Lokasi kantor');
+        }
+        if (radNow !== ORIGINAL.radius) {
+            changes.push('Radius: ' + ORIGINAL.radius + 'm &rarr; ' + radNow + 'm');
+        }
+        if (jamMasukNow !== ORIGINAL.jamMasuk) {
+            changes.push('Jam masuk: ' + ORIGINAL.jamMasuk + ' &rarr; ' + jamMasukNow);
+        }
+        if (jamPulangNow !== ORIGINAL.jamPulang) {
+            changes.push('Jam pulang: ' + ORIGINAL.jamPulang + ' &rarr; ' + jamPulangNow);
+        }
+        if (toleransiNow !== ORIGINAL.toleransi) {
+            changes.push('Toleransi: ' + ORIGINAL.toleransi + ' menit &rarr; ' + toleransiNow + ' menit');
+        }
+        return changes;
+    }
+
+    document.getElementById('formPengaturan').addEventListener('submit', function (e) {
+        var lat = parseFloat(document.getElementById('latitude').value);
+        var lng = parseFloat(document.getElementById('longitude').value);
+        var rad = parseFloat(document.getElementById('radius_meter').value);
+        var jamMasuk = document.getElementById('jam_masuk_std').value;
+        var jamPulang = document.getElementById('jam_pulang_std').value;
+
+        /* ── Validasi dasar ──────────────────────────────────────────── */
         if (isNaN(lat) || isNaN(lng)) {
             e.preventDefault();
-            alert('Koordinat kantor belum diatur. Klik atau drag marker di peta.');
+            Swal.fire({ icon: 'warning', title: 'Koordinat belum diatur', text: 'Klik atau drag marker di peta untuk menentukan lokasi kantor.' });
             return;
         }
         if (rad < 10) {
             e.preventDefault();
-            alert('Radius minimal adalah 10 meter.');
+            Swal.fire({ icon: 'warning', title: 'Radius terlalu kecil', text: 'Radius minimal adalah 10 meter.' });
             return;
         }
+
+        /* ── Deteksi perubahan ───────────────────────────────────────── */
+        var changes = getChanges();
+        if (changes.length === 0) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'info',
+                title: 'Tidak ada perubahan',
+                text: 'Tidak ada pengaturan yang diubah.',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+            return;
+        }
+
+        /* ── Peringatan: jam pulang sebelum jam masuk ────────────────── */
+        if (jamPulang < jamMasuk) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Jam Pulang sebelum Jam Masuk?',
+                html: 'Jam pulang <strong>' + jamPulang + '</strong> lebih awal dari jam masuk <strong>' + jamMasuk + '</strong>. Tetap simpan?',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, simpan',
+                cancelButtonText: 'Perbaiki'
+            }).then(function (result) {
+                if (result.isConfirmed) submitWithConfirm(changes);
+            });
+            return;
+        }
+
+        /* ── Peringatan: radius terlalu kecil ────────────────────────── */
+        if (rad < 30) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Radius sangat kecil',
+                text: 'Radius ' + rad + ' meter mungkin terlalu kecil. Karyawan mungkin kesulitan melakukan absensi. Tetap simpan?',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, simpan',
+                cancelButtonText: 'Perbesar'
+            }).then(function (result) {
+                if (result.isConfirmed) submitWithConfirm(changes);
+            });
+            return;
+        }
+
+        /* ── Peringatan: koordinat berubah drastis ───────────────────── */
+        var latDiff = Math.abs(lat - ORIGINAL.lat);
+        var lngDiff = Math.abs(lng - ORIGINAL.lng);
+        if (latDiff > 0.01 || lngDiff > 0.01) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'question',
+                title: 'Lokasi kantor berubah jauh?',
+                text: 'Koordinat berubah signifikan dari lokasi sebelumnya. Pastikan ini benar.',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, simpan',
+                cancelButtonText: 'Cek lagi'
+            }).then(function (result) {
+                if (result.isConfirmed) submitWithConfirm(changes);
+            });
+            return;
+        }
+
+        /* ── Konfirmasi perubahan ────────────────────────────────────── */
+        e.preventDefault();
+        submitWithConfirm(changes);
     });
 
-    /* ── 12. FIX: LEAFLET MAP SIZE (jika layout menyebabkan container 0px) */
+    function submitWithConfirm(changes) {
+        var changesHtml = changes.map(function (c) {
+            return '<div style="text-align:left;padding:3px 0;border-bottom:1px solid #f1f5f9">&bull; ' + c + '</div>';
+        }).join('');
+
+        Swal.fire({
+            icon: 'question',
+            title: 'Simpan pengaturan?',
+            html: '<div style="text-align:left;margin-bottom:8px;color:#64748b;font-size:14px">Perubahan yang akan disimpan:</div>' + changesHtml,
+            showCancelButton: true,
+            confirmButtonText: 'Ya, simpan!',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#1e293b'
+        }).then(function (result) {
+            if (!result.isConfirmed) return;
+
+            // Loading state
+            Swal.fire({
+                title: 'Menyimpan...',
+                html: 'Mohon tunggu sebentar',
+                allowOutsideClick: false,
+                didOpen: function () { Swal.showLoading(); }
+            });
+
+            document.getElementById('formPengaturan').submit();
+        });
+    }
+
+    /* ── 14. FIX: LEAFLET MAP SIZE ─────────────────────────────────────── */
     setTimeout(function () { map.invalidateSize(); }, 300);
 
-    /* ── SEARCH LOKASI (Nominatim) ──────────────────────────────────────── */
+    /* ── 15. SEARCH LOKASI (Nominatim) ─────────────────────────────────── */
     var adminSearchTimeout = null;
 
     function adminSearchLocation(query) {
@@ -472,14 +649,14 @@
         });
     }
 
-    /* ── TOMBOL LOKASI SAYA ─────────────────────────────────────────────── */
+    /* ── 16. TOMBOL LOKASI SAYA ────────────────────────────────────────── */
     function adminGoToMyLocation() {
         var btn = document.getElementById('adminMyLocationBtn');
         btn.innerHTML = '<i class="bi bi-arrow-repeat" style="display:inline-block;animation:spin 0.8s linear infinite"></i> <span class="hidden sm:inline">Mencari...</span>';
         btn.disabled = true;
 
         if (!navigator.geolocation) {
-            alert('Browser tidak mendukung geolocation.');
+            Swal.fire({ icon: 'error', title: 'Browser tidak mendukung geolocation.', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
             btn.innerHTML = '<i class="bi bi-geo-alt-fill"></i> <span class="hidden sm:inline">Lokasi Saya</span>';
             btn.disabled = false;
             return;
@@ -494,7 +671,7 @@
                 btn.disabled = false;
             },
             function() {
-                alert('Tidak dapat mengakses lokasi. Pastikan izin lokasi diaktifkan.');
+                Swal.fire({ icon: 'error', title: 'Tidak dapat mengakses lokasi. Pastikan izin lokasi diaktifkan.', toast: true, position: 'top-end', showConfirmButton: false, timer: 4000 });
                 btn.innerHTML = '<i class="bi bi-geo-alt-fill"></i> <span class="hidden sm:inline">Lokasi Saya</span>';
                 btn.disabled = false;
             },
@@ -502,7 +679,7 @@
         );
     }
 
-    /* ── EVENT LISTENERS ────────────────────────────────────────────────── */
+    /* ── 17. EVENT LISTENERS ───────────────────────────────────────────── */
     document.getElementById('adminSearchBtn').addEventListener('click', function() {
         adminSearchLocation(document.getElementById('adminSearchInput').value);
     });
@@ -546,8 +723,8 @@
         color: #475569 !important;
     }
 
-    /* Smooth flash dismiss */
-    #flashSuccess { transition: opacity .3s; }
+    /* Swal toast tampil di atas map */
+    .swal2-container { z-index: 99999 !important; }
 
     /* Animasi spin untuk tombol Lokasi Saya */
     @keyframes spin { to { transform: rotate(360deg); } }

@@ -74,16 +74,7 @@
     border-radius: 1rem;
     box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
 }
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+
 </style>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -106,50 +97,34 @@ var officeCircle = null;
 var currentPosition = null;
 var isWithinRadius = false;
 var watchId = null;
+var gpsFirstFix = false;
+var gpsAccuracyWarned = false;
 
 // =========================================================================
-// FUNGSI NOTIFIKASI CUSTOM (TULISAN HITAM, DURASI 3 DETIK)
+// FUNGSI NOTIFIKASI SWEETALERT2 TOAST
 // =========================================================================
 function showSuccessNotification(message) {
-    var oldNotif = document.getElementById('customNotif');
-    if (oldNotif) oldNotif.remove();
-    
-    var notif = document.createElement('div');
-    notif.id = 'customNotif';
-    notif.style.cssText = 'margin-bottom: 16px; padding: 8px 0; color: #1e293b; font-weight: 500; font-size: 14px; text-align: center; animation: fadeInUp 0.3s ease-out;';
-    notif.innerHTML = message;
-    
-    var actionBtn = document.getElementById('actionBtn');
-    if (actionBtn && actionBtn.parentNode) {
-        actionBtn.parentNode.insertBefore(notif, actionBtn);
-    }
-    
-    setTimeout(function() {
-        notif.style.opacity = '0';
-        notif.style.transition = 'opacity 0.3s';
-        setTimeout(function() { notif.remove(); }, 300);
-    }, 3000);
+    Swal.fire({
+        icon: 'success',
+        title: message,
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true
+    });
 }
 
 function showErrorNotification(message) {
-    var oldNotif = document.getElementById('customNotif');
-    if (oldNotif) oldNotif.remove();
-    
-    var notif = document.createElement('div');
-    notif.id = 'customNotif';
-    notif.style.cssText = 'margin-bottom: 16px; padding: 8px 0; color: #dc2626; font-weight: 500; font-size: 14px; text-align: center; animation: fadeInUp 0.3s ease-out;';
-    notif.innerHTML = message;
-    
-    var actionBtn = document.getElementById('actionBtn');
-    if (actionBtn && actionBtn.parentNode) {
-        actionBtn.parentNode.insertBefore(notif, actionBtn);
-    }
-    
-    setTimeout(function() {
-        notif.style.opacity = '0';
-        notif.style.transition = 'opacity 0.3s';
-        setTimeout(function() { notif.remove(); }, 300);
-    }, 3000);
+    Swal.fire({
+        icon: 'error',
+        title: message,
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 4000,
+        timerProgressBar: true
+    });
 }
 
 // =========================================================================
@@ -261,6 +236,33 @@ function updateLocationStatus(position) {
             '<br><strong>Akurasi:</strong> ±' + accuracy.toFixed(1) + ' meter' +
             '<br><strong>Jarak ke Kantor:</strong> ' + distance.toFixed(2) + ' meter';
     }
+
+    /* ── Notifikasi GPS pertama ditemukan ──────────────────────────── */
+    if (!gpsFirstFix) {
+        gpsFirstFix = true;
+        Swal.fire({
+            icon: 'success',
+            title: 'Lokasi terdeteksi!',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    }
+
+    /* ── Peringatan akurasi GPS rendah (hanya sekali) ───────────────── */
+    if (accuracy > 100 && !gpsAccuracyWarned) {
+        gpsAccuracyWarned = true;
+        Swal.fire({
+            icon: 'warning',
+            title: 'Akurasi GPS rendah (' + accuracy.toFixed(0) + 'm)',
+            text: 'Koordinat tetap tersimpan, namun akurasi bisa memengaruhi presisi lokasi.',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 4000
+        });
+    }
     
     var statusContainer = document.getElementById('locationStatusContainer');
     if (statusContainer) {
@@ -363,16 +365,45 @@ function performAction() {
         showErrorNotification('Lokasi tidak terdeteksi');
         return;
     }
-    
+
+    var jarak = calculateDistance(currentPosition.lat, currentPosition.lng, OFFICE_LOCATION.lat, OFFICE_LOCATION.lng).toFixed(0);
+    var jam = document.getElementById('clock').textContent;
+
+    Swal.fire({
+        icon: 'question',
+        title: 'Check In Sekarang?',
+        html: '<div style="text-align:left">' +
+            '<div style="padding:6px 0"><strong>Jam:</strong> ' + jam + '</div>' +
+            '<div style="padding:6px 0"><strong>Jarak ke Kantor:</strong> ' + jarak + ' meter</div>' +
+            '<div style="padding:6px 0"><strong>Status:</strong> ' + (isWithinRadius ? 'Dalam Radius' : 'Luar Radius') + '</div>' +
+            '</div>',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Check In!',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#2563eb'
+    }).then(function(result) {
+        if (!result.isConfirmed) return;
+        submitCheckIn();
+    });
+}
+
+function submitCheckIn() {
     var submitBtn = document.getElementById('actionBtn');
     var originalText = submitBtn.innerHTML;
     submitBtn.innerHTML = '<i class="bi bi-hourglass-split spin"></i> Memproses...';
     submitBtn.disabled = true;
-    
+
+    Swal.fire({
+        title: 'Memproses...',
+        text: 'Mohon tunggu sebentar',
+        allowOutsideClick: false,
+        didOpen: function () { Swal.showLoading(); }
+    });
+
     var now = new Date();
     var jamMasuk = now.toLocaleTimeString('id-ID', { hour12: false });
     jamMasuk = jamMasuk.replace(/\./g, ':');
-    
+
     fetch('{{ route("karyawan.checkin.store") }}', {
         method: 'POST',
         headers: {
@@ -391,12 +422,19 @@ function performAction() {
     })
     .then(function(result) {
         if (result.success) {
-            showSuccessNotification('Selamat Bekerja!');
+            Swal.close();
+            var terlambat = result.data && result.data.menit_terlambat > 0;
+            if (terlambat) {
+                showErrorNotification('Anda terlambat ' + result.data.menit_terlambat + ' menit!');
+            } else {
+                showSuccessNotification('Selamat Bekerja!');
+            }
             hasCheckedToday = true;
             setTimeout(function() {
                 window.location.href = "{{ route('karyawan.dashboard') }}";
             }, 3000);
         } else {
+            Swal.close();
             showErrorNotification(result.message);
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
@@ -404,6 +442,7 @@ function performAction() {
     })
     .catch(function(error) {
         console.error('Error:', error);
+        Swal.close();
         showErrorNotification('Terjadi kesalahan, silakan coba lagi');
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;

@@ -121,6 +121,16 @@ class AbsenKeluar extends Controller
                 ], 400);
             }
 
+            $now = now();
+            if ($now->hour >= 0 && $now->hour < 6) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Batas check out kemarin sudah lewat (23:59). Status anda akan otomatis alfa.',
+                    'code' => 'DEADLINE_PASSED'
+                ], 400);
+            }
+
             $setting = MasterData::first();
 
             if ($setting) {
