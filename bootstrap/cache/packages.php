@@ -20,6 +20,18 @@
       0 => 'Laravel\\Tinker\\TinkerServiceProvider',
     ),
   ),
+  'mayaram/laravel-browser-location' => 
+  array (
+    'aliases' => 
+    array (
+      'BrowserGeocoder' => 'Mayaram\\BrowserLocation\\Facades\\Geocoder',
+      'BrowserLocation' => 'Mayaram\\BrowserLocation\\Facades\\BrowserLocation',
+    ),
+    'providers' => 
+    array (
+      0 => 'Mayaram\\BrowserLocation\\BrowserLocationServiceProvider',
+    ),
+  ),
   'nesbot/carbon' => 
   array (
     'providers' => 
