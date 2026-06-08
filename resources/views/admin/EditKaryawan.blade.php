@@ -38,11 +38,12 @@
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">
                             Nama Lengkap <span class="text-red-500">*</span>
                         </label>
-                        <input type="text" 
-                               name="nama_lengkap" 
-                               class="input-field w-full @error('nama_lengkap') border-red-500 @enderror" 
-                               value="{{ old('nama_lengkap', $karyawan->nama_lengkap) }}" 
-                               required>
+                        <input type="text"
+                               name="nama_lengkap"
+                               class="input-field w-full @error('nama_lengkap') border-red-500 @enderror"
+                               value="{{ old('nama_lengkap', $karyawan->nama_lengkap) }}"
+                               minlength="3" maxlength="100" pattern="[\pL\s]+"
+                               title="Hanya huruf dan spasi" required>
                         @error('nama_lengkap')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
@@ -53,11 +54,12 @@
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">
                             ID Karyawan <span class="text-red-500">*</span>
                         </label>
-                        <input type="text" 
-                               name="id_karyawan" 
-                               class="input-field w-full @error('id_karyawan') border-red-500 @enderror" 
-                               value="{{ old('id_karyawan', $karyawan->id_karyawan) }}" 
-                               required>
+                        <input type="text"
+                               name="id_karyawan"
+                               class="input-field w-full @error('id_karyawan') border-red-500 @enderror"
+                               value="{{ old('id_karyawan', $karyawan->id_karyawan) }}"
+                               maxlength="20" pattern="EMP-\d+"
+                               title="Format: EMP-001" required>
                         @error('id_karyawan')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
@@ -68,11 +70,12 @@
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">
                             Username <span class="text-red-500">*</span>
                         </label>
-                        <input type="text" 
-                               name="username" 
-                               class="input-field w-full @error('username') border-red-500 @enderror" 
-                               value="{{ old('username', $karyawan->username) }}" 
-                               required>
+                        <input type="text"
+                               name="username"
+                               class="input-field w-full @error('username') border-red-500 @enderror"
+                               value="{{ old('username', $karyawan->username) }}"
+                               minlength="5" maxlength="30" pattern="\S+"
+                               title="Tanpa spasi" required>
                         @error('username')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
@@ -83,31 +86,40 @@
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">
                             Alamat
                         </label>
-                        <textarea name="alamat" 
-                                  rows="3" 
+                        <textarea name="alamat"
+                                  rows="3" maxlength="255"
                                   class="input-field w-full">{{ old('alamat', $karyawan->alamat) }}</textarea>
                     </div>
 
                     {{-- Nomor HP --}}
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">
-                            Nomor HP
+                            Nomor HP <span class="text-red-500">*</span>
                         </label>
-                        <input type="tel" 
-                               name="nomor_hp" 
-                               class="input-field w-full" 
-                               value="{{ old('nomor_hp', $karyawan->nomor_hp) }}">
+                        <input type="tel"
+                               name="nomor_hp"
+                               class="input-field w-full @error('nomor_hp') border-red-500 @enderror"
+                               value="{{ old('nomor_hp', $karyawan->nomor_hp) }}"
+                               pattern="[0-9]{10,15}" inputmode="numeric"
+                               title="10-15 digit angka" required>
+                        @error('nomor_hp')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     {{-- Tanggal Mulai Kerja --}}
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">
-                            Tanggal Mulai Kerja
+                            Tanggal Mulai Kerja <span class="text-red-500">*</span>
                         </label>
-                        <input type="date" 
-                               name="tgl_mulai_kerja" 
-                               class="input-field w-full" 
-                               value="{{ old('tgl_mulai_kerja', $karyawan->tgl_mulai_kerja) }}">
+                        <input type="date"
+                               name="tgl_mulai_kerja"
+                               class="input-field w-full @error('tgl_mulai_kerja') border-red-500 @enderror"
+                               value="{{ old('tgl_mulai_kerja', $karyawan->tgl_mulai_kerja) }}"
+                               max="{{ date('Y-m-d') }}" required>
+                        @error('tgl_mulai_kerja')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     {{-- Divisi --}}
@@ -133,12 +145,13 @@
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">
                             Password Baru
                         </label>
-                        <input type="password" 
-                               name="password" 
-                               class="input-field w-full" 
+                        <input type="password"
+                               name="password"
+                               class="input-field w-full"
                                placeholder="Kosongkan jika tidak ingin mengubah"
+                               minlength="8"
                                autocomplete="new-password">
-                        <p class="text-xs text-slate-400 mt-1">Isi hanya jika ingin mengubah password</p>
+                        <p class="text-xs text-slate-400 mt-1">Minimal 8 karakter. Isi hanya jika ingin mengubah password.</p>
                     </div>
 
                     {{-- Konfirmasi Password Baru --}}
@@ -146,10 +159,11 @@
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">
                             Konfirmasi Password Baru
                         </label>
-                        <input type="password" 
-                               name="password_confirmation" 
-                               class="input-field w-full" 
+                        <input type="password"
+                               name="password_confirmation"
+                               class="input-field w-full"
                                placeholder="Konfirmasi password baru"
+                               minlength="8"
                                autocomplete="new-password">
                     </div>
                 </div>
