@@ -114,7 +114,8 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
-                        @forelse($presensi as $p)
+                        @if($presensi->count() > 0)
+                        @foreach($presensi as $p)
                         <tr class="hover:bg-slate-50 transition">
                             <td class="px-4 py-3 text-sm text-slate-600">
                                 {{ \Carbon\Carbon::parse($p->tanggal)->format('d/m/Y') }}
@@ -154,16 +155,16 @@
                                 {{ ($p->menit_terlambat ?? 0) > 0 ? ($p->menit_terlambat ?? 0) . ' menit' : '-' }}
                             </td>
                         </tr>
-                        @empty
-                        <tr>
-                            <td colspan="6" class="px-4 py-8 text-center text-slate-500">
-                                <i class="bi bi-inbox text-4xl"></i>
-                                <p class="mt-2">Belum ada data kehadiran untuk periode ini</p>
-                            </td>
-                        </tr>
-                        @endforelse
+                        @endforeach
+                        @endif
                     </tbody>
                 </table>
+                @if($presensi->count() === 0)
+                <div class="flex flex-col items-center justify-center py-12 text-slate-500">
+                    <i class="bi bi-inbox text-5xl mb-3"></i>
+                    <p class="text-lg">Belum ada data kehadiran untuk periode ini</p>
+                </div>
+                @endif
             </div>
         </div>
     </div>
