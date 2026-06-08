@@ -22,7 +22,6 @@ class TambahKaryawan extends Controller
     {
         $validated = $request->validate([
             'nama_lengkap'    => ['required', 'string', 'min:3', 'max:100', 'regex:/^[\pL\s]+$/u'],
-            'id_karyawan'     => ['required', 'string', 'max:20', 'regex:/^EMP-\d+$/u', 'unique:pengguna,id_karyawan'],
             'username'        => ['required', 'string', 'min:5', 'max:30', 'regex:/^\S+$/', 'unique:pengguna,username'],
             'alamat'          => ['nullable', 'string', 'max:255'],
             'nomor_hp'        => ['required', 'digits_between:10,15'],
@@ -34,10 +33,6 @@ class TambahKaryawan extends Controller
             'nama_lengkap.min'         => 'Nama lengkap minimal 3 karakter.',
             'nama_lengkap.max'         => 'Nama lengkap maksimal 100 karakter.',
             'nama_lengkap.regex'       => 'Nama lengkap hanya boleh berisi huruf dan spasi.',
-            'id_karyawan.required'     => 'ID karyawan wajib diisi.',
-            'id_karyawan.regex'        => 'Format ID karyawan harus EMP-001 (EMP- diikuti angka).',
-            'id_karyawan.unique'       => 'ID karyawan sudah digunakan.',
-            'id_karyawan.max'          => 'ID karyawan maksimal 20 karakter.',
             'username.required'        => 'Username wajib diisi.',
             'username.min'             => 'Username minimal 5 karakter.',
             'username.max'             => 'Username maksimal 30 karakter.',
@@ -55,9 +50,17 @@ class TambahKaryawan extends Controller
         ]);
 
         try {
+            $last = Pengguna::where('id_karyawan', 'like', 'EMP-%')
+                ->orderByRaw('CAST(SUBSTRING(id_karyawan, 5) AS UNSIGNED) DESC')
+                ->lockForUpdate()
+                ->first();
+
+            $nextNumber = $last ? (int) substr($last->id_karyawan, 4) + 1 : 1;
+            $id_karyawan = 'EMP-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+
             Pengguna::create([
                 'nama_lengkap' => $validated['nama_lengkap'],
-                'id_karyawan' => $validated['id_karyawan'],
+                'id_karyawan' => $id_karyawan,
                 'username' => $validated['username'],
                 'alamat' => $validated['alamat'],
                 'nomor_hp' => $validated['nomor_hp'],
@@ -98,7 +101,6 @@ class TambahKaryawan extends Controller
 
         $validated = $request->validate([
             'nama_lengkap'    => ['required', 'string', 'min:3', 'max:100', 'regex:/^[\pL\s]+$/u'],
-            'id_karyawan'     => ['required', 'string', 'max:20', 'regex:/^EMP-\d+$/u', 'unique:pengguna,id_karyawan,' . $id . ',id_pengguna'],
             'username'        => ['required', 'string', 'min:5', 'max:30', 'regex:/^\S+$/', 'unique:pengguna,username,' . $id . ',id_pengguna'],
             'alamat'          => ['nullable', 'string', 'max:255'],
             'nomor_hp'        => ['required', 'digits_between:10,15'],
@@ -109,10 +111,6 @@ class TambahKaryawan extends Controller
             'nama_lengkap.min'         => 'Nama lengkap minimal 3 karakter.',
             'nama_lengkap.max'         => 'Nama lengkap maksimal 100 karakter.',
             'nama_lengkap.regex'       => 'Nama lengkap hanya boleh berisi huruf dan spasi.',
-            'id_karyawan.required'     => 'ID karyawan wajib diisi.',
-            'id_karyawan.regex'        => 'Format ID karyawan harus EMP-001 (EMP- diikuti angka).',
-            'id_karyawan.unique'       => 'ID karyawan sudah digunakan.',
-            'id_karyawan.max'          => 'ID karyawan maksimal 20 karakter.',
             'username.required'        => 'Username wajib diisi.',
             'username.min'             => 'Username minimal 5 karakter.',
             'username.max'             => 'Username maksimal 30 karakter.',
@@ -129,7 +127,6 @@ class TambahKaryawan extends Controller
         try {
             $updateData = [
                 'nama_lengkap' => $validated['nama_lengkap'],
-                'id_karyawan' => $validated['id_karyawan'],
                 'username' => $validated['username'],
                 'alamat' => $validated['alamat'],
                 'nomor_hp' => $validated['nomor_hp'],

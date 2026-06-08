@@ -57,22 +57,15 @@
                         @enderror
                     </div>
 
-                    {{-- ID Karyawan --}}
+                    {{-- ID Karyawan (auto) --}}
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">
-                            ID Karyawan <span class="text-red-500">*</span>
+                            ID Karyawan
                         </label>
                         <input type="text"
-                               name="id_karyawan"
-                               class="input-field w-full @error('id_karyawan') border-red-500 @enderror"
-                               placeholder="EMP-001"
-                               value="{{ old('id_karyawan') }}"
-                               maxlength="20" pattern="EMP-\d+"
-                               title="Format: EMP-001" required>
-                        <p class="text-xs text-slate-400 mt-1">Format: EMP-001</p>
-                        @error('id_karyawan')
-                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                        @enderror
+                               class="input-field w-full bg-slate-50 text-slate-400"
+                               value="Otomatis (EMP-xxx)"
+                               disabled readonly>
                     </div>
 
                     {{-- Username --}}
