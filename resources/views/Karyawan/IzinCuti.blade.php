@@ -375,26 +375,7 @@
 
     loadData();
 
-    function initDataTable() {
-        if ($.fn.DataTable.isDataTable('#izinCutiTable')) {
-            $('#izinCutiTable').DataTable().destroy();
-        }
-        $('#izinCutiTable').DataTable({
-            language: {
-                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json'
-            },
-            columnDefs: [
-                { orderable: false, targets: [0, 6] }
-            ]
-        });
-    }
 
-    // Inisialisasi DataTable setelah render tabel
-    const originalRender = renderTable;
-    renderTable = function() {
-        originalRender();
-        initDataTable();
-    };
 </script>
 
 <style>
