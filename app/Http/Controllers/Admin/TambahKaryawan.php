@@ -5,8 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Devisi;
 use App\Models\Pengguna;
-use App\Models\Perizinan;
-use App\Models\Presensi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -156,22 +154,31 @@ class TambahKaryawan extends Controller
     {
         try {
             $karyawan = Pengguna::findOrFail($id);
-
-            Perizinan::where('id_pengguna_pengaju', $id)
-                ->orWhere('id_admin_validator', $id)
-                ->delete();
-
-            Presensi::where('id_pengguna', $id)->delete();
-
-            $karyawan->delete();
+            $karyawan->update(['status' => 'nonaktif']);
 
             return redirect()
                 ->route('admin.rekap-karyawan')
-                ->with('success', 'Karyawan berhasil dihapus!');
+                ->with('success', 'Karyawan ' . $karyawan->nama_lengkap . ' berhasil dinonaktifkan.');
         } catch (\Exception $e) {
             return redirect()
                 ->back()
-                ->with('error', 'Gagal menghapus karyawan. Silakan coba lagi.');
+                ->with('error', 'Gagal menonaktifkan karyawan. Silakan coba lagi.');
+        }
+    }
+
+    public function activate($id)
+    {
+        try {
+            $karyawan = Pengguna::findOrFail($id);
+            $karyawan->update(['status' => 'aktif']);
+
+            return redirect()
+                ->route('admin.rekap-karyawan')
+                ->with('success', 'Karyawan ' . $karyawan->nama_lengkap . ' berhasil diaktifkan kembali.');
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Gagal mengaktifkan karyawan. Silakan coba lagi.');
         }
     }
 }

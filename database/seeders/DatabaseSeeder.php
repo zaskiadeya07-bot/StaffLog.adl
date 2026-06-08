@@ -145,6 +145,7 @@ class DatabaseSeeder extends Seeder
         $counter = 1;
         foreach ($penggunaData as $pengguna) {
             $pengguna['id_karyawan'] = 'EMP-' . str_pad($counter, 3, '0', STR_PAD_LEFT);
+            $pengguna['status'] = 'aktif';
             $counter++;
             $penggunaIds[] = DB::table('pengguna')->insertGetId($pengguna);
         }

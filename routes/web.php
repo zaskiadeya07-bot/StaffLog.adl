@@ -50,8 +50,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/edit-karyawan/{id}', [TambahKaryawan::class, 'edit'])->name('edit-karyawan');
     Route::put('/edit-karyawan/{id}', [TambahKaryawan::class, 'update'])->name('edit-karyawan.update');
     
-    // Hapus Karyawan
+    // Hapus (Nonaktifkan) & Aktifkan Karyawan
     Route::delete('/hapus-karyawan/{id}', [TambahKaryawan::class, 'destroy'])->name('hapus-karyawan');
+    Route::put('/aktifkan-karyawan/{id}', [TambahKaryawan::class, 'activate'])->name('aktifkan-karyawan');
     
     // NOTIFIKASI PERIZINAN (sudah diperbaiki)
     Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi');
