@@ -73,16 +73,7 @@
     border-radius: 1rem;
     box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
 }
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+
 </style>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -96,50 +87,34 @@ var OFFICE_LOCATION = {
 
 var map, userMarker, officeMarker, officeCircle, currentPosition, isWithinRadius = false;
 var hasCheckedOut = false;
+var gpsFirstFix = false;
+var gpsAccuracyWarned = false;
 
 // =========================================================================
-// FUNGSI NOTIFIKASI CUSTOM (TULISAN HITAM, DURASI 3 DETIK, DI ATAS TOMBOL)
+// FUNGSI NOTIFIKASI SWEETALERT2 TOAST
 // =========================================================================
 function showSuccessNotification(message) {
-    var oldNotif = document.getElementById('customNotif');
-    if (oldNotif) oldNotif.remove();
-    
-    var notif = document.createElement('div');
-    notif.id = 'customNotif';
-    notif.style.cssText = 'margin-bottom: 16px; padding: 8px 0; color: #1e293b; font-weight: 500; font-size: 14px; text-align: center; animation: fadeInUp 0.3s ease-out;';
-    notif.innerHTML = message;
-    
-    var actionBtn = document.getElementById('actionBtn');
-    if (actionBtn && actionBtn.parentNode) {
-        actionBtn.parentNode.insertBefore(notif, actionBtn);
-    }
-    
-    setTimeout(function() {
-        notif.style.opacity = '0';
-        notif.style.transition = 'opacity 0.3s';
-        setTimeout(function() { notif.remove(); }, 300);
-    }, 3000);
+    Swal.fire({
+        icon: 'success',
+        title: message,
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true
+    });
 }
 
 function showErrorNotification(message) {
-    var oldNotif = document.getElementById('customNotif');
-    if (oldNotif) oldNotif.remove();
-    
-    var notif = document.createElement('div');
-    notif.id = 'customNotif';
-    notif.style.cssText = 'margin-bottom: 16px; padding: 8px 0; color: #dc2626; font-weight: 500; font-size: 14px; text-align: center; animation: fadeInUp 0.3s ease-out;';
-    notif.innerHTML = message;
-    
-    var actionBtn = document.getElementById('actionBtn');
-    if (actionBtn && actionBtn.parentNode) {
-        actionBtn.parentNode.insertBefore(notif, actionBtn);
-    }
-    
-    setTimeout(function() {
-        notif.style.opacity = '0';
-        notif.style.transition = 'opacity 0.3s';
-        setTimeout(function() { notif.remove(); }, 300);
-    }, 3000);
+    Swal.fire({
+        icon: 'error',
+        title: message,
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 4000,
+        timerProgressBar: true
+    });
 }
 
 function updateClock() {
@@ -162,6 +137,9 @@ function checkTodayCheckOut() {
             hasCheckedOut = true;
             enableButton(false);
             showErrorNotification('Anda sudah melakukan check out hari ini');
+        } else if (!result.data) {
+            enableButton(false);
+            showErrorNotification('Anda belum check in hari ini. Check in terlebih dahulu.');
         }
     })
     .catch(function(error) { console.error('Error:', error); });
@@ -197,9 +175,39 @@ function updateLocationStatus(position) {
     var distance = calculateDistance(userLat, userLng, OFFICE_LOCATION.lat, OFFICE_LOCATION.lng);
     isWithinRadius = distance <= OFFICE_LOCATION.radius;
     
+    var accuracy = position.coords.accuracy;
+
     document.getElementById('coordinates').innerHTML = '<strong>Latitude:</strong> ' + userLat.toFixed(6) +
         '<br><strong>Longitude:</strong> ' + userLng.toFixed(6) +
-        '<br><strong>Akurasi:</strong> ±' + position.coords.accuracy.toFixed(1) + ' meter';
+        '<br><strong>Akurasi:</strong> ±' + accuracy.toFixed(1) + ' meter' +
+        '<br><strong>Jarak ke Kantor:</strong> ' + distance.toFixed(2) + ' meter';
+
+    /* ── Notifikasi GPS pertama ditemukan ──────────────────────────── */
+    if (!gpsFirstFix) {
+        gpsFirstFix = true;
+        Swal.fire({
+            icon: 'success',
+            title: 'Lokasi terdeteksi!',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    }
+
+    /* ── Peringatan akurasi GPS rendah (hanya sekali) ───────────────── */
+    if (accuracy > 100 && !gpsAccuracyWarned) {
+        gpsAccuracyWarned = true;
+        Swal.fire({
+            icon: 'warning',
+            title: 'Akurasi GPS rendah (' + accuracy.toFixed(0) + 'm)',
+            text: 'Koordinat tetap tersimpan, namun akurasi bisa memengaruhi presisi lokasi.',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 4000
+        });
+    }
     
     var statusContainer = document.getElementById('locationStatusContainer');
     if (isWithinRadius) {
@@ -282,12 +290,48 @@ function performAction() {
         showErrorNotification('Lokasi tidak terdeteksi');
         return;
     }
-    
+
+    /* ── Cek batas waktu check out (23:59) ──────────────────────────── */
+    var jamSekarang = new Date();
+    if (jamSekarang.getHours() >= 0 && jamSekarang.getHours() < 6) {
+        showErrorNotification('Batas check out kemarin sudah lewat (23:59). Status anda akan otomatis alfa.');
+        return;
+    }
+
+    var jarak = calculateDistance(currentPosition.lat, currentPosition.lng, OFFICE_LOCATION.lat, OFFICE_LOCATION.lng).toFixed(0);
+    var jam = document.getElementById('clock').textContent;
+
+    Swal.fire({
+        icon: 'question',
+        title: 'Check Out Sekarang?',
+        html: '<div style="text-align:left">' +
+            '<div style="padding:6px 0"><strong>Jam:</strong> ' + jam + '</div>' +
+            '<div style="padding:6px 0"><strong>Jarak ke Kantor:</strong> ' + jarak + ' meter</div>' +
+            '<div style="padding:6px 0"><strong>Status:</strong> ' + (isWithinRadius ? 'Dalam Radius' : 'Luar Radius') + '</div>' +
+            '</div>',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Check Out!',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#2563eb'
+    }).then(function(result) {
+        if (!result.isConfirmed) return;
+        submitCheckOut();
+    });
+}
+
+function submitCheckOut() {
     var submitBtn = document.getElementById('actionBtn');
     var originalText = submitBtn.innerHTML;
     submitBtn.innerHTML = '<i class="bi bi-hourglass-split spin"></i> Memproses...';
     submitBtn.disabled = true;
-    
+
+    Swal.fire({
+        title: 'Memproses...',
+        text: 'Mohon tunggu sebentar',
+        allowOutsideClick: false,
+        didOpen: function () { Swal.showLoading(); }
+    });
+
     fetch('{{ route("karyawan.checkout.store") }}', {
         method: 'POST',
         headers: {
@@ -300,10 +344,12 @@ function performAction() {
     .then(function(response) { return response.json(); })
     .then(function(result) {
         if (result.success) {
+            Swal.close();
             showSuccessNotification('Selamat Beristirahat!');
             hasCheckedOut = true;
             setTimeout(function() { window.location.href = "{{ route('karyawan.dashboard') }}"; }, 3000);
         } else {
+            Swal.close();
             showErrorNotification(result.message);
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
@@ -311,6 +357,7 @@ function performAction() {
     })
     .catch(function(error) {
         console.error('Error:', error);
+        Swal.close();
         showErrorNotification('Terjadi kesalahan, silakan coba lagi');
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
