@@ -19,8 +19,9 @@ class Pengguna extends Model
         'divisi',
         'nomor_hp',
         'tgl_mulai_kerja',
-        'alamat',        // ✅ ADA di database stafflog_db
-        'id_karyawan',   // ✅ ADA di database stafflog_db
+        'alamat',
+        'id_karyawan',
+        'status',
     ];
 
     protected $hidden = [
