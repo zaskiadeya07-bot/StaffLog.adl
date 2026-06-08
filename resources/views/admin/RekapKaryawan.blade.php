@@ -47,6 +47,7 @@
     <div class="card">
         <div class="p-0">
             <div class="table-responsive overflow-x-auto">
+                @if($karyawan->count() > 0)
                 <table id="rekapKaryawanTable" class="min-w-full divide-y divide-slate-200">
                     <thead class="bg-slate-50">
                         <tr>
@@ -61,7 +62,7 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
-                        @forelse($karyawan as $index => $k)
+                        @foreach($karyawan as $index => $k)
                         <tr class="hover:bg-slate-50 transition">
                             <td class="px-4 py-3 text-sm text-slate-600">{{ $index + 1 }}</td>
                             <td class="px-4 py-3 text-sm text-slate-600 font-mono">{{ $k->id_karyawan ?? '-' }}</td>
@@ -115,21 +116,18 @@
                                 </div>
                             </td>
                         </tr>
-                        @empty
-                        <tr>
-                            <td class="px-4 py-8 text-center text-slate-500" colspan="8">
-                                <div class="flex flex-col items-center gap-2">
-                                    <i class="bi bi-inbox text-4xl"></i>
-                                    <p>Belum ada data karyawan</p>
-                                    <a href="{{ route('admin.tambah-karyawan') }}" class="text-blue-500 hover:underline">
-                                        Tambah karyawan sekarang
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        @endforelse
+                        @endforeach
                     </tbody>
                 </table>
+                @else
+                <div class="flex flex-col items-center justify-center py-12 text-slate-500">
+                    <i class="bi bi-inbox text-5xl mb-3"></i>
+                    <p class="text-lg">Belum ada data karyawan</p>
+                    <a href="{{ route('admin.tambah-karyawan') }}" class="text-blue-500 hover:underline mt-2">
+                        Tambah karyawan sekarang
+                    </a>
+                </div>
+                @endif
             </div>
         </div>
     </div>
@@ -179,16 +177,17 @@
     }
 
     $(document).ready(function() {
-        @if($karyawan->count() > 0)
-        $('#rekapKaryawanTable').DataTable({
-            language: {
-                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json'
-            },
-            columnDefs: [
-                { orderable: false, targets: [0, 7] }
-            ]
-        });
-        @endif
+        const table = document.getElementById('rekapKaryawanTable');
+        if (table) {
+            $(table).DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json'
+                },
+                columnDefs: [
+                    { orderable: false, targets: [0, 7] }
+                ]
+            });
+        }
     });
 </script>
 @endpush
