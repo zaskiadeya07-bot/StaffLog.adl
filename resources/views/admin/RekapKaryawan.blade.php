@@ -117,12 +117,14 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="8" class="px-4 py-8 text-center text-slate-500">
-                                <i class="bi bi-inbox text-4xl"></i>
-                                <p class="mt-2">Belum ada data karyawan</p>
-                                <a href="{{ route('admin.tambah-karyawan') }}" class="text-blue-500 hover:underline mt-2 inline-block">
-                                    Tambah karyawan sekarang
-                                </a>
+                            <td class="px-4 py-8 text-center text-slate-500" colspan="8">
+                                <div class="flex flex-col items-center gap-2">
+                                    <i class="bi bi-inbox text-4xl"></i>
+                                    <p>Belum ada data karyawan</p>
+                                    <a href="{{ route('admin.tambah-karyawan') }}" class="text-blue-500 hover:underline">
+                                        Tambah karyawan sekarang
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                         @endforelse
@@ -177,6 +179,7 @@
     }
 
     $(document).ready(function() {
+        @if($karyawan->count() > 0)
         $('#rekapKaryawanTable').DataTable({
             language: {
                 url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json'
@@ -185,6 +188,7 @@
                 { orderable: false, targets: [0, 7] }
             ]
         });
+        @endif
     });
 </script>
 @endpush
