@@ -33,27 +33,21 @@
                 <div>
                     <label class="block text-xs text-slate-500 mb-1">Bulan</label>
                     <select id="bulanSelect" class="input-field">
-                        <option value="1">Januari</option>
-                        <option value="2">Februari</option>
-                        <option value="3">Maret</option>
-                        <option value="4" selected>April</option>
-                        <option value="5">Mei</option>
-                        <option value="6">Juni</option>
-                        <option value="7">Juli</option>
-                        <option value="8">Agustus</option>
-                        <option value="9">September</option>
-                        <option value="10">Oktober</option>
-                        <option value="11">November</option>
-                        <option value="12">Desember</option>
+                        @php $blnSekarang = date('m'); @endphp
+                        @for($i = 1; $i <= 12; $i++)
+                            <option value="{{ $i }}" {{ $blnSekarang == $i ? 'selected' : '' }}>
+                                {{ date('F', mktime(0, 0, 0, $i, 1)) }}
+                            </option>
+                        @endfor
                     </select>
                 </div>
                 <div>
                     <label class="block text-xs text-slate-500 mb-1">Tahun</label>
                     <select id="tahunSelect" class="input-field">
-                        <option value="2022">2022</option>
-                        <option value="2023">2023</option>
-                        <option value="2024" selected>2024</option>
-                        <option value="2025">2025</option>
+                        @php $thnSekarang = date('Y'); @endphp
+                        @for($i = 2022; $i <= $thnSekarang; $i++)
+                            <option value="{{ $i }}" {{ $thnSekarang == $i ? 'selected' : '' }}>{{ $i }}</option>
+                        @endfor
                     </select>
                 </div>
                 <div>
@@ -148,45 +142,31 @@
     }
     
     function formatTanggal(tgl) {
-        return new Date(tgl).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+        return new Date(tgl + 'T00:00:00').toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+    }
+    
+    function getHari(tgl) {
+        const nama = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+        return nama[new Date(tgl + 'T00:00:00').getDay()];
     }
     
     function getStatusBadge(status) {
         const badges = {
-            'Hadir': '<span class="badge-success"><i class="bi bi-check-circle"></i> Hadir</span>',
-            'Terlambat': '<span class="badge-warning"><i class="bi bi-clock"></i> Terlambat</span>',
-            'Izin': '<span class="badge-info"><i class="bi bi-pencil-square"></i> Izin</span>',
-            'Sakit': '<span class="badge-info"><i class="bi bi-thermometer-half"></i> Sakit</span>',
-            'Alpha': '<span class="badge-secondary"><i class="bi bi-x-circle"></i> Alpha</span>'
+            'hadir': '<span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs"><i class="bi bi-check-circle"></i> Hadir</span>',
+            'terlambat': '<span class="bg-amber-100 text-amber-700 px-2 py-1 rounded-full text-xs"><i class="bi bi-clock"></i> Terlambat</span>',
+            'izin': '<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs"><i class="bi bi-pencil-square"></i> Izin</span>',
+            'alpha': '<span class="bg-slate-100 text-slate-600 px-2 py-1 rounded-full text-xs"><i class="bi bi-x-circle"></i> Alpha</span>'
         };
-        return badges[status] || badges.Alpha;
-    }
-    
-    function getMyAbsensiData(bulan, tahun) {
-        const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-        const userName = loggedInUser?.name || localStorage.getItem('userName') || 'Budi Santoso';
-        const userDivision = loggedInUser?.division || localStorage.getItem('userDivision') || 'IT';
-        
-        return {
-            nama: userName,
-            divisi: userDivision,
-            absensi: [
-                { tgl: `${tahun}-${String(bulan).padStart(2,'0')}-01`, hari: 'Senin', jamMasuk: '07:55', jamPulang: '17:00', status: 'Hadir', keterangan: '-', latMasuk: -6.200000, lngMasuk: 106.816666, latPulang: -6.200000, lngPulang: 106.816666 },
-                { tgl: `${tahun}-${String(bulan).padStart(2,'0')}-02`, hari: 'Selasa', jamMasuk: '08:10', jamPulang: '17:00', status: 'Terlambat', keterangan: 'Terlambat 10 menit', latMasuk: -6.200000, lngMasuk: 106.816666, latPulang: -6.200000, lngPulang: 106.816666 },
-                { tgl: `${tahun}-${String(bulan).padStart(2,'0')}-03`, hari: 'Rabu', jamMasuk: '07:50', jamPulang: '17:00', status: 'Hadir', keterangan: '-', latMasuk: -6.200000, lngMasuk: 106.816666, latPulang: -6.200000, lngPulang: 106.816666 },
-                { tgl: `${tahun}-${String(bulan).padStart(2,'0')}-04`, hari: 'Kamis', jamMasuk: '-', jamPulang: '-', status: 'Izin', keterangan: 'Urusan keluarga', latMasuk: null, lngMasuk: null, latPulang: null, lngPulang: null },
-                { tgl: `${tahun}-${String(bulan).padStart(2,'0')}-05`, hari: 'Jumat', jamMasuk: '08:30', jamPulang: '17:00', status: 'Terlambat', keterangan: 'Terlambat 30 menit', latMasuk: -6.200000, lngMasuk: 106.816666, latPulang: -6.200000, lngPulang: 106.816666 }
-            ]
-        };
+        return badges[status] || badges['alpha'];
     }
     
     function updateStats(data) {
         let hadir = 0, terlambat = 0, izin = 0, sakit = 0;
         data.forEach(item => {
-            if (item.status === 'Hadir') hadir++;
-            else if (item.status === 'Terlambat') terlambat++;
-            else if (item.status === 'Izin') izin++;
-            else if (item.status === 'Sakit') sakit++;
+            if (item.status === 'hadir') hadir++;
+            else if (item.status === 'terlambat') terlambat++;
+            else if (item.status === 'izin') izin++;
+            else if (item.status === 'sakit') sakit++;
         });
         document.getElementById('statHadir').innerText = hadir;
         document.getElementById('statIzin').innerText = izin;
@@ -198,7 +178,6 @@
         const tbody = document.getElementById('rekapTableBody');
         tbody.innerHTML = '';
         updateStats(data);
-        
         data.forEach(item => {
             const row = `<tr class="hover:bg-slate-50 transition">
                 <td class="px-4 py-3 text-sm text-slate-600">${formatTanggal(item.tgl)}</td>
@@ -206,18 +185,18 @@
                 <td class="px-4 py-3 text-sm text-slate-600">${item.jamMasuk}</td>
                 <td class="px-4 py-3 text-sm text-slate-600">${item.jamPulang}</td>
                 <td class="px-4 py-3">${getStatusBadge(item.status)}</td>
-                <td class="px-4 py-3"><button onclick="showDetail('${item.tgl}', '${item.hari}', '${item.jamMasuk}', '${item.jamPulang}', '${item.status}', '${item.keterangan}', ${item.latMasuk || null}, ${item.lngMasuk || null}, ${item.latPulang || null}, ${item.lngPulang || null})" class="bg-blue-50 text-blue-600 p-2 rounded-lg hover:bg-blue-100 transition"><i class="bi bi-eye"></i> Detail</button></td>
+                <td class="px-4 py-3"><button onclick='showDetail(${JSON.stringify(item)})' class="bg-blue-50 text-blue-600 p-2 rounded-lg hover:bg-blue-100 transition"><i class="bi bi-eye"></i> Detail</button></td>
             </tr>`;
             tbody.insertAdjacentHTML('beforeend', row);
         });
     }
     
-    function showDetail(tgl, hari, jamMasuk, jamPulang, status, keterangan, latMasuk, lngMasuk, latPulang, lngPulang) {
-        document.getElementById('detailTglHari').innerHTML = `${formatTanggal(tgl)} (${hari})`;
-        document.getElementById('detailStatusBadge').innerHTML = getStatusBadge(status);
-        document.getElementById('detailKeterangan').innerHTML = keterangan !== '-' ? keterangan : 'Tidak ada keterangan';
-        document.getElementById('detailTimeMasuk').innerHTML = jamMasuk !== '-' ? jamMasuk : '--:--';
-        document.getElementById('detailTimePulang').innerHTML = jamPulang !== '-' ? jamPulang : '--:--';
+    function showDetail(item) {
+        document.getElementById('detailTglHari').innerHTML = `${formatTanggal(item.tgl)} (${item.hari})`;
+        document.getElementById('detailStatusBadge').innerHTML = getStatusBadge(item.status);
+        document.getElementById('detailKeterangan').innerHTML = item.keterangan !== '-' ? item.keterangan : 'Tidak ada keterangan';
+        document.getElementById('detailTimeMasuk').innerHTML = item.jamMasuk !== '-' ? item.jamMasuk : '--:--';
+        document.getElementById('detailTimePulang').innerHTML = item.jamPulang !== '-' ? item.jamPulang : '--:--';
         
         setTimeout(() => {
             if (mapMasuk) mapMasuk.remove();
@@ -226,22 +205,22 @@
             const mapMasukDiv = document.getElementById('detailMapMasuk');
             const mapPulangDiv = document.getElementById('detailMapPulang');
             
-            if (latMasuk && lngMasuk) {
-                mapMasukDiv.innerHTML = '';
-                mapMasuk = L.map('detailMapMasuk').setView([latMasuk, lngMasuk], 15);
+            if (item.latMasuk && item.lngMasuk) {
+                mapMasukDiv.innerHTML = '<div class="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full z-[999]"><i class="bi bi-clock"></i> ' + item.jamMasuk + '</div>';
+                mapMasuk = L.map('detailMapMasuk').setView([item.latMasuk, item.lngMasuk], 15);
                 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(mapMasuk);
-                L.marker([latMasuk, lngMasuk]).addTo(mapMasuk);
+                L.marker([item.latMasuk, item.lngMasuk]).addTo(mapMasuk);
             } else {
-                mapMasukDiv.innerHTML = '<div class="flex items-center justify-center h-full text-slate-400"><i class="bi bi-geo-alt-fill text-2xl"></i><span class="ml-2">Lokasi tidak tersedia</span></div>';
+                mapMasukDiv.innerHTML = '<div class="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full z-[999]"><i class="bi bi-clock"></i> --:--</div><div class="flex items-center justify-center h-full text-slate-400"><i class="bi bi-geo-alt-fill text-2xl"></i><span class="ml-2">Lokasi tidak tersedia</span></div>';
             }
             
-            if (latPulang && lngPulang) {
-                mapPulangDiv.innerHTML = '';
-                mapPulang = L.map('detailMapPulang').setView([latPulang, lngPulang], 15);
+            if (item.latPulang && item.lngPulang) {
+                mapPulangDiv.innerHTML = '<div class="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full z-[999]"><i class="bi bi-clock"></i> ' + item.jamPulang + '</div>';
+                mapPulang = L.map('detailMapPulang').setView([item.latPulang, item.lngPulang], 15);
                 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(mapPulang);
-                L.marker([latPulang, lngPulang]).addTo(mapPulang);
+                L.marker([item.latPulang, item.lngPulang]).addTo(mapPulang);
             } else {
-                mapPulangDiv.innerHTML = '<div class="flex items-center justify-center h-full text-slate-400"><i class="bi bi-geo-alt-fill text-2xl"></i><span class="ml-2">Lokasi tidak tersedia</span></div>';
+                mapPulangDiv.innerHTML = '<div class="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full z-[999]"><i class="bi bi-clock"></i> --:--</div><div class="flex items-center justify-center h-full text-slate-400"><i class="bi bi-geo-alt-fill text-2xl"></i><span class="ml-2">Lokasi tidak tersedia</span></div>';
             }
         }, 100);
         
@@ -254,22 +233,55 @@
         document.getElementById('detailModal').classList.remove('flex');
     }
     
-    function loadMyData() {
+    async function loadMyData() {
         const bulan = document.getElementById('bulanSelect').value;
         const tahun = document.getElementById('tahunSelect').value;
-        const dataAbsen = getMyAbsensiData(bulan, tahun);
-        const userName = localStorage.getItem('userName') || 'Budi Santoso';
-        document.getElementById('employeeName').innerHTML = `Rekap Kehadiran ${userName}`;
-        document.getElementById('employeeInfo').innerHTML = `<i class="bi bi-building"></i> ${dataAbsen.divisi} | Periode: ${getNamaBulan(bulan)} ${tahun}`;
-        renderTable(dataAbsen.absensi);
+        try {
+            const res = await fetch('/karyawan/rekap/data?bulan=' + bulan + '&tahun=' + tahun);
+            const data = await res.json();
+            const mapped = data.map(item => ({
+                tgl: item.tanggal,
+                hari: getHari(item.tanggal),
+                jamMasuk: item.check_in || '-',
+                jamPulang: item.check_out || '-',
+                status: item.status || 'alpha',
+                keterangan: item.catatan_keterlambatan || '-',
+                latMasuk: item.check_in_lat,
+                lngMasuk: item.check_in_lng,
+                latPulang: item.check_out_lat,
+                lngPulang: item.check_out_lng
+            }));
+            document.getElementById('employeeName').innerHTML = 'Rekap Kehadiran {{ session('pengguna_nama') }}';
+            document.getElementById('employeeInfo').innerHTML = '<i class="bi bi-building"></i> Periode: ' + getNamaBulan(bulan) + ' ' + tahun;
+            renderTable(mapped);
+        } catch (e) {
+            console.error('Gagal memuat data rekap:', e);
+        }
     }
     
-    function filterData() {
+    async function filterData() {
         const bulan = document.getElementById('bulanSelect').value;
         const tahun = document.getElementById('tahunSelect').value;
-        const dataAbsen = getMyAbsensiData(bulan, tahun);
-        renderTable(dataAbsen.absensi);
-        document.getElementById('employeeInfo').innerHTML = `<i class="bi bi-building"></i> ${dataAbsen.divisi} | Periode: ${getNamaBulan(bulan)} ${tahun}`;
+        try {
+            const res = await fetch('/karyawan/rekap/data?bulan=' + bulan + '&tahun=' + tahun);
+            const data = await res.json();
+            const mapped = data.map(item => ({
+                tgl: item.tanggal,
+                hari: getHari(item.tanggal),
+                jamMasuk: item.check_in || '-',
+                jamPulang: item.check_out || '-',
+                status: item.status || 'alpha',
+                keterangan: item.catatan_keterlambatan || '-',
+                latMasuk: item.check_in_lat,
+                lngMasuk: item.check_in_lng,
+                latPulang: item.check_out_lat,
+                lngPulang: item.check_out_lng
+            }));
+            document.getElementById('employeeInfo').innerHTML = '<i class="bi bi-building"></i> Periode: ' + getNamaBulan(bulan) + ' ' + tahun;
+            renderTable(mapped);
+        } catch (e) {
+            console.error('Gagal memuat data:', e);
+        }
     }
     
     document.getElementById('filterBtn')?.addEventListener('click', filterData);

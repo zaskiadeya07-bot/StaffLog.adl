@@ -37,10 +37,10 @@ class DetailRekapKehadiranController extends Controller
             ->orderBy('tanggal', 'desc')
             ->get();
         
-        $statHadir = $presensi->where('status_kehadiran', 'hadir')->count();
-        $statTerlambat = $presensi->where('status_kehadiran', 'terlambat')->count();
-        $statIzin = $presensi->where('status_kehadiran', 'izin')->count();
-        $statAlpha = $presensi->where('status_kehadiran', 'alpha')->count();
+        $statHadir = $presensi->where('status', 'hadir')->count();
+        $statTerlambat = $presensi->where('status', 'terlambat')->count();
+        $statIzin = $presensi->where('status', 'izin')->count();
+        $statAlpha = $presensi->where('status', 'alpha')->count();
         
         return view('admin.detail-rekap-kehadiran', compact(
             'karyawan', 'presensi', 'bulan', 'tahun', 
