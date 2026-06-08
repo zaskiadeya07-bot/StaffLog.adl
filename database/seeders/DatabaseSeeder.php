@@ -18,11 +18,12 @@ class DatabaseSeeder extends Seeder
         // ─────────────────────────────────────────────
         $devisiIds = [];
         $devisiList = [
-            'Teknologi Informasi',
-            'Sumber Daya Manusia',
-            'Keuangan & Akuntansi',
-            'Operasional',
-            'Marketing & Komunikasi',
+            'Barista',
+            'Kasir',
+            'Kitchen',
+            'Service Crew',
+            'Admin',
+            'Manager',
         ];
 
         foreach ($devisiList as $nama) {
