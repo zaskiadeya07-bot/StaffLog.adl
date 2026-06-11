@@ -30,5 +30,9 @@ class Perizinan extends Model
         return $this->belongsTo(Pengguna::class, 'id_pengguna_pengaju', 'id_pengguna');
     }
 
+    public function adminValidator(): BelongsTo
+    {
+        return $this->belongsTo(Pengguna::class, 'id_admin_validator', 'id_pengguna');
+    }
 
 }

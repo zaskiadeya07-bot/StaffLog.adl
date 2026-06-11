@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Devisi;
 use App\Models\MasterData;
 use Illuminate\Http\Request;
 
@@ -20,10 +21,13 @@ class PengaturanKantorController extends Controller
                 'long_kantor' => 106.84559300,
                 'radius' => 100,
                 'toleransi' => 15,
+                'jatah_cuti_tahunan' => 12,
             ]);
         }
 
-        return view('admin.PengaturanKantor', compact('setting'));
+        $divisis = Devisi::orderBy('id_devisi')->get();
+
+        return view('admin.PengaturanKantor', compact('setting', 'divisis'));
     }
 
     public function update(Request $request)
@@ -35,6 +39,7 @@ class PengaturanKantorController extends Controller
             'long_kantor' => 'required|numeric|between:-180,180',
             'radius' => 'required|integer|min:10|max:1000',
             'toleransi' => 'required|integer|min:0|max:120',
+            'jatah_cuti_tahunan' => 'required|integer|min:0|max:365',
         ]);
 
         try {

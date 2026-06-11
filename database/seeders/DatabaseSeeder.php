@@ -38,5 +38,7 @@ class DatabaseSeeder extends Seeder
             'id_karyawan'    => 'EMP-001',
             'status'         => 'aktif',
         ]);
+
+        $this->call(SampleDataSeeder::class);
     }
 }

@@ -28,7 +28,6 @@ class Presensi extends Model
         'id_pengaturan',
         'id_izin',
         'tanggal',
-        'hari',
         'check_in',
         'check_in_lat',
         'check_in_lng',
@@ -36,7 +35,6 @@ class Presensi extends Model
         'check_out_lat',
         'check_out_lng',
         'status',
-        'keterangan',
         'menit_terlambat',
         'catatan_keterlambatan',
     ];

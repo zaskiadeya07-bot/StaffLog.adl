@@ -140,12 +140,19 @@
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">
                             Password Baru
                         </label>
-                        <input type="password"
-                               name="password"
-                               class="input-field w-full"
-                               placeholder="Kosongkan jika tidak ingin mengubah"
-                               minlength="8"
-                               autocomplete="new-password">
+                        <div class="relative">
+                            <input type="password"
+                                   name="password"
+                                   id="pwEdit"
+                                   class="input-field w-full pr-10"
+                                   placeholder="Kosongkan jika tidak ingin mengubah"
+                                   minlength="8"
+                                   autocomplete="new-password">
+                            <button type="button" onclick="togglePass('pwEdit', 'eyeEdit')"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                                <i class="bi bi-eye" id="eyeEdit"></i>
+                            </button>
+                        </div>
                         <p class="text-xs text-slate-400 mt-1">Minimal 8 karakter. Isi hanya jika ingin mengubah password.</p>
                     </div>
 
@@ -154,12 +161,19 @@
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">
                             Konfirmasi Password Baru
                         </label>
-                        <input type="password"
-                               name="password_confirmation"
-                               class="input-field w-full"
-                               placeholder="Konfirmasi password baru"
-                               minlength="8"
-                               autocomplete="new-password">
+                        <div class="relative">
+                            <input type="password"
+                                   name="password_confirmation"
+                                   id="pwEditKonfirmasi"
+                                   class="input-field w-full pr-10"
+                                   placeholder="Konfirmasi password baru"
+                                   minlength="8"
+                                   autocomplete="new-password">
+                            <button type="button" onclick="togglePass('pwEditKonfirmasi', 'eyeEditKonfirmasi')"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                                <i class="bi bi-eye" id="eyeEditKonfirmasi"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
@@ -175,4 +189,17 @@
         </div>
     </div>
 </div>
+<script>
+function togglePass(inputId, iconId) {
+    var input = document.getElementById(inputId);
+    var icon  = document.getElementById(iconId);
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'bi bi-eye-slash';
+    } else {
+        input.type = 'password';
+        icon.className = 'bi bi-eye';
+    }
+}
+</script>
 @endsection

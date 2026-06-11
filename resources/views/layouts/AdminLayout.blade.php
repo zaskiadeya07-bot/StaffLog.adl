@@ -216,17 +216,13 @@
             <i class="bi bi-people text-lg"></i>
             <span>Data Karyawan</span>
         </a>
-        <a href="{{ route('admin.tambah-karyawan') }}" class="sidebar-link">
-            <i class="bi bi-person-plus text-lg"></i>
-            <span>Tambah Karyawan</span>
-        </a>
         <a href="{{ route('admin.notifikasi') }}" class="sidebar-link">
             <i class="bi bi-bell text-lg"></i>
             <span>Notifikasi Perizinan</span>
         </a>
         <a href="{{ route('admin.pengaturan-kantor') }}" class="sidebar-link">
             <i class="bi bi-building-gear text-lg"></i>
-            <span>Pengaturan</span>
+            <span>Pengaturan Kantor</span>
         </a>
     </nav>
 </div>
