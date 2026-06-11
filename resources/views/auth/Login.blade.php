@@ -9,9 +9,47 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { font-family: 'Inter', sans-serif; background: #1e293b; }
+
+        .back-link {
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 10;
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: slideIn 0.6s ease-out forwards;
+            transition: color 0.2s;
+        }
+        .back-link:hover {
+            color: white;
+        }
+        .back-link i {
+            font-size: 20px;
+            transition: transform 0.2s;
+        }
+        .back-link:hover i {
+            transform: translateX(-4px);
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen">
+<body class="flex items-center justify-center min-h-screen relative">
+    <a href="{{ route('landing') }}" class="back-link">
+        <i class="bi bi-arrow-left"></i> Kembali
+    </a>
     <div class="w-full max-w-md px-4">
         <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-xl">
 

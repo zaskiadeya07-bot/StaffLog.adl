@@ -28,20 +28,29 @@
         </div>
     @endif
 
-    {{-- Filter Tab --}}
-    <div class="flex gap-1 mb-4 bg-slate-100 p-1 rounded-lg w-fit">
-        <a href="{{ route('admin.rekap-karyawan', ['filter' => 'aktif']) }}"
-           class="px-4 py-2 text-sm font-medium rounded-md transition {{ $filter === 'aktif' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}">
-            <i class="bi bi-person-check"></i> Aktif
-        </a>
-        <a href="{{ route('admin.rekap-karyawan', ['filter' => 'nonaktif']) }}"
-           class="px-4 py-2 text-sm font-medium rounded-md transition {{ $filter === 'nonaktif' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}">
-            <i class="bi bi-person-x"></i> Nonaktif
-        </a>
-        <a href="{{ route('admin.rekap-karyawan', ['filter' => 'semua']) }}"
-           class="px-4 py-2 text-sm font-medium rounded-md transition {{ $filter === 'semua' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}">
-            <i class="bi bi-people"></i> Semua
-        </a>
+    {{-- Filter Tab & Divisi --}}
+    <div class="flex flex-wrap items-center gap-2 mb-4">
+        <div class="flex gap-1 bg-slate-100 p-1 rounded-lg">
+            <a href="{{ route('admin.rekap-karyawan', array_merge(request()->query(), ['filter' => 'aktif', 'page' => null])) }}"
+               class="px-4 py-2 text-sm font-medium rounded-md transition {{ $filter === 'aktif' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}">
+                <i class="bi bi-person-check"></i> Aktif
+            </a>
+            <a href="{{ route('admin.rekap-karyawan', array_merge(request()->query(), ['filter' => 'nonaktif', 'page' => null])) }}"
+               class="px-4 py-2 text-sm font-medium rounded-md transition {{ $filter === 'nonaktif' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}">
+                <i class="bi bi-person-x"></i> Nonaktif
+            </a>
+            <a href="{{ route('admin.rekap-karyawan', array_merge(request()->query(), ['filter' => 'semua', 'page' => null])) }}"
+               class="px-4 py-2 text-sm font-medium rounded-md transition {{ $filter === 'semua' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}">
+                <i class="bi bi-people"></i> Semua
+            </a>
+        </div>
+        <select onchange="filterByDivisi(this.value)"
+                class="text-sm border border-slate-300 rounded-lg px-3 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-400">
+            <option value="">Semua Divisi</option>
+            @foreach($divisis as $d)
+                <option value="{{ $d->id_devisi }}" {{ $divisiId == $d->id_devisi ? 'selected' : '' }}>{{ $d->nama_devisi }}</option>
+            @endforeach
+        </select>
     </div>
 
     <div class="card">
@@ -174,6 +183,13 @@
     function closeDeleteModal() {
         document.getElementById('deleteModal').classList.add('hidden');
         document.getElementById('deleteModal').classList.remove('flex');
+    }
+
+    function filterByDivisi(divisiId) {
+        const params = new URLSearchParams(window.location.search);
+        params.set('divisi', divisiId);
+        params.set('filter', '{{ $filter }}');
+        window.location.search = params.toString();
     }
 
     $(document).ready(function() {

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Pengguna;
 use App\Models\Presensi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class DetailRekapKehadiranController extends Controller
@@ -88,5 +89,33 @@ class DetailRekapKehadiranController extends Controller
         $namaFile = 'Rekap_Kehadiran_' . str_replace(' ', '_', $karyawan->nama_lengkap) . '_' . $bulanNama . '_' . $tahun . '.pdf';
 
         return $pdf->download($namaFile);
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        try {
+            $validated = $request->validate([
+                'status' => 'required|in:hadir,terlambat,izin,alpha',
+                'keterangan' => 'nullable|string|max:255',
+            ]);
+
+            $presensi = Presensi::findOrFail($id);
+
+            $presensi->update([
+                'status' => $validated['status'],
+                'catatan_keterlambatan' => $validated['keterangan'] ?? $presensi->catatan_keterlambatan,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Status kehadiran berhasil diperbarui.'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Gagal update status presensi: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memperbarui status kehadiran.'
+            ], 500);
+        }
     }
 }

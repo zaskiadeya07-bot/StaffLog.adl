@@ -7,29 +7,32 @@
     <div class="flex justify-between items-center flex-wrap gap-3 mb-6">
         <div>
             <h1 class="text-2xl font-bold text-slate-800">Notifikasi Perizinan</h1>
-            <p class="text-slate-500 text-sm">Daftar pengajuan izin dan sakit dari karyawan</p>
+            <p class="text-slate-500 text-sm">Daftar pengajuan izin, cuti, dan sakit yang menunggu validasi</p>
         </div>
         <div>
             <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm" id="totalNotif">0</span>
             <span class="text-slate-500 ml-1 text-sm">Total Notifikasi</span>
         </div>
     </div>
-    
+
     <!-- Tabs -->
     <div class="border-b border-slate-200 mb-5">
         <nav class="flex gap-1">
             <button class="tab-btn active px-5 py-2.5 text-sm font-medium rounded-t-lg" data-tab="semua">
                 <i class="bi bi-envelope"></i> Semua
             </button>
+            <button class="tab-btn px-5 py-2.5 text-sm font-medium rounded-t-lg" data-tab="cuti_tahunan">
+                <i class="bi bi-calendar-check"></i> Cuti Tahunan
+            </button>
             <button class="tab-btn px-5 py-2.5 text-sm font-medium rounded-t-lg" data-tab="izin">
                 <i class="bi bi-pencil-square"></i> Izin
             </button>
             <button class="tab-btn px-5 py-2.5 text-sm font-medium rounded-t-lg" data-tab="sakit">
-                <i class="bi bi-thermometer-half"></i> Sakit
+                <i class="bi bi-thermometer-half"></i> Cuti Sakit
             </button>
         </nav>
     </div>
-    
+
     <!-- Tab Content -->
     <div class="card">
         <div class="p-0">
@@ -76,6 +79,9 @@
 let currentTab = 'semua';
 let currentPerizinanId = null;
 let allData = [];
+let currentPage = 1;
+let lastPage = 1;
+const PER_PAGE = 10;
 
 function formatTanggal(tgl) {
     return new Date(tgl).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
@@ -84,10 +90,12 @@ function formatTanggal(tgl) {
 function getJenisBadge(jenis) {
     if (jenis === 'Izin') {
         return '<span class="bg-amber-100 text-amber-700 px-2 py-1 rounded-full text-xs"><i class="bi bi-pencil-square"></i> Izin</span>';
-    } else if (jenis === 'Sakit') {
-        return '<span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs"><i class="bi bi-thermometer-half"></i> Sakit</span>';
+    } else if (jenis === 'Cuti Sakit') {
+        return '<span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs"><i class="bi bi-thermometer-half"></i> Cuti Sakit</span>';
+    } else if (jenis === 'Cuti Tahunan') {
+        return '<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs"><i class="bi bi-calendar-check"></i> Cuti Tahunan</span>';
     }
-    return '<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs">' + jenis + '</span>';
+    return '<span class="bg-slate-100 text-slate-600 px-2 py-1 rounded-full text-xs">' + jenis + '</span>';
 }
 
 function getStatusBadge(status) {
@@ -95,22 +103,26 @@ function getStatusBadge(status) {
         return '<span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs"><i class="bi bi-clock-history"></i> Menunggu</span>';
     } else if (status === 'Disetujui') {
         return '<span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs"><i class="bi bi-check-circle"></i> Disetujui</span>';
+    } else if (status === 'Ditolak') {
+        return '<span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs"><i class="bi bi-x-circle"></i> Ditolak</span>';
     }
-    return '<span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs"><i class="bi bi-x-circle"></i> Ditolak</span>';
+    return '<span class="bg-slate-100 text-slate-500 px-2 py-1 rounded-full text-xs"><i class="bi bi-x-octagon"></i> ' + status + '</span>';
 }
 
 function loadData() {
-    let url = '{{ route('admin.notifikasi.data') }}';
+    let url = '{{ route('admin.notifikasi.data') }}?page=' + currentPage + '&per_page=' + PER_PAGE;
     if (currentTab !== 'semua') {
-        url += '?jenis=' + currentTab;
+        url += '&jenis=' + currentTab;
     }
-    
+
     fetch(url)
         .then(response => response.json())
-        .then(data => {
-            allData = data;
+        .then(res => {
+            allData = res.data;
+            lastPage = res.last_page;
+            document.getElementById('totalNotif').innerText = res.total;
             renderTable();
-            document.getElementById('totalNotif').innerText = allData.length;
+            renderPagination();
         })
         .catch(error => {
             console.error('Error:', error);
@@ -122,20 +134,20 @@ function renderTable() {
     const table = document.getElementById('notifikasiTable');
     const empty = document.getElementById('notifikasiEmpty');
     tbody.innerHTML = '';
-    
+
     if (allData.length === 0) {
         table.classList.add('hidden');
         empty.classList.remove('hidden');
         return;
     }
-    
+
     table.classList.remove('hidden');
     empty.classList.add('hidden');
-    
+
     allData.forEach((item, index) => {
         const row = `
             <tr class="hover:bg-slate-50 transition">
-                <td class="px-4 py-3 text-sm text-slate-600">${index + 1}</td>
+                <td class="px-4 py-3 text-sm text-slate-600">${(currentPage - 1) * PER_PAGE + index + 1}</td>
                 <td class="px-4 py-3 text-sm text-slate-600">${formatTanggal(item.tanggal)}</td>
                 <td class="px-4 py-3 font-medium text-slate-800">${item.nama}</td>
                 <td class="px-4 py-3 text-sm text-slate-600">${item.divisi}</td>
@@ -152,12 +164,66 @@ function renderTable() {
     });
 }
 
+function renderPagination() {
+    let pagContainer = document.getElementById('paginationContainer');
+    if (!pagContainer) {
+        pagContainer = document.createElement('div');
+        pagContainer.id = 'paginationContainer';
+        pagContainer.className = 'flex items-center justify-between p-4 border-t border-slate-100';
+        document.querySelector('.card .p-0').appendChild(pagContainer);
+    }
+
+    let html = '<div class="text-sm text-slate-500">Halaman ' + currentPage + ' dari ' + lastPage + '</div>';
+    html += '<div class="flex gap-1">';
+
+    html += '<button onclick="goToPage(1)" class="px-3 py-1.5 text-sm rounded-lg border ' + (currentPage === 1 ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-white text-slate-600 hover:bg-slate-50') + '">&laquo;</button>';
+    html += '<button onclick="goToPage(' + (currentPage - 1) + ')" class="px-3 py-1.5 text-sm rounded-lg border ' + (currentPage === 1 ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-white text-slate-600 hover:bg-slate-50') + '">&lsaquo;</button>';
+
+    for (let p = Math.max(1, currentPage - 2); p <= Math.min(lastPage, currentPage + 2); p++) {
+        html += '<button onclick="goToPage(' + p + ')" class="px-3 py-1.5 text-sm rounded-lg border ' + (p === currentPage ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-600 hover:bg-slate-50') + '">' + p + '</button>';
+    }
+
+    html += '<button onclick="goToPage(' + (currentPage + 1) + ')" class="px-3 py-1.5 text-sm rounded-lg border ' + (currentPage === lastPage ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-white text-slate-600 hover:bg-slate-50') + '">&rsaquo;</button>';
+    html += '<button onclick="goToPage(' + lastPage + ')" class="px-3 py-1.5 text-sm rounded-lg border ' + (currentPage === lastPage ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-white text-slate-600 hover:bg-slate-50') + '">&raquo;</button>';
+
+    html += '</div>';
+    pagContainer.innerHTML = html;
+}
+
+function goToPage(page) {
+    if (page < 1 || page > lastPage) return;
+    currentPage = page;
+    loadData();
+}
+
 function showDetail(id) {
     const item = allData.find(i => i.id === id);
     if (!item) return;
-    
+
     currentPerizinanId = item.id;
-    
+
+    let lampiranHtml = '';
+    if (item.file_surat) {
+        const fileName = item.file_surat.split('/').pop();
+        const fileUrl = '{{ asset('storage') }}/' + item.file_surat;
+        lampiranHtml = `
+            <div class="md:col-span-2">
+                <p class="text-xs text-slate-500">Lampiran</p>
+                <div class="mt-1 flex items-center gap-2">
+                    <a href="${fileUrl}" target="_blank" class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 bg-blue-50 px-3 py-2 rounded-lg">
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span class="text-sm">${fileName}</span>
+                        <i class="bi bi-box-arrow-up-right ml-1"></i>
+                    </a>
+                    <a href="${fileUrl}" download="${fileName}" class="text-slate-500 hover:text-slate-700 p-2 rounded-lg hover:bg-slate-100" title="Download">
+                        <i class="bi bi-download"></i>
+                    </a>
+                </div>
+            </div>
+        `;
+    }
+
+    const isProcessed = item.status_original !== 'pending';
     const detailContent = `
         <div class="space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -189,24 +255,28 @@ function showDetail(id) {
                     <p class="text-xs text-slate-500">Alasan / Keterangan</p>
                     <p class="bg-slate-50 p-3 rounded-xl text-sm">${item.keterangan || '-'}</p>
                 </div>
+                ${lampiranHtml}
                 <div class="md:col-span-2">
                     <p class="text-xs text-slate-500">Catatan Admin</p>
-                    <textarea id="catatanAdmin" class="input-field w-full p-2 border rounded-lg" rows="3" placeholder="Tambahkan catatan...">${item.catatan_admin || ''}</textarea>
+                    <textarea id="catatanAdmin" class="input-field w-full p-2 border rounded-lg" rows="3" placeholder="Tambahkan catatan..." ${isProcessed ? 'disabled' : ''}>${item.catatan_admin || ''}</textarea>
                 </div>
             </div>
         </div>
     `;
-    
+
     document.getElementById('detailContent').innerHTML = detailContent;
     document.getElementById('detailModal').classList.remove('hidden');
     document.getElementById('detailModal').classList.add('flex');
+
+    document.getElementById('approveBtn').classList.toggle('hidden', isProcessed);
+    document.getElementById('rejectBtn').classList.toggle('hidden', isProcessed);
 }
 
 function updateStatus(status) {
     if (!currentPerizinanId) return;
-    
+
     const catatan = document.getElementById('catatanAdmin')?.value || '';
-    
+
     fetch('{{ route('admin.notifikasi.update', ':id') }}'.replace(':id', currentPerizinanId), {
         method: 'PUT',
         headers: {
@@ -236,7 +306,8 @@ function updateStatus(status) {
 
 function showToast(message, type = 'success') {
     const toast = document.createElement('div');
-    toast.className = `fixed bottom-5 right-5 z-50 bg-${type === 'success' ? 'emerald-500' : 'red-500'} text-white px-5 py-3 rounded-xl shadow-lg`;
+    toast.className = 'fixed bottom-5 right-5 z-50 text-white px-5 py-3 rounded-xl shadow-lg flex items-center gap-2';
+    toast.style.background = type === 'success' ? '#10b981' : '#ef4444';
     toast.innerHTML = message;
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 3000);
@@ -248,12 +319,12 @@ function closeDetailModal() {
     currentPerizinanId = null;
 }
 
-// Event Listeners
 document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', function() {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         this.classList.add('active');
         currentTab = this.dataset.tab;
+        currentPage = 1;
         loadData();
     });
 });
@@ -265,28 +336,6 @@ document.querySelectorAll('.close-modal').forEach(btn => {
 document.getElementById('approveBtn')?.addEventListener('click', () => updateStatus('Disetujui'));
 document.getElementById('rejectBtn')?.addEventListener('click', () => updateStatus('Ditolak'));
 
-// Load data pertama kali
 loadData();
-
-function initDataTable() {
-    if ($.fn.DataTable.isDataTable('#notifikasiTable')) {
-        $('#notifikasiTable').DataTable().destroy();
-    }
-    if (allData.length === 0) return;
-    $('#notifikasiTable').DataTable({
-        language: {
-            url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json'
-        },
-        columnDefs: [
-            { orderable: false, targets: [0, 6] }
-        ]
-    });
-}
-
-const originalRender = renderTable;
-renderTable = function() {
-    originalRender();
-    initDataTable();
-};
 </script>
 @endsection

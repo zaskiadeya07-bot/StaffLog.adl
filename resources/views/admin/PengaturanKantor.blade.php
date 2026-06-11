@@ -7,15 +7,12 @@
 {{-- ── PAGE HEADER ─────────────────────────────────────────────────────────── --}}
 <div class="flex justify-between items-center flex-wrap gap-3 mb-6">
     <div>
-        <h1 class="text-2xl font-bold text-slate-800">Pengaturan Kantor</h1>
-        <p class="text-slate-500 text-sm">Atur lokasi, radius, dan jam kerja kantor</p>
+        <h1 class="text-2xl font-bold text-slate-800">Pengaturan</h1>
+        <p class="text-slate-500 text-sm">Kelola pengaturan aplikasi secara keseluruhan</p>
     </div>
-    <span class="inline-flex items-center gap-2 text-sm text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg">
-        <i class="bi bi-building"></i> Konfigurasi Absensi
-    </span>
 </div>
 
-{{-- ── FLASH MESSAGE (hidden, digunakan oleh Swal toast) ──────────────────── --}}
+{{-- ── FLASH MESSAGE ─────────────────────────────────────────────────────────── --}}
 @if (session('success'))
     <div id="flashSuccess" data-type="success" data-message="{{ session('success') }}" class="hidden"></div>
 @endif
@@ -23,7 +20,19 @@
     <div id="flashError" data-type="error" data-message="{{ session('error') }}" class="hidden"></div>
 @endif
 
-{{-- ── FORM ─────────────────────────────────────────────────────────────────── --}}
+{{-- ── TAB NAVIGATION ─────────────────────────────────────────────────────── --}}
+<div class="mb-6 border-b border-slate-200">
+    <div class="flex gap-1 -mb-px">
+        <button onclick="switchTab('kantor')" id="tabBtn-kantor" class="tab-btn px-5 py-3 text-sm font-semibold border-b-2 border-slate-800 text-slate-800">Lokasi</button>
+        <button onclick="switchTab('divisi')" id="tabBtn-divisi" class="tab-btn px-5 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600">Divisi</button>
+        <button onclick="switchTab('password')" id="tabBtn-password" class="tab-btn px-5 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600">Password</button>
+    </div>
+</div>
+
+{{-- ══════════════════════════════════════════════════════════════════════════ --}}
+{{-- TAB 1: KANTOR --}}
+{{-- ══════════════════════════════════════════════════════════════════════════ --}}
+<div id="tab-kantor" class="tab-content">
 <form action="{{ route('admin.pengaturan-kantor.update') }}" method="POST" id="formPengaturan">
     @csrf
     @method('POST')
@@ -182,6 +191,30 @@
                     <p class="text-xs text-slate-400">Diperbarui otomatis saat marker dipindahkan.</p>
                 </div>
 
+                {{-- JATAH CUTI TAHUNAN --}}
+                <div class="flex flex-col gap-1.5">
+                    <label for="jatah_cuti_tahunan"
+                           class="text-sm font-medium text-slate-600 flex items-center gap-1.5">
+                        <i class="bi bi-calendar-check text-slate-400"></i> Jatah Cuti Tahunan
+                    </label>
+                    <div class="relative">
+                        <input
+                            type="number"
+                            id="jatah_cuti_tahunan"
+                            name="jatah_cuti_tahunan"
+                            class="input-field w-full pr-14"
+                            min="0"
+                            step="1"
+                            value="{{ old('jatah_cuti_tahunan', $setting->jatah_cuti_tahunan ?? 12) }}"
+                            required
+                        >
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 pointer-events-none">
+                            hari
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-400">Jumlah hari cuti tahunan per karyawan per tahun.</p>
+                </div>
+
                 {{-- RADIUS --}}
                 <div class="flex flex-col gap-1.5">
                     <label for="radius_meter"
@@ -245,6 +278,153 @@
     </div>{{-- /card --}}
 
 </form>
+</div>{{-- /tab-kantor --}}
+
+{{-- ══════════════════════════════════════════════════════════════════════════ --}}
+{{-- TAB 2: DIVISI --}}
+{{-- ══════════════════════════════════════════════════════════════════════════ --}}
+<div id="tab-divisi" class="tab-content hidden">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="font-semibold text-slate-700">Daftar Divisi</h2>
+        <button onclick="openModalDivisi(null)" class="btn-primary inline-flex items-center gap-2 text-sm">
+            <i class="bi bi-plus-circle"></i> Tambah
+        </button>
+    </div>
+
+    <div class="card">
+        <div class="p-0">
+            <table id="divisiTable" class="min-w-full divide-y divide-slate-200">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="px-5 py-3 text-left text-xs font-semibold text-slate-600 w-16">#</th>
+                        <th class="px-5 py-3 text-left text-xs font-semibold text-slate-600">Nama Divisi</th>
+                        <th class="px-5 py-3 text-right text-xs font-semibold text-slate-600">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @forelse($divisis as $d)
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="px-5 py-3 text-sm text-slate-500">{{ $d->id_devisi }}</td>
+                        <td class="px-5 py-3 text-sm font-medium text-slate-800">{{ $d->nama_devisi }}</td>
+                        <td class="px-5 py-3 text-right">
+                            <button onclick="openModalDivisi({{ $d->id_devisi }}, '{{ $d->nama_devisi }}')"
+                                class="bg-blue-50 text-blue-600 p-2 rounded-lg hover:bg-blue-100 transition" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button onclick="hapusDivisi({{ $d->id_devisi }}, '{{ $d->nama_devisi }}')"
+                                class="bg-red-50 text-red-600 p-2 rounded-lg hover:bg-red-100 transition ml-1" title="Hapus">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="3" class="px-5 py-12 text-center text-slate-400">
+                            <i class="bi bi-building text-5xl block mb-3"></i>
+                            <p>Belum ada divisi</p>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {{-- Modal Divisi --}}
+    <div id="modalDivisi" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+        <div class="bg-white rounded-3xl max-w-md w-full mx-4">
+            <div class="bg-slate-800 p-5 rounded-t-3xl">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-bold text-white" id="modalDivisiTitle">Tambah Divisi</h3>
+                    <button onclick="tutupModalDivisi()" class="text-slate-400 hover:text-white text-2xl">&times;</button>
+                </div>
+            </div>
+            <form id="formDivisi" method="POST">
+                @csrf
+                <div class="p-6">
+                    <input type="hidden" id="divisiId">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Nama Divisi</label>
+                        <input type="text" id="namaDivisiInput" name="nama_devisi"
+                            class="input-field w-full" placeholder="Masukkan nama divisi" maxlength="50" required>
+                    </div>
+                </div>
+                <div class="p-5 border-t border-slate-100 flex justify-end gap-3">
+                    <button type="button" onclick="tutupModalDivisi()" class="btn-secondary px-5">Batal</button>
+                    <button type="submit" class="btn-primary px-5" id="btnSimpanDivisi">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>{{-- /tab-divisi --}}
+
+{{-- ══════════════════════════════════════════════════════════════════════════ --}}
+{{-- TAB 3: PASSWORD --}}
+{{-- ══════════════════════════════════════════════════════════════════════════ --}}
+<div id="tab-password" class="tab-content hidden">
+    <div class="card max-w-2xl">
+        <div class="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
+            <i class="bi bi-shield-lock text-slate-500"></i>
+            <h3 class="font-semibold text-slate-700">Ubah Password Admin</h3>
+        </div>
+        <div class="p-5">
+            <form action="{{ route('admin.ganti-password.update') }}" method="POST">
+                @csrf
+                @method('PUT')
+
+                <div class="mb-4">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1.5">
+                        <i class="bi bi-lock text-slate-400 mr-1"></i> Password Saat Ini
+                    </label>
+                    <div class="relative">
+                        <input type="password" name="password_lama" id="pwLama"
+                            class="w-full px-4 py-2.5 pr-10 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-200"
+                            placeholder="Masukkan password saat ini">
+                        <button type="button" onclick="togglePass('pwLama', 'eyeLama')"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                            <i class="bi bi-eye" id="eyeLama"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1.5">
+                        <i class="bi bi-key text-slate-400 mr-1"></i> Password Baru
+                    </label>
+                    <div class="relative">
+                        <input type="password" name="password_baru" id="pwBaru"
+                            class="w-full px-4 py-2.5 pr-10 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-200"
+                            placeholder="Minimal 6 karakter">
+                        <button type="button" onclick="togglePass('pwBaru', 'eyeBaru')"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                            <i class="bi bi-eye" id="eyeBaru"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mb-5">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1.5">
+                        <i class="bi bi-key-fill text-slate-400 mr-1"></i> Konfirmasi Password Baru
+                    </label>
+                    <div class="relative">
+                        <input type="password" name="password_baru_confirmation" id="pwKonfirmasi"
+                            class="w-full px-4 py-2.5 pr-10 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-200"
+                            placeholder="Ulangi password baru">
+                        <button type="button" onclick="togglePass('pwKonfirmasi', 'eyeKonfirmasi')"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                            <i class="bi bi-eye" id="eyeKonfirmasi"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit"
+                    class="bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2.5 px-6 rounded-xl text-sm transition flex items-center gap-2">
+                    <i class="bi bi-floppy"></i> Simpan Password Baru
+                </button>
+            </form>
+        </div>
+    </div>
+</div>{{-- /tab-password --}}
 
 @endsection
 
@@ -391,7 +571,110 @@
         toastTimer = setTimeout(() => { toast.style.opacity = '0'; }, 2500);
     }
 
-    /* ── 10. FLASH MESSAGE → SWAL TOAST ──────────────────────────────────── */
+    /* ── 10. TAB SWITCHING ───────────────────────────────────────────────── */
+    var activeTab = localStorage.getItem('pengaturanTab') || 'kantor';
+
+    window.switchTab = function(tab) {
+        document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.add('hidden'); });
+        document.getElementById('tab-' + tab).classList.remove('hidden');
+        document.querySelectorAll('.tab-btn').forEach(function(btn) {
+            btn.classList.remove('border-slate-800', 'text-slate-800');
+            btn.classList.add('border-transparent', 'text-slate-400');
+        });
+        var btn = document.getElementById('tabBtn-' + tab);
+        btn.classList.remove('border-transparent', 'text-slate-400');
+        btn.classList.add('border-slate-800', 'text-slate-800');
+        activeTab = tab;
+        localStorage.setItem('pengaturanTab', tab);
+
+        if (tab === 'divisi' && document.getElementById('divisiTable') && !$.fn.DataTable.isDataTable('#divisiTable')) {
+            $('#divisiTable').DataTable({
+                language: { url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json' },
+                columnDefs: [{ orderable: false, targets: [2] }]
+            });
+        }
+    };
+
+    /* ── 11. DIVISI MODAL ────────────────────────────────────────────────── */
+    window.openModalDivisi = function(id, nama) {
+        var modal = document.getElementById('modalDivisi');
+        var form = document.getElementById('formDivisi');
+        var title = document.getElementById('modalDivisiTitle');
+        var btnSimpan = document.getElementById('btnSimpanDivisi');
+        var idInput = document.getElementById('divisiId');
+        var namaInput = document.getElementById('namaDivisiInput');
+
+        if (id) {
+            title.textContent = 'Edit Divisi';
+            btnSimpan.innerHTML = '<i class="bi bi-save"></i> Simpan';
+            idInput.value = id;
+            namaInput.value = nama;
+            form.action = '{{ route('admin.divisi.update', ':id') }}'.replace(':id', id);
+            var methodInput = form.querySelector('input[name="_method"]');
+            if (!methodInput) {
+                methodInput = document.createElement('input');
+                methodInput.type = 'hidden';
+                methodInput.name = '_method';
+                form.appendChild(methodInput);
+            }
+            methodInput.value = 'PUT';
+        } else {
+            title.textContent = 'Tambah Divisi';
+            btnSimpan.innerHTML = '<i class="bi bi-plus-circle"></i> Tambah';
+            idInput.value = '';
+            namaInput.value = '';
+            form.action = '{{ route('admin.divisi.store') }}';
+            var methodInput = form.querySelector('input[name="_method"]');
+            if (methodInput) methodInput.remove();
+        }
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        setTimeout(function() { namaInput.focus(); }, 100);
+    };
+
+    window.tutupModalDivisi = function() {
+        document.getElementById('modalDivisi').classList.add('hidden');
+        document.getElementById('modalDivisi').classList.remove('flex');
+    };
+
+    window.hapusDivisi = function(id, nama) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Hapus Divisi?',
+            text: 'Divisi "' + nama + '" akan dihapus permanent.',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#dc2626'
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                var form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '{{ route('admin.divisi.destroy', ':id') }}'.replace(':id', id);
+                form.innerHTML = '@csrf @method('DELETE')';
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    };
+
+    /* ── 12. TOGGLE PASSWORD ─────────────────────────────────────────────── */
+    window.togglePass = function(inputId, iconId) {
+        var input = document.getElementById(inputId);
+        var icon  = document.getElementById(iconId);
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'bi bi-eye-slash';
+        } else {
+            input.type = 'password';
+            icon.className = 'bi bi-eye';
+        }
+    };
+
+    /* ── 13. INIT TAB ────────────────────────────────────────────────────── */
+    window.switchTab(activeTab);
+
+    /* ── 14. FLASH MESSAGE → SWAL TOAST ──────────────────────────────────── */
     var flashSuccess = document.getElementById('flashSuccess');
     var flashError   = document.getElementById('flashError');
 

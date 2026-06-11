@@ -111,6 +111,7 @@
                             <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">Jam Keluar</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">Status</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">Keterlambatan</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
@@ -153,6 +154,11 @@
                             </td>
                             <td class="px-4 py-3 text-sm text-slate-600">
                                 {{ ($p->menit_terlambat ?? 0) > 0 ? ($p->menit_terlambat ?? 0) . ' menit' : '-' }}
+                            </td>
+                            <td class="px-4 py-3">
+                                <button onclick="openEditModal({{ $p->id_presensi }}, '{{ $p->status }}', {{ $p->id_pengguna }})" class="bg-blue-50 text-blue-600 p-2 rounded-lg hover:bg-blue-100 transition" title="Edit Status">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
                             </td>
                         </tr>
                         @endforeach
@@ -231,16 +237,95 @@
     </div>
 </div>
 
+<!-- Modal Edit Status -->
+<div id="editStatusModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+    <div class="bg-white rounded-3xl max-w-md w-full mx-4">
+        <div class="bg-slate-800 p-5 rounded-t-3xl">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xl font-bold text-white">Edit Status Kehadiran</h3>
+                <button class="close-edit-modal text-slate-400 hover:text-white text-2xl">&times;</button>
+            </div>
+        </div>
+        <div class="p-6">
+            <form id="editStatusForm">
+                <input type="hidden" id="editPresensiId">
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2">Status</label>
+                    <select id="editStatusSelect" class="input-field w-full">
+                        <option value="hadir">Hadir</option>
+                        <option value="terlambat">Terlambat</option>
+                        <option value="izin">Izin</option>
+                        <option value="alpha">Alpha</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2">Keterangan</label>
+                    <textarea id="editKeterangan" class="input-field w-full" rows="2" placeholder="Opsional"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="p-5 border-t border-slate-100 flex justify-end gap-3">
+            <button class="close-edit-modal btn-secondary px-6">Batal</button>
+            <button onclick="saveEditStatus()" class="btn-primary px-6">Simpan</button>
+        </div>
+    </div>
+</div>
+
 <script>
     let mapMasuk, mapPulang;
-    
+    let editPresensiId = null;
+
     function closeDetailModal() {
         document.getElementById('detailModal').classList.add('hidden');
         document.getElementById('detailModal').classList.remove('flex');
     }
-    
+
+    function openEditModal(id, status, penggunaId) {
+        editPresensiId = id;
+        document.getElementById('editPresensiId').value = id;
+        document.getElementById('editStatusSelect').value = status;
+        document.getElementById('editKeterangan').value = '';
+        document.getElementById('editStatusModal').classList.remove('hidden');
+        document.getElementById('editStatusModal').classList.add('flex');
+    }
+
+    function saveEditStatus() {
+        const id = document.getElementById('editPresensiId').value;
+        const status = document.getElementById('editStatusSelect').value;
+        const keterangan = document.getElementById('editKeterangan').value;
+
+        fetch('{{ route('admin.detail-rekap-kehadiran.update-status', ':id') }}'.replace(':id', id), {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ status, keterangan })
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                Swal.fire({ icon: 'success', title: result.message, toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
+                document.getElementById('editStatusModal').classList.add('hidden');
+                location.reload();
+            } else {
+                Swal.fire({ icon: 'error', title: result.message, toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
+            }
+        })
+        .catch(error => {
+            Swal.fire({ icon: 'error', title: 'Terjadi kesalahan', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
+        });
+    }
+
     document.querySelectorAll('.close-modal').forEach(btn => {
         btn.addEventListener('click', closeDetailModal);
+    });
+
+    document.querySelectorAll('.close-edit-modal').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.getElementById('editStatusModal').classList.add('hidden');
+            document.getElementById('editStatusModal').classList.remove('flex');
+        });
     });
 
     $(document).ready(function() {
@@ -248,7 +333,8 @@
             language: {
                 url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json'
             },
-            order: [[0, 'desc']]
+            order: [[0, 'desc']],
+            columnDefs: [{ orderable: false, targets: [6] }]
         });
     });
 </script>

@@ -153,13 +153,20 @@
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">
                             Password <span class="text-red-500">*</span>
                         </label>
-                        <input type="password"
-                               name="password"
-                               class="input-field w-full @error('password') border-red-500 @enderror"
-                               placeholder="Buat password akun"
-                               minlength="8"
-                               autocomplete="new-password"
-                               required>
+                        <div class="relative">
+                            <input type="password"
+                                   name="password"
+                                   id="pwTambah"
+                                   class="input-field w-full pr-10 @error('password') border-red-500 @enderror"
+                                   placeholder="Buat password akun"
+                                   minlength="8"
+                                   autocomplete="new-password"
+                                   required>
+                            <button type="button" onclick="togglePass('pwTambah', 'eyeTambah')"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                                <i class="bi bi-eye" id="eyeTambah"></i>
+                            </button>
+                        </div>
                         @error('password')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
@@ -170,13 +177,20 @@
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">
                             Konfirmasi Password <span class="text-red-500">*</span>
                         </label>
-                        <input type="password"
-                               name="password_confirmation"
-                               class="input-field w-full"
-                               placeholder="Konfirmasi password"
-                               minlength="8"
-                               autocomplete="new-password"
-                               required>
+                        <div class="relative">
+                            <input type="password"
+                                   name="password_confirmation"
+                                   id="pwTambahKonfirmasi"
+                                   class="input-field w-full pr-10"
+                                   placeholder="Konfirmasi password"
+                                   minlength="8"
+                                   autocomplete="new-password"
+                                   required>
+                            <button type="button" onclick="togglePass('pwTambahKonfirmasi', 'eyeTambahKonfirmasi')"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                                <i class="bi bi-eye" id="eyeTambahKonfirmasi"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
@@ -195,4 +209,17 @@
         </div>
     </div>
 </div>
+<script>
+function togglePass(inputId, iconId) {
+    var input = document.getElementById(inputId);
+    var icon  = document.getElementById(iconId);
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'bi bi-eye-slash';
+    } else {
+        input.type = 'password';
+        icon.className = 'bi bi-eye';
+    }
+}
+</script>
 @endsection

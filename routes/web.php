@@ -8,6 +8,8 @@ use App\Http\Controllers\Admin\PengaturanKantorController;
 use App\Http\Controllers\Admin\DetailRekapKehadiranController;
 use App\Http\Controllers\Admin\NotifikasiController;
 use App\Http\Controllers\Admin\RekapKaryawanController;
+use App\Http\Controllers\Admin\GantiPasswordController;
+use App\Http\Controllers\Admin\DivisiController;
 use App\Http\Controllers\Karyawan\AbsenMasuk;
 use App\Http\Controllers\Karyawan\AbsenKeluar;
 use App\Http\Controllers\Karyawan\DashboardController;
@@ -62,10 +64,21 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Detail Rekap Kehadiran
     Route::get('/detail-rekap-kehadiran/{id}', [DetailRekapKehadiranController::class, 'index'])->name('detail-rekap-kehadiran');
     Route::get('/detail-rekap-kehadiran/{id}/export-pdf', [DetailRekapKehadiranController::class, 'exportPdf'])->name('detail-rekap-kehadiran.export-pdf');
+    Route::put('/detail-rekap-kehadiran/update-status/{id}', [DetailRekapKehadiranController::class, 'updateStatus'])->name('detail-rekap-kehadiran.update-status');
     
     // Pengaturan Kantor   
     Route::get('/pengaturan-kantor', [PengaturanKantorController::class, 'index'])->name('pengaturan-kantor');
     Route::post('/pengaturan-kantor', [PengaturanKantorController::class, 'update'])->name('pengaturan-kantor.update');
+
+    // Ganti Password
+    Route::get('/ganti-password', [GantiPasswordController::class, 'index'])->name('ganti-password');
+    Route::put('/ganti-password', [GantiPasswordController::class, 'update'])->name('ganti-password.update');
+
+    // Divisi
+    Route::get('/divisi', [DivisiController::class, 'index'])->name('divisi');
+    Route::post('/divisi', [DivisiController::class, 'store'])->name('divisi.store');
+    Route::put('/divisi/{id}', [DivisiController::class, 'update'])->name('divisi.update');
+    Route::delete('/divisi/{id}', [DivisiController::class, 'destroy'])->name('divisi.destroy');
 });
 
 // =========================================================================
@@ -83,6 +96,7 @@ Route::prefix('karyawan')->name('karyawan.')->group(function () {
     Route::get('/izin-cuti', [IzinCutiController::class, 'index'])->name('izin-cuti');
     Route::post('/izin-cuti/store', [IzinCutiController::class, 'store'])->name('izin-cuti.store');
     Route::get('/izin-cuti/data', [IzinCutiController::class, 'getData'])->name('izin-cuti.data');
+    Route::put('/izin-cuti/cancel/{id}', [IzinCutiController::class, 'cancel'])->name('izin-cuti.cancel');
 
     // Profile & Ganti Password
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');

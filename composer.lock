@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "398ac677a9c6311454725e156f8de59c",
+    "content-hash": "fbecf2392085afe08213044ca821b51f",
     "packages": [
         {
             "name": "barryvdh/laravel-dompdf",
@@ -2318,6 +2318,88 @@
                 "source": "https://github.com/Masterminds/html5-php/tree/2.10.0"
             },
             "time": "2025-07-25T09:04:22+00:00"
+        },
+        {
+            "name": "mayaram/laravel-browser-location",
+            "version": "v2.1.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mayaramyadav/laravel-browser-location.git",
+                "reference": "2cdaf7fb46f37a4e77ec09ad8aed7ad1d39ee618"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mayaramyadav/laravel-browser-location/zipball/2cdaf7fb46f37a4e77ec09ad8aed7ad1d39ee618",
+                "reference": "2cdaf7fb46f37a4e77ec09ad8aed7ad1d39ee618",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/http": "^10.0|^11.0|^12.0|^13.0",
+                "illuminate/support": "^10.0|^11.0|^12.0|^13.0",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.27",
+                "pestphp/pest": "^4.4",
+                "pestphp/pest-plugin-laravel": "^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "BrowserGeocoder": "Mayaram\\BrowserLocation\\Facades\\Geocoder",
+                        "BrowserLocation": "Mayaram\\BrowserLocation\\Facades\\BrowserLocation"
+                    },
+                    "providers": [
+                        "Mayaram\\BrowserLocation\\BrowserLocationServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Mayaram\\BrowserLocation\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mayaram",
+                    "email": "info@mayaram.in"
+                }
+            ],
+            "description": "HTML5 browser geolocation package for Laravel with Livewire 4 support, GPS capture, reverse geocoding, maps, and API integration.",
+            "homepage": "https://github.com/mayaramyadav/laravel-browser-location",
+            "keywords": [
+                "Browser Location",
+                "Free Laravel Geolocation",
+                "HTML5 Geolocation",
+                "Laravel Geolocation API",
+                "Laravel Geolocation Middleware",
+                "Laravel Geolocation Package",
+                "Laravel Geolocation Service",
+                "Laravel Location API",
+                "Laravel Location Middleware",
+                "Laravel Location Package",
+                "Laravel Location Service",
+                "Laravel Location Tracking",
+                "Livewire GPS",
+                "User Tracking Laravel",
+                "laravel geolocation"
+            ],
+            "support": {
+                "issues": "https://github.com/mayaramyadav/laravel-browser-location/issues",
+                "source": "https://github.com/mayaramyadav/laravel-browser-location/tree/v2.1.3"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/mayaram",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-03-18T10:01:19+00:00"
         },
         {
             "name": "monolog/monolog",
