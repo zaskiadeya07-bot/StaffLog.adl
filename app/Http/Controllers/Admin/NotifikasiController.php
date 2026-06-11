@@ -138,7 +138,7 @@ class NotifikasiController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Status perizinan berhasil diupdate'
+                'message' => 'Status perizinan berhasil diperbarui'
             ]);
         } catch (\Exception $e) {
             Log::error('Gagal update status perizinan: ' . $e->getMessage());

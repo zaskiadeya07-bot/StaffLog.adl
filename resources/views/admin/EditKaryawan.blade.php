@@ -63,7 +63,7 @@
                     {{-- Username --}}
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">
-                            Username <span class="text-red-500">*</span>
+                            Nama Pengguna <span class="text-red-500">*</span>
                         </label>
                         <input type="text"
                                name="username"
@@ -138,7 +138,7 @@
                     {{-- Password Baru (Opsional) --}}
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">
-                            Password Baru
+                            Kata Sandi Baru
                         </label>
                         <div class="relative">
                             <input type="password"
@@ -153,20 +153,20 @@
                                 <i class="bi bi-eye" id="eyeEdit"></i>
                             </button>
                         </div>
-                        <p class="text-xs text-slate-400 mt-1">Minimal 8 karakter. Isi hanya jika ingin mengubah password.</p>
+                        <p class="text-xs text-slate-400 mt-1">Minimal 8 karakter. Isi hanya jika ingin mengubah kata sandi.</p>
                     </div>
 
                     {{-- Konfirmasi Password Baru --}}
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">
-                            Konfirmasi Password Baru
+                            Konfirmasi Kata Sandi Baru
                         </label>
                         <div class="relative">
                             <input type="password"
                                    name="password_confirmation"
                                    id="pwEditKonfirmasi"
                                    class="input-field w-full pr-10"
-                                   placeholder="Konfirmasi password baru"
+                                    placeholder="Konfirmasi kata sandi baru"
                                    minlength="8"
                                    autocomplete="new-password">
                             <button type="button" onclick="togglePass('pwEditKonfirmasi', 'eyeEditKonfirmasi')"

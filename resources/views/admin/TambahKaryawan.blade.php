@@ -71,12 +71,12 @@
                     {{-- Username --}}
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">
-                            Username <span class="text-red-500">*</span>
+                            Nama Pengguna <span class="text-red-500">*</span>
                         </label>
                         <input type="text"
                                name="username"
                                class="input-field w-full @error('username') border-red-500 @enderror"
-                               placeholder="Masukkan username untuk login"
+                               placeholder="Masukkan nama pengguna untuk login"
                                value="{{ old('username') }}"
                                minlength="5" maxlength="30" pattern="\S+"
                                title="Tanpa spasi" required>
@@ -151,14 +151,14 @@
                     {{-- Password --}}
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">
-                            Password <span class="text-red-500">*</span>
+                            Kata Sandi <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
                             <input type="password"
                                    name="password"
                                    id="pwTambah"
                                    class="input-field w-full pr-10 @error('password') border-red-500 @enderror"
-                                   placeholder="Buat password akun"
+                                   placeholder="Buat kata sandi akun"
                                    minlength="8"
                                    autocomplete="new-password"
                                    required>
@@ -175,14 +175,14 @@
                     {{-- Konfirmasi Password --}}
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">
-                            Konfirmasi Password <span class="text-red-500">*</span>
+                            Konfirmasi Kata Sandi <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
                             <input type="password"
                                    name="password_confirmation"
                                    id="pwTambahKonfirmasi"
                                    class="input-field w-full pr-10"
-                                   placeholder="Konfirmasi password"
+                                    placeholder="Konfirmasi kata sandi"
                                    minlength="8"
                                    autocomplete="new-password"
                                    required>

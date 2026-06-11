@@ -63,7 +63,7 @@
                             <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">No</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">ID Karyawan</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Nama Lengkap</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Username</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Nama Pengguna</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Divisi</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Nomor HP</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Status</th>

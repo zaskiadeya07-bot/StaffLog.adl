@@ -17,7 +17,7 @@
         <div class="flex gap-2">
             <a href="{{ route('admin.detail-rekap-kehadiran.export-pdf', ['id' => $karyawan->id_pengguna, 'bulan' => $bulan, 'tahun' => $tahun]) }}"
                class="btn-primary inline-flex items-center gap-2" style="background:#2563eb;">
-                <i class="bi bi-filetype-pdf"></i> Export PDF
+                <i class="bi bi-filetype-pdf"></i> Ekspor PDF
             </a>
             <a href="{{ route('admin.rekap-karyawan') }}" class="btn-secondary inline-flex items-center gap-2">
                 <i class="bi bi-arrow-left"></i> Kembali
@@ -201,7 +201,7 @@
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
-                    <label class="block text-sm font-semibold mb-2">Lokasi Check-In</label>
+                    <label class="block text-sm font-semibold mb-2">Lokasi Absen Masuk</label>
                     <div id="detailMapMasuk" class="h-48 bg-slate-100 rounded-xl overflow-hidden relative">
                         <div class="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
                             <i class="bi bi-clock"></i> <span id="detailTimeMasuk">--:--</span>
@@ -213,7 +213,7 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold mb-2">Lokasi Check-Out</label>
+                    <label class="block text-sm font-semibold mb-2">Lokasi Absen Pulang</label>
                     <div id="detailMapPulang" class="h-48 bg-slate-100 rounded-xl overflow-hidden relative">
                         <div class="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
                             <i class="bi bi-clock"></i> <span id="detailTimePulang">--:--</span>

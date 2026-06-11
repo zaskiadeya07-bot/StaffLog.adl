@@ -1,13 +1,13 @@
 @extends('layouts.KaryawanLayout')
 
-@section('title', 'Check In / Absen Masuk')
+@section('title', 'Absen Masuk')
 
 @section('content')
 <div>
     {{-- ========== HEADER HALAMAN ========== --}}
     <div class="flex justify-between items-center mb-6 flex-wrap gap-3">
         <div>
-            <h1 class="text-2xl font-bold text-slate-800">Check In</h1>
+            <h1 class="text-2xl font-bold text-slate-800">Absen Masuk</h1>
             <p class="text-slate-500 text-sm">Validasi lokasi aktif dengan radius kantor {{ $setting->radius ?? 100 }} meter.</p>
         </div>
         <div class="clock-card">
@@ -60,7 +60,7 @@
     {{-- ========== TOMBOL CHECK IN ========== --}}
     <div class="text-center">
         <button id="actionBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-semibold shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed">
-            <i class="bi bi-check-circle mr-2"></i> Check In Sekarang
+            <i class="bi bi-check-circle mr-2"></i> Absen Masuk Sekarang
         </button>
     </div>
 </div>
@@ -166,8 +166,8 @@ function checkTodayAttendance() {
     .then(function(result) {
         if (result.sudah_check_in === true || result.hasCheckedIn === true) {
             hasCheckedToday = true;
-            enableButton(false, 'Anda sudah melakukan check in hari ini');
-            showErrorNotification('Anda sudah melakukan check in hari ini');
+            enableButton(false, 'Anda sudah absen masuk hari ini');
+            showErrorNotification('Anda sudah absen masuk hari ini');
         }
     })
     .catch(function(error) {
@@ -358,7 +358,7 @@ function performAction() {
         return;
     }
     if (hasCheckedToday) {
-        showErrorNotification('Anda sudah check in hari ini');
+        showErrorNotification('Anda sudah absen masuk hari ini');
         return;
     }
     if (!currentPosition) {
@@ -371,14 +371,14 @@ function performAction() {
 
     Swal.fire({
         icon: 'question',
-        title: 'Check In Sekarang?',
+        title: 'Absen Masuk Sekarang?',
         html: '<div style="text-align:left">' +
             '<div style="padding:6px 0"><strong>Jam:</strong> ' + jam + '</div>' +
             '<div style="padding:6px 0"><strong>Jarak ke Kantor:</strong> ' + jarak + ' meter</div>' +
             '<div style="padding:6px 0"><strong>Status:</strong> ' + (isWithinRadius ? 'Dalam Radius' : 'Luar Radius') + '</div>' +
             '</div>',
         showCancelButton: true,
-        confirmButtonText: 'Ya, Check In!',
+        confirmButtonText: 'Ya, Absen Masuk!',
         cancelButtonText: 'Batal',
         confirmButtonColor: '#2563eb'
     }).then(function(result) {

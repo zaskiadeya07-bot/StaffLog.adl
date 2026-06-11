@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StaffLog Admin - @yield('title', 'Admin Panel')</title>
+    <title>StaffLog Admin - @yield('title', 'Panel Admin')</title>
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -236,7 +236,7 @@
             <button id="sidebarToggleBtn" class="sidebar-toggle-btn">
                 <i class="bi bi-list"></i>
             </button>
-            <span class="text-slate-700 font-semibold text-sm">@yield('title', 'Admin Panel')</span>
+            <span class="text-slate-700 font-semibold text-sm">@yield('title', 'Panel Admin')</span>
         </div>
         <div class="flex items-center gap-3">
             <span class="text-sm text-slate-500 hidden sm:block">
@@ -246,7 +246,7 @@
                 @csrf
                 <button type="submit" class="logout-btn">
                     <i class="bi bi-box-arrow-right"></i>
-                    <span class="hidden sm:inline">Logout</span>
+                    <span class="hidden sm:inline">Keluar</span>
                 </button>
             </form>
         </div>

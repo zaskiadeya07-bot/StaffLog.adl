@@ -265,7 +265,7 @@
                 <button type="button"
                         onclick="resetToDefault()"
                         class="btn-secondary">
-                    <i class="bi bi-arrow-counterclockwise"></i> Reset Default
+                    <i class="bi bi-arrow-counterclockwise"></i> Reset Bawaan
                 </button>
                 <button type="submit" class="btn-primary">
                     <i class="bi bi-floppy"></i> Simpan Pengaturan
@@ -733,7 +733,7 @@
     window.resetToDefault = function () {
         Swal.fire({
             icon: 'question',
-            title: 'Reset ke lokasi default?',
+            title: 'Reset ke lokasi bawaan?',
             text: 'Koordinat akan kembali ke lokasi default Jakarta.',
             showCancelButton: true,
             confirmButtonText: 'Ya, reset!',
@@ -752,7 +752,7 @@
 
             Swal.fire({
                 icon: 'success',
-                title: 'Lokasi direset ke default',
+                title: 'Lokasi direset ke bawaan',
                 toast: true,
                 position: 'top-end',
                 showConfirmButton: false,

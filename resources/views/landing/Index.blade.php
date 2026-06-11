@@ -1,6 +1,6 @@
 @extends('layouts.App')
 
-@section('title', 'Landing Page')
+@section('title', 'Halaman Utama')
 
 @section('content')
 <div class="min-h-screen flex flex-col">
@@ -50,7 +50,7 @@
                     <div class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <i class="bi bi-geo-alt-fill text-3xl text-slate-700"></i>
                     </div>
-                    <h3 class="font-bold text-lg mb-2">Check-In / Out</h3>
+                    <h3 class="font-bold text-lg mb-2">Absen Masuk / Pulang</h3>
                 </div>
                 <div class="card card-hover p-6 text-center">
                     <div class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -129,7 +129,7 @@
         <div class="p-6">
             <p class="font-semibold text-slate-800 mb-3">Butuh bantuan seputar StaffLog.adl?</p>
             <ul class="space-y-2 mb-4">
-                <li class="flex gap-2"><i class="bi bi-fingerprint text-amber-500"></i> <span><strong>Cara Check-In/Out:</strong> Klik tombol "Absen" pada dashboard</span></li>
+                <li class="flex gap-2"><i class="bi bi-fingerprint text-amber-500"></i> <span><strong>Cara Absen Masuk/Pulang:</strong> Klik tombol "Absen" pada dashboard</span></li>
                 <li class="flex gap-2"><i class="bi bi-calendar-plus text-amber-500"></i> <span><strong>Pengajuan Izin:</strong> Akses menu "Izin", isi form</span></li>
                 <li class="flex gap-2"><i class="bi bi-envelope text-amber-500"></i> <span><strong>Email:</strong> support@stafflog.adl</span></li>
             </ul>

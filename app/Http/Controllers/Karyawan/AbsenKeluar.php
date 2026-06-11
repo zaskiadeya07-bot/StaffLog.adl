@@ -43,7 +43,7 @@ class AbsenKeluar extends Controller
             if (!$request->session()->has('pengguna_id')) {
                 return response()->json([
                     'hasCheckedOut' => false,
-                    'error' => 'Session tidak valid'
+                    'error' => 'Sesi tidak valid'
                 ], 401);
             }
 
@@ -107,7 +107,7 @@ class AbsenKeluar extends Controller
                 DB::rollBack();
                 return response()->json([
                     'success' => false,
-                    'message' => 'Anda belum melakukan check in hari ini. Silakan check in terlebih dahulu.',
+                    'message' => 'Anda belum absen masuk hari ini. Silakan absen masuk terlebih dahulu.',
                     'code' => 'NO_CHECK_IN'
                 ], 400);
             }
@@ -116,7 +116,7 @@ class AbsenKeluar extends Controller
                 DB::rollBack();
                 return response()->json([
                     'success' => false,
-                    'message' => 'Anda sudah melakukan check out hari ini pada pukul ' . $presensi->check_out,
+                    'message' => 'Anda sudah absen pulang hari ini pada pukul ' . $presensi->check_out,
                     'code' => 'ALREADY_CHECKED_OUT'
                 ], 400);
             }
@@ -126,7 +126,7 @@ class AbsenKeluar extends Controller
                 DB::rollBack();
                 return response()->json([
                     'success' => false,
-                    'message' => 'Batas check out kemarin sudah lewat (23:59). Status anda akan otomatis alfa.',
+                    'message' => 'Batas absen pulang kemarin sudah lewat (23:59). Status anda akan otomatis alfa.',
                     'code' => 'DEADLINE_PASSED'
                 ], 400);
             }
@@ -164,7 +164,7 @@ class AbsenKeluar extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Check Out Berhasil! Selamat Beristirahat!',
+                'message' => 'Absen Pulang Berhasil! Selamat Beristirahat!',
                 'code' => 'SUCCESS',
                 'data' => [
                     'check_out_time' => $presensi->check_out,

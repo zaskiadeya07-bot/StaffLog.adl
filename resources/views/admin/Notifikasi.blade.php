@@ -215,7 +215,7 @@ function showDetail(id) {
                         <span class="text-sm">${fileName}</span>
                         <i class="bi bi-box-arrow-up-right ml-1"></i>
                     </a>
-                    <a href="${fileUrl}" download="${fileName}" class="text-slate-500 hover:text-slate-700 p-2 rounded-lg hover:bg-slate-100" title="Download">
+                    <a href="${fileUrl}" download="${fileName}" class="text-slate-500 hover:text-slate-700 p-2 rounded-lg hover:bg-slate-100" title="Unduh">
                         <i class="bi bi-download"></i>
                     </a>
                 </div>

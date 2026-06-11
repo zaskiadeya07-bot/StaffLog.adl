@@ -116,7 +116,7 @@
                 </div>
 
                 <div>
-                    <p class="text-xs text-slate-400 mb-1">Username</p>
+                    <p class="text-xs text-slate-400 mb-1">Nama Pengguna</p>
                     <p class="font-semibold text-slate-800">{{ $pengguna->username }}</p>
                 </div>
 
@@ -184,12 +184,12 @@
                     {{-- Password Lama --}}
                     <div class="mb-4">
                         <label class="block text-xs font-semibold text-slate-600 mb-1.5">
-                            <i class="bi bi-lock text-slate-400 mr-1"></i> Password Saat Ini
+                            <i class="bi bi-lock text-slate-400 mr-1"></i> Kata Sandi Saat Ini
                         </label>
                         <div class="relative">
                             <input type="password" name="password_lama" id="passwordLama"
                                 class="w-full px-4 py-2.5 pr-10 border {{ $errors->has('password_lama') ? 'border-red-400' : 'border-slate-200' }} rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-200"
-                                placeholder="Masukkan password saat ini" autocomplete="current-password">
+                                placeholder="Masukkan kata sandi saat ini" autocomplete="current-password">
                             <button type="button" onclick="togglePass('passwordLama', 'eyeLama')"
                                 class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                                 <i class="bi bi-eye" id="eyeLama"></i>
@@ -203,7 +203,7 @@
                     {{-- Password Baru --}}
                     <div class="mb-4">
                         <label class="block text-xs font-semibold text-slate-600 mb-1.5">
-                            <i class="bi bi-key text-slate-400 mr-1"></i> Password Baru
+                            <i class="bi bi-key text-slate-400 mr-1"></i> Kata Sandi Baru
                         </label>
                         <div class="relative">
                             <input type="password" name="password_baru" id="passwordBaru"
@@ -222,7 +222,7 @@
                     {{-- Konfirmasi Password --}}
                     <div class="mb-5">
                         <label class="block text-xs font-semibold text-slate-600 mb-1.5">
-                            <i class="bi bi-key-fill text-slate-400 mr-1"></i> Konfirmasi Password Baru
+                            <i class="bi bi-key-fill text-slate-400 mr-1"></i> Konfirmasi Kata Sandi Baru
                         </label>
                         <div class="relative">
                             <input type="password" name="password_baru_confirmation" id="passwordKonfirmasi"

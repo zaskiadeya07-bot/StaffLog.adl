@@ -141,11 +141,11 @@ class TambahKaryawan extends Controller
 
             return redirect()
                 ->route('admin.rekap-karyawan')
-                ->with('success', 'Data karyawan berhasil diupdate!');
+                ->with('success', 'Data karyawan berhasil diperbarui!');
         } catch (\Exception $e) {
             return redirect()
                 ->back()
-                ->with('error', 'Gagal mengupdate karyawan. Silakan coba lagi.')
+                ->with('error', 'Gagal memperbarui karyawan. Silakan coba lagi.')
                 ->withInput();
         }
     }

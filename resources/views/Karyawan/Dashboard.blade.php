@@ -1,6 +1,6 @@
 @extends('layouts.KaryawanLayout')
 
-@section('title', 'Dashboard')
+@section('title', 'Beranda')
 
 @section('content')
 <div>

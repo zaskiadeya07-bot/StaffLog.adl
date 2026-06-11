@@ -39,7 +39,7 @@ class AbsenMasuk extends Controller
     {
         try {
             if (!$request->session()->has('pengguna_id')) {
-                return response()->json(['sudah_check_in' => false, 'error' => 'Session tidak valid'], 401);
+                return response()->json(['sudah_check_in' => false, 'error' => 'Sesi tidak valid'], 401);
             }
 
             return response()->json(
@@ -79,7 +79,7 @@ class AbsenMasuk extends Controller
 
             if ($existingPresensi) {
                 DB::rollBack();
-                return response()->json(['success' => false, 'message' => 'Anda sudah melakukan check in hari ini!'], 400);
+                return response()->json(['success' => false, 'message' => 'Anda sudah absen masuk hari ini!'], 400);
             }
 
             $setting = MasterData::first();
@@ -137,7 +137,7 @@ class AbsenMasuk extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error check in: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat check in.'], 500);
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat absen masuk.'], 500);
         }
     }
 }

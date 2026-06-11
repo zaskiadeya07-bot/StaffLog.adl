@@ -1,12 +1,12 @@
 @extends('layouts.KaryawanLayout')
 
-@section('title', 'Check Out')
+@section('title', 'Absen Pulang')
 
 @section('content')
 <div>
     <div class="flex justify-between items-center mb-6 flex-wrap gap-3">
         <div>
-            <h1 class="text-2xl font-bold text-slate-800">Check Out</h1>
+            <h1 class="text-2xl font-bold text-slate-800">Absen Pulang</h1>
             <p class="text-slate-500 text-sm">Validasi lokasi aktif, radius kantor {{ $setting->radius ?? 100 }} meter.</p>
         </div>
         <div class="clock-card">
@@ -59,7 +59,7 @@
     {{-- TOMBOL CHECK OUT (WARNA BIRU SAMA KAYAK CHECK IN) --}}
     <div class="text-center">
         <button id="actionBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-semibold shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed">
-            <i class="bi bi-box-arrow-right mr-2"></i> Check Out Sekarang
+            <i class="bi bi-box-arrow-right mr-2"></i> Absen Pulang Sekarang
         </button>
     </div>
 </div>
@@ -136,10 +136,10 @@ function checkTodayCheckOut() {
         if (result.hasCheckedOut) {
             hasCheckedOut = true;
             enableButton(false);
-            showErrorNotification('Anda sudah melakukan check out hari ini');
+            showErrorNotification('Anda sudah absen pulang hari ini');
         } else if (!result.data) {
             enableButton(false);
-            showErrorNotification('Anda belum check in hari ini. Check in terlebih dahulu.');
+            showErrorNotification('Anda belum absen masuk hari ini. Absen masuk terlebih dahulu.');
         }
     })
     .catch(function(error) { console.error('Error:', error); });
@@ -283,7 +283,7 @@ function performAction() {
         return;
     }
     if (hasCheckedOut) {
-        showErrorNotification('Anda sudah check out hari ini');
+        showErrorNotification('Anda sudah absen pulang hari ini');
         return;
     }
     if (!currentPosition) {
@@ -294,7 +294,7 @@ function performAction() {
     /* ── Cek batas waktu check out (23:59) ──────────────────────────── */
     var jamSekarang = new Date();
     if (jamSekarang.getHours() >= 0 && jamSekarang.getHours() < 6) {
-        showErrorNotification('Batas check out kemarin sudah lewat (23:59). Status anda akan otomatis alfa.');
+        showErrorNotification('Batas absen pulang kemarin sudah lewat (23:59). Status anda akan otomatis alfa.');
         return;
     }
 
@@ -303,14 +303,14 @@ function performAction() {
 
     Swal.fire({
         icon: 'question',
-        title: 'Check Out Sekarang?',
+        title: 'Absen Pulang Sekarang?',
         html: '<div style="text-align:left">' +
             '<div style="padding:6px 0"><strong>Jam:</strong> ' + jam + '</div>' +
             '<div style="padding:6px 0"><strong>Jarak ke Kantor:</strong> ' + jarak + ' meter</div>' +
             '<div style="padding:6px 0"><strong>Status:</strong> ' + (isWithinRadius ? 'Dalam Radius' : 'Luar Radius') + '</div>' +
             '</div>',
         showCancelButton: true,
-        confirmButtonText: 'Ya, Check Out!',
+        confirmButtonText: 'Ya, Absen Pulang!',
         cancelButtonText: 'Batal',
         confirmButtonColor: '#2563eb'
     }).then(function(result) {
