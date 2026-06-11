@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Karyawan;
 
+use App\Helpers\BulanHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Presensi;
 use Illuminate\Http\Request;
@@ -18,12 +19,7 @@ class RekapAbsenController extends Controller
         $bulan = $request->get('bulan', date('m'));
         $tahun = $request->get('tahun', date('Y'));
 
-        $namaBulan = [
-            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
-        ];
-        $bulanNama = $namaBulan[(int)$bulan];
+        $bulanNama = BulanHelper::getNamaBulanByAngka((int)$bulan);
 
         $presensi = Presensi::where('id_pengguna', $idPengguna)
             ->whereMonth('tanggal', $bulan)
