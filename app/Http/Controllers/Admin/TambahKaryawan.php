@@ -33,7 +33,7 @@ class TambahKaryawan extends Controller
             'username'        => $request->username,
             'alamat'          => $request->alamat,
             'nomor_hp'        => $request->nomor_hp,
-            'tgl_mulai_kerja' => $request->tgl_mulai_kerja,
+            'tgl_mulai_kerja' => $request->tgl_mulai_kerja ?? now()->toDateString(),
             'divisi'          => $request->divisi,
             'password'        => Hash::make($request->password),
             'role'            => 'karyawan',

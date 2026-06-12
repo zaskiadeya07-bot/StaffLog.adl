@@ -78,7 +78,7 @@
                         </label>
                         <input type="date" name="tgl_mulai_kerja"
                             class="input-field w-full @error('tgl_mulai_kerja') border-red-500 @enderror"
-                            value="{{ old('tgl_mulai_kerja') }}" max="{{ date('Y-m-d') }}" required>
+                            value="{{ old('tgl_mulai_kerja', date('Y-m-d')) }}" max="{{ date('Y-m-d') }}">
                         @error('tgl_mulai_kerja')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
