@@ -67,7 +67,7 @@
 </div>
 
 {{-- MODAL --}}
-<div id="modalDivisi" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+<div id="modalDivisi" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center">
     <div class="bg-white rounded-3xl max-w-md w-full mx-4 shadow-2xl">
         <div class="bg-slate-800 p-5 rounded-t-3xl">
             <div class="flex justify-between items-center">

@@ -113,7 +113,7 @@
 </div>
 
 {{-- Modal Konfirmasi Nonaktifkan --}}
-<div id="deleteModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+<div id="deleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center">
     <div class="bg-white rounded-2xl max-w-md w-full mx-4 shadow-xl">
         <div class="bg-amber-600 text-white p-4 rounded-t-2xl">
             <h3 class="font-bold text-lg flex items-center gap-2">

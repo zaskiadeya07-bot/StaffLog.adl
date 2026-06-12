@@ -91,7 +91,7 @@
 </div>
 
 <!-- Modal Form -->
-<div id="formModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+<div id="formModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center">
     <div class="bg-white rounded-3xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div class="bg-slate-800 p-5 rounded-t-3xl sticky top-0"><div class="flex justify-between items-center"><h3 class="text-xl font-bold text-white"><i class="bi bi-file-text mr-2"></i> Form Pengajuan Izin / Cuti</h3><button class="close-modal text-slate-400 hover:text-white text-2xl">&times;</button></div></div>
         <div class="p-6">
@@ -140,7 +140,7 @@
 </div>
 
 <!-- Modal Detail -->
-<div id="detailModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+<div id="detailModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center">
     <div class="bg-white rounded-3xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div class="bg-slate-800 p-5 rounded-t-3xl sticky top-0"><div class="flex justify-between items-center"><h3 class="text-xl font-bold text-white">Detail Permohonan</h3><button class="close-modal-detail text-slate-400 hover:text-white text-2xl">&times;</button></div></div>
         <div class="p-6" id="detailContent"></div>
