@@ -5,12 +5,7 @@
 @section('content')
 
 {{-- ── PAGE HEADER ─────────────────────────────────────────────────────────── --}}
-<div class="flex justify-between items-center flex-wrap gap-3 mb-6">
-    <div>
-        <h1 class="text-2xl font-bold text-slate-800">Pengaturan</h1>
-        <p class="text-slate-500 text-sm">Kelola pengaturan aplikasi secara keseluruhan</p>
-    </div>
-</div>
+<x-page-header title="Pengaturan" description="Kelola pengaturan aplikasi secara keseluruhan" />
 
 {{-- ── FLASH MESSAGE ─────────────────────────────────────────────────────────── --}}
 @if (session('success'))

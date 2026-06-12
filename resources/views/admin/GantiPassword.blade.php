@@ -4,10 +4,13 @@
 
 @section('content')
 <div>
-    <div class="mb-6">
-        <h1 class="text-2xl font-bold text-slate-800">Ganti Kata Sandi</h1>
-        <p class="text-slate-500 text-sm">Perbarui kata sandi akun admin Anda</p>
-    </div>
+    <x-page-header title="Ganti Kata Sandi" description="Perbarui kata sandi akun admin Anda" />
+
+    <x-errors />
+
+    @if (session('success'))
+        <x-alert type="success">{{ session('success') }}</x-alert>
+    @endif
 
     <div class="card max-w-2xl">
         <div class="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
@@ -15,14 +18,6 @@
             <h3 class="font-semibold text-slate-700">Ubah Kata Sandi</h3>
         </div>
         <div class="p-5">
-
-            @if (session('success'))
-            <div class="flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl px-4 py-3 mb-4 text-sm">
-                <i class="bi bi-check-circle-fill text-emerald-500"></i>
-                {{ session('success') }}
-            </div>
-            @endif
-
             <form action="{{ route('admin.ganti-password.update') }}" method="POST">
                 @csrf
                 @method('PUT')
@@ -34,9 +29,6 @@
                     <input type="password" name="password_lama"
                         class="w-full px-4 py-2.5 border {{ $errors->has('password_lama') ? 'border-red-400' : 'border-slate-200' }} rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-200"
                         placeholder="Masukkan kata sandi saat ini">
-                    @if ($errors->has('password_lama'))
-                        <p class="text-xs text-red-500 mt-1">{{ $errors->first('password_lama') }}</p>
-                    @endif
                 </div>
 
                 <div class="mb-4">
@@ -46,9 +38,6 @@
                     <input type="password" name="password_baru"
                         class="w-full px-4 py-2.5 border {{ $errors->has('password_baru') ? 'border-red-400' : 'border-slate-200' }} rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-200"
                         placeholder="Minimal 6 karakter">
-                    @if ($errors->has('password_baru'))
-                        <p class="text-xs text-red-500 mt-1">{{ $errors->first('password_baru') }}</p>
-                    @endif
                 </div>
 
                 <div class="mb-5">
@@ -58,9 +47,6 @@
                     <input type="password" name="password_baru_confirmation"
                         class="w-full px-4 py-2.5 border {{ $errors->has('password_baru_confirmation') ? 'border-red-400' : 'border-slate-200' }} rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-200"
                         placeholder="Ulangi kata sandi baru">
-                    @if ($errors->has('password_baru_confirmation'))
-                        <p class="text-xs text-red-500 mt-1">{{ $errors->first('password_baru_confirmation') }}</p>
-                    @endif
                 </div>
 
                 <button type="submit"

@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UpdatePengaturanRequest;
 use App\Models\Devisi;
 use App\Models\MasterData;
-use Illuminate\Http\Request;
 
 class PengaturanKantorController extends Controller
 {
@@ -30,36 +30,21 @@ class PengaturanKantorController extends Controller
         return view('admin.PengaturanKantor', compact('setting', 'divisis'));
     }
 
-    public function update(Request $request)
+    public function update(UpdatePengaturanRequest $request)
     {
-        $validated = $request->validate([
-            'jam_masuk_std' => 'required',
-            'jam_pulang_std' => 'required',
-            'lat_kantor' => 'required|numeric|between:-90,90',
-            'long_kantor' => 'required|numeric|between:-180,180',
-            'radius' => 'required|integer|min:10|max:1000',
-            'toleransi' => 'required|integer|min:0|max:120',
-            'jatah_cuti_tahunan' => 'required|integer|min:0|max:365',
-        ]);
+        $data = $request->validated();
+        $data['jam_masuk_std']  = date('H:i:s', strtotime($data['jam_masuk_std']));
+        $data['jam_pulang_std'] = date('H:i:s', strtotime($data['jam_pulang_std']));
 
-        try {
-            $validated['jam_masuk_std']  = date('H:i:s', strtotime($validated['jam_masuk_std']));
-            $validated['jam_pulang_std'] = date('H:i:s', strtotime($validated['jam_pulang_std']));
+        $setting = MasterData::first();
 
-            $setting = MasterData::first();
-
-            if ($setting) {
-                $setting->update($validated);
-            } else {
-                MasterData::create($validated);
-            }
-
-            return redirect()->route('admin.pengaturan-kantor')
-                ->with('success', 'Pengaturan kantor berhasil disimpan!');
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->with('error', 'Gagal menyimpan pengaturan. Silakan coba lagi.')
-                ->withInput();
+        if ($setting) {
+            $setting->update($data);
+        } else {
+            MasterData::create($data);
         }
+
+        return redirect()->route('admin.pengaturan-kantor')
+            ->with('success', 'Pengaturan kantor berhasil disimpan!');
     }
 }

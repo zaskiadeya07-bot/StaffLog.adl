@@ -4,45 +4,26 @@
 
 @section('content')
 <div>
-    <div class="flex justify-between items-center flex-wrap gap-3 mb-4">
-        <div>
-            <h1 class="text-2xl font-bold text-slate-800">Data Karyawan</h1>
-            <p class="text-slate-500 text-sm">Kelola data karyawan yang terdaftar</p>
-        </div>
-        <a href="{{ route('admin.tambah-karyawan') }}" class="btn-primary inline-flex items-center gap-2">
-            <i class="bi bi-person-plus"></i> Tambah Karyawan
-        </a>
-    </div>
+    <x-page-header title="Data Karyawan" description="Kelola data karyawan yang terdaftar"
+        actionUrl="{{ route('admin.tambah-karyawan') }}"
+        actionIcon="bi-person-plus" actionLabel="Tambah Karyawan" />
 
     @if(session('success'))
-        <div class="bg-emerald-100 text-emerald-700 p-3 rounded-lg mb-4 flex items-center gap-2">
-            <i class="bi bi-check-circle-fill"></i>
-            {{ session('success') }}
-        </div>
+        <x-alert type="success">{{ session('success') }}</x-alert>
     @endif
-
     @if(session('error'))
-        <div class="bg-red-100 text-red-700 p-3 rounded-lg mb-4 flex items-center gap-2">
-            <i class="bi bi-exclamation-triangle-fill"></i>
-            {{ session('error') }}
-        </div>
+        <x-alert type="error">{{ session('error') }}</x-alert>
     @endif
 
-    {{-- Filter Tab & Divisi --}}
+    {{-- Filter --}}
     <div class="flex flex-wrap items-center gap-2 mb-4">
         <div class="flex gap-1 bg-slate-100 p-1 rounded-lg">
-            <a href="{{ route('admin.rekap-karyawan', array_merge(request()->query(), ['filter' => 'aktif', 'page' => null])) }}"
-               class="px-4 py-2 text-sm font-medium rounded-md transition {{ $filter === 'aktif' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}">
-                <i class="bi bi-person-check"></i> Aktif
+            @foreach(['aktif' => 'Person-check', 'nonaktif' => 'Person-x', 'semua' => 'People'] as $f => $icon)
+            <a href="{{ route('admin.rekap-karyawan', array_merge(request()->query(), ['filter' => $f, 'page' => null])) }}"
+               class="px-4 py-2 text-sm font-medium rounded-md transition {{ $filter === $f ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}">
+                <i class="bi bi-{{ lcfirst(substr($icon, 1)) }}"></i> {{ ucfirst($f) }}
             </a>
-            <a href="{{ route('admin.rekap-karyawan', array_merge(request()->query(), ['filter' => 'nonaktif', 'page' => null])) }}"
-               class="px-4 py-2 text-sm font-medium rounded-md transition {{ $filter === 'nonaktif' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}">
-                <i class="bi bi-person-x"></i> Nonaktif
-            </a>
-            <a href="{{ route('admin.rekap-karyawan', array_merge(request()->query(), ['filter' => 'semua', 'page' => null])) }}"
-               class="px-4 py-2 text-sm font-medium rounded-md transition {{ $filter === 'semua' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}">
-                <i class="bi bi-people"></i> Semua
-            </a>
+            @endforeach
         </div>
         <select onchange="filterByDivisi(this.value)"
                 class="text-sm border border-slate-300 rounded-lg px-3 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-400">
@@ -77,20 +58,10 @@
                             <td class="px-4 py-3 text-sm text-slate-600 font-mono">{{ $k->id_karyawan ?? '-' }}</td>
                             <td class="px-4 py-3 font-medium text-slate-800">{{ $k->nama_lengkap }}</td>
                             <td class="px-4 py-3 text-sm text-slate-600">{{ $k->username }}</td>
-                            <td class="px-4 py-3 text-sm text-slate-600">
-                                @if($k->divisi_nama)
-                                    {{ $k->divisi_nama }}
-                                @else
-                                    <span class="text-slate-400">-</span>
-                                @endif
-                            </td>
+                            <td class="px-4 py-3 text-sm text-slate-600">{{ $k->divisi_nama ?? '-' }}</td>
                             <td class="px-4 py-3 text-sm text-slate-600">{{ $k->nomor_hp ?? '-' }}</td>
                             <td class="px-4 py-3">
-                                @if($k->status === 'aktif')
-                                    <span class="bg-emerald-100 text-emerald-700 text-xs font-medium px-2.5 py-1 rounded-full">Aktif</span>
-                                @else
-                                    <span class="bg-red-100 text-red-700 text-xs font-medium px-2.5 py-1 rounded-full">Nonaktif</span>
-                                @endif
+                                <x-badge type="{{ $k->status }}">{{ ucfirst($k->status) }}</x-badge>
                             </td>
                             <td class="px-4 py-3">
                                 <div class="flex gap-2">
@@ -113,8 +84,7 @@
                                     </button>
                                     @else
                                     <form action="{{ route('admin.aktifkan-karyawan', $k->id_pengguna) }}" method="POST" class="inline">
-                                        @csrf
-                                        @method('PUT')
+                                        @csrf @method('PUT')
                                         <button type="submit"
                                                 class="bg-blue-50 text-blue-600 p-2 rounded-lg hover:bg-blue-100 transition"
                                                 title="Aktifkan Kembali">
@@ -142,7 +112,7 @@
     </div>
 </div>
 
-<!-- Modal Konfirmasi Nonaktifkan -->
+{{-- Modal Konfirmasi Nonaktifkan --}}
 <div id="deleteModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
     <div class="bg-white rounded-2xl max-w-md w-full mx-4 shadow-xl">
         <div class="bg-amber-600 text-white p-4 rounded-t-2xl">
@@ -160,8 +130,7 @@
                 Batal
             </button>
             <form id="deleteForm" method="POST">
-                @csrf
-                @method('DELETE')
+                @csrf @method('DELETE')
                 <button type="submit" class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition">
                     <i class="bi bi-person-x"></i> Nonaktifkan
                 </button>
@@ -174,8 +143,7 @@
 <script>
     function showDeleteModal(id, name) {
         document.getElementById('deleteName').innerText = name;
-        const deleteForm = document.getElementById('deleteForm');
-        deleteForm.action = '{{ route('admin.hapus-karyawan', ':id') }}'.replace(':id', id);
+        document.getElementById('deleteForm').action = '{{ route('admin.hapus-karyawan', ':id') }}'.replace(':id', id);
         document.getElementById('deleteModal').classList.remove('hidden');
         document.getElementById('deleteModal').classList.add('flex');
     }
@@ -196,12 +164,8 @@
         const table = document.getElementById('rekapKaryawanTable');
         if (table) {
             $(table).DataTable({
-                language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json'
-                },
-                columnDefs: [
-                    { orderable: false, targets: [0, 7] }
-                ]
+                language: { url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json' },
+                columnDefs: [{ orderable: false, targets: [0, 7] }]
             });
         }
     });
