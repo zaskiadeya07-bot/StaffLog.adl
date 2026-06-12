@@ -39,7 +39,7 @@ Route::get('/api/setting', [MasterDataController::class, 'apiSetting'])->name('a
 // =========================================================================
 // ADMIN ROUTES
 // =========================================================================
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['session.check', 'role.check:admin'])->group(function () {
 
     // Rekap Karyawan
     Route::get('/rekap-karyawan', [RekapKaryawanController::class, 'index'])->name('rekap-karyawan');
@@ -84,7 +84,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 // =========================================================================
 // KARYAWAN ROUTES
 // =========================================================================
-Route::prefix('karyawan')->name('karyawan.')->group(function () {
+Route::prefix('karyawan')->name('karyawan.')->middleware(['session.check', 'role.check:karyawan'])->group(function () {
     
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
