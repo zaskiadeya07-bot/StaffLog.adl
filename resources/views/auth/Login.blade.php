@@ -104,7 +104,7 @@
                             autocomplete="current-password"
                             class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-200 pr-10"
                             placeholder="Masukkan kata sandi">
-                        <button type="button" onclick="togglePassword()"
+                        <button type="button" onclick="togglePass('passwordInput', 'eyeIcon')"
                             class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                             <i class="bi bi-eye" id="eyeIcon"></i>
                         </button>
@@ -121,18 +121,6 @@
         </div>
     </div>
 
-    <script>
-        function togglePassword() {
-            const input = document.getElementById('passwordInput');
-            const icon  = document.getElementById('eyeIcon');
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.className = 'bi bi-eye-slash';
-            } else {
-                input.type = 'password';
-                icon.className = 'bi bi-eye';
-            }
-        }
-    </script>
+    <script src="{{ asset('js/helpers.js') }}"></script>
 </body>
 </html>

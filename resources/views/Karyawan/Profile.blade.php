@@ -13,11 +13,7 @@
     </div>
 @else
 
-{{-- ── HEADER ──────────────────────────────────────────────────────────────── --}}
-<div class="mb-6">
-    <h1 class="text-2xl font-bold text-slate-800">Profil Saya</h1>
-    <p class="text-slate-500 text-sm">Informasi akun dan data kepegawaian Anda</p>
-</div>
+<x-page-header title="Profil Saya" description="Informasi akun dan data kepegawaian Anda" />
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
@@ -155,26 +151,12 @@
             </div>
             <div class="p-5">
 
-                {{-- Flash sukses --}}
                 @if (session('password_success'))
-                <div id="passSuccess" class="flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl px-4 py-3 mb-4 text-sm">
-                    <i class="bi bi-check-circle-fill text-emerald-500"></i>
-                    {{ session('password_success') }}
-                    <button onclick="document.getElementById('passSuccess').remove()" class="ml-auto text-emerald-400 hover:text-emerald-600">
-                        <i class="bi bi-x-lg"></i>
-                    </button>
-                </div>
+                    <x-alert type="success" dismissible>{{ session('password_success') }}</x-alert>
                 @endif
 
-                {{-- Flash error --}}
                 @if (session('password_error'))
-                <div id="passError" class="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 rounded-xl px-4 py-3 mb-4 text-sm">
-                    <i class="bi bi-exclamation-triangle-fill text-red-500"></i>
-                    {{ session('password_error') }}
-                    <button onclick="document.getElementById('passError').remove()" class="ml-auto text-red-400 hover:text-red-600">
-                        <i class="bi bi-x-lg"></i>
-                    </button>
-                </div>
+                    <x-alert type="error" dismissible>{{ session('password_error') }}</x-alert>
                 @endif
 
                 <form action="{{ route('karyawan.password.update') }}" method="POST" id="formPassword">

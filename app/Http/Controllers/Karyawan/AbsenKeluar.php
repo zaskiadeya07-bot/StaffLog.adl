@@ -34,7 +34,7 @@ class AbsenKeluar extends Controller
                 ->with('error', 'Akun tidak ditemukan. Silakan login kembali.');
         }
 
-        return view('karyawan.CheckOut', compact('setting', 'pengguna'));
+        return view('karyawan.Absen', ['mode' => 'pulang', 'setting' => $setting, 'pengguna' => $pengguna]);
     }
 
     public function status(Request $request)

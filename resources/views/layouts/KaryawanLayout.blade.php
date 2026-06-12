@@ -250,6 +250,7 @@
         .p-5 { padding: 20px; }
         .p-6 { padding: 24px; }
 
+        .px-2\.5 { padding-left: 10px; padding-right: 10px; }
         .px-4 { padding-left: 16px; padding-right: 16px; }
         .px-5 { padding-left: 20px; padding-right: 20px; }
 
@@ -482,21 +483,10 @@
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-<script>
-function togglePass(inputId, iconId) {
-    var input = document.getElementById(inputId);
-    var icon  = document.getElementById(iconId);
-    if (input.type === 'password') {
-        input.type = 'text';
-        icon.className = 'bi bi-eye-slash';
-    } else {
-        input.type = 'password';
-        icon.className = 'bi bi-eye';
-    }
-}
-</script>
+<script src="{{ asset('js/helpers.js') }}"></script>
 @stack('scripts')
 </body>
 </html>

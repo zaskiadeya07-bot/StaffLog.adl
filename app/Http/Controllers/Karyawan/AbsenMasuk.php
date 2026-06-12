@@ -32,7 +32,7 @@ class AbsenMasuk extends Controller
             return redirect()->route('login')->with('error', 'Akun tidak ditemukan.');
         }
 
-        return view('karyawan.CheckIn', compact('setting', 'pengguna'));
+        return view('karyawan.Absen', ['mode' => 'masuk', 'setting' => $setting, 'pengguna' => $pengguna]);
     }
 
     public function status(Request $request)

@@ -4,12 +4,7 @@
 
 @section('content')
 <div>
-    <div class="flex justify-between items-center flex-wrap gap-3 mb-6">
-        <div>
-            <h1 class="text-2xl font-bold text-slate-800">Rekap Absen</h1>
-            <p class="text-slate-500 text-sm">Riwayat kehadiran Anda periode {{ $bulanNama }} {{ $tahun }}</p>
-        </div>
-    </div>
+    <x-page-header title="Rekap Absen" description="Riwayat kehadiran Anda periode {{ $bulanNama }} {{ $tahun }}" />
 
     <!-- Statistik Cards -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
@@ -108,21 +103,13 @@
                             </td>
                             <td class="px-4 py-3">
                                 @if($p->status == 'hadir')
-                                    <span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs">
-                                        <i class="bi bi-check-circle"></i> Hadir
-                                    </span>
+                                    <x-badge type="hadir"><i class="bi bi-check-circle"></i> Hadir</x-badge>
                                 @elseif($p->status == 'terlambat')
-                                    <span class="bg-amber-100 text-amber-700 px-2 py-1 rounded-full text-xs">
-                                        <i class="bi bi-clock-history"></i> Terlambat
-                                    </span>
+                                    <x-badge type="terlambat"><i class="bi bi-clock-history"></i> Terlambat</x-badge>
                                 @elseif($p->status == 'izin')
-                                    <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs">
-                                        <i class="bi bi-pencil-square"></i> Izin
-                                    </span>
+                                    <x-badge type="izin"><i class="bi bi-pencil-square"></i> Izin</x-badge>
                                 @else
-                                    <span class="bg-slate-100 text-slate-600 px-2 py-1 rounded-full text-xs">
-                                        <i class="bi bi-x-circle"></i> Alpha
-                                    </span>
+                                    <x-badge type="alpha"><i class="bi bi-x-circle"></i> Alpha</x-badge>
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-sm text-slate-600">
