@@ -199,6 +199,38 @@
         @media (max-width: 768px) {
             .main-content { padding: 16px; }
         }
+
+        /* ── Animations ─────────────────────────────────────── */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        .main-content {
+            animation: fadeInUp 0.45s ease-out;
+        }
+        .card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+        .btn-primary, .btn-secondary {
+            transition: background 0.2s, transform 0.15s;
+        }
+        .btn-primary:active, .btn-secondary:active {
+            transform: scale(0.96);
+        }
+        .sidebar-link {
+            transition: background 0.2s, color 0.2s, transform 0.15s;
+        }
+        .sidebar-link:active {
+            transform: scale(0.96);
+        }
     </style>
 </head>
 <body>

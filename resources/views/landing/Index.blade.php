@@ -2,13 +2,37 @@
 
 @section('title', 'Halaman Utama')
 
+@push('styles')
+<style>
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(24px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+    }
+    .hero-section { animation: fadeInUp 0.6s ease-out; }
+    .features-title { animation: fadeInUp 0.5s ease-out 0.1s both; }
+    .features-grid { animation: fadeInUp 0.5s ease-out 0.2s both; }
+    .footer-section { animation: fadeIn 0.6s ease-out 0.3s both; }
+    .modal-content {
+        animation: fadeInUp 0.25s ease-out;
+    }
+    .landing-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .landing-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+    }
+</style>
+@endpush
+
 @section('content')
 <div class="min-h-screen flex flex-col">
     <!-- Header - Tombol Masuk lebih ke kanan -->
     <header class="bg-slate-800 sticky top-0 z-50 shadow-lg">
-        <!-- Tailwind CSS CDN -->
-        <script src="https://cdn.tailwindcss.com"></script>
-
         <!-- Bootstrap Icons CDN -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
@@ -22,7 +46,7 @@
 
     <!-- Hero Section -->
     <main class="grow">
-        <div class="container mx-auto px-6 py-16">
+        <div class="hero-section container mx-auto px-6 py-16">
             <div class="flex flex-col lg:flex-row items-center justify-between gap-12">
                 <div class="lg:w-1/2 text-center lg:text-left">
                     <h1 class="text-5xl lg:text-6xl font-extrabold text-slate-800 mb-4 tracking-tight">
@@ -43,28 +67,28 @@
         </div>
 
         <!-- Features Section -->
-        <div class="container mx-auto px-6 py-16">
+        <div class="features-title container mx-auto px-6 py-16">
             <h2 class="text-3xl font-bold text-center text-slate-800 mb-12">Fitur Unggulan</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="card card-hover p-6 text-center">
+            <div class="features-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="card landing-card p-6 text-center">
                     <div class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <i class="bi bi-geo-alt-fill text-3xl text-slate-700"></i>
                     </div>
                     <h3 class="font-bold text-lg mb-2">Absen Masuk / Pulang</h3>
                 </div>
-                <div class="card card-hover p-6 text-center">
+                <div class="card landing-card p-6 text-center">
                     <div class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <i class="bi bi-calendar-check text-3xl text-slate-700"></i>
                     </div>
                     <h3 class="font-bold text-lg mb-2">Persetujuan Izin</h3>
                 </div>
-                <div class="card card-hover p-6 text-center">
+                <div class="card landing-card p-6 text-center">
                     <div class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <i class="bi bi-graph-up text-3xl text-slate-700"></i>
                     </div>
                     <h3 class="font-bold text-lg mb-2">Rekap Absensi</h3>
                 </div>
-                <div class="card card-hover p-6 text-center">
+                <div class="card landing-card p-6 text-center">
                     <div class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <i class="bi bi-people text-3xl text-slate-700"></i>
                     </div>
@@ -75,7 +99,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-slate-800 py-12 mt-auto">
+    <footer class="footer-section bg-slate-800 py-12 mt-auto">
         <div class="container mx-auto px-6">
             <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
                 <div class="text-center md:text-left">
@@ -96,8 +120,8 @@
 </div>
 
 <!-- Modal Tentang -->
-<div id="tentangModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
-    <div class="bg-white rounded-3xl max-w-md w-full mx-4 overflow-hidden">
+<div id="tentangModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center" style="transition: opacity 0.25s ease-out;">
+    <div class="modal-content bg-white rounded-3xl max-w-md w-full mx-4 overflow-hidden">
         <div class="bg-slate-800 p-5 flex justify-between items-center">
             <h3 class="text-xl font-bold text-white flex items-center gap-2">
                 <i class="bi bi-building text-amber-400"></i> Tentang StaffLog.adl
@@ -118,8 +142,8 @@
 </div>
 
 <!-- Modal Bantuan -->
-<div id="bantuanModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
-    <div class="bg-white rounded-3xl max-w-md w-full mx-4 overflow-hidden">
+<div id="bantuanModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center" style="transition: opacity 0.25s ease-out;">
+    <div class="modal-content bg-white rounded-3xl max-w-md w-full mx-4 overflow-hidden">
         <div class="bg-slate-800 p-5 flex justify-between items-center">
             <h3 class="text-xl font-bold text-white flex items-center gap-2">
                 <i class="bi bi-question-circle text-amber-400"></i> Pusat Bantuan

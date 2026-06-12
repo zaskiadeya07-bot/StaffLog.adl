@@ -44,6 +44,33 @@
                 transform: translateX(0);
             }
         }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        .login-card {
+            animation: fadeInUp 0.45s ease-out;
+        }
+        .form-header {
+            animation: fadeInUp 0.4s ease-out 0.05s both;
+        }
+        .field-username {
+            animation: fadeInUp 0.4s ease-out 0.1s both;
+        }
+        .field-password {
+            animation: fadeInUp 0.4s ease-out 0.15s both;
+        }
+        .btn-submit {
+            animation: fadeInUp 0.4s ease-out 0.2s both;
+            transition: background 0.2s, transform 0.15s;
+        }
+        .btn-submit:active {
+            transform: scale(0.96);
+        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen relative">
@@ -51,10 +78,10 @@
         <i class="bi bi-arrow-left"></i> Kembali
     </a>
     <div class="w-full max-w-md px-4">
-        <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-xl">
+        <div class="login-card bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-xl">
 
             {{-- Header --}}
-            <div class="text-center mb-8">
+            <div class="form-header text-center mb-8">
                 <h1 class="text-3xl font-bold text-slate-800">StaffLog</h1>
                 <p class="text-slate-500 text-sm">Masuk ke akun Anda</p>
             </div>
@@ -80,7 +107,7 @@
                 @csrf
 
                 {{-- Username --}}
-                <div class="mb-4">
+                <div class="field-username mb-4">
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Pengguna</label>
                     <input
                         type="text"
@@ -94,7 +121,7 @@
                 </div>
 
                 {{-- Password --}}
-                <div class="mb-6">
+                <div class="field-password mb-6">
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Kata Sandi</label>
                     <div class="relative">
                         <input
@@ -113,7 +140,7 @@
 
                 {{-- Submit --}}
                 <button type="submit"
-                    class="w-full bg-slate-800 text-white py-3 rounded-xl font-semibold hover:bg-slate-700 active:scale-[0.98] transition">
+                    class="btn-submit w-full bg-slate-800 text-white py-3 rounded-xl font-semibold hover:bg-slate-700">
                     <i class="bi bi-box-arrow-in-right mr-2"></i>Masuk
                 </button>
             </form>
