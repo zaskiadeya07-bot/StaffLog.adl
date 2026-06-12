@@ -72,15 +72,10 @@
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">
-                            Tanggal Mulai Kerja <span class="text-red-500">*</span>
+                            Tanggal Mulai Kerja
                         </label>
-                        <input type="date" name="tgl_mulai_kerja"
-                            class="input-field w-full @error('tgl_mulai_kerja') border-red-500 @enderror"
-                            value="{{ old('tgl_mulai_kerja', $karyawan->tgl_mulai_kerja) }}"
-                            max="{{ date('Y-m-d') }}" required>
-                        @error('tgl_mulai_kerja')
-                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                        @enderror
+                        <input type="text" class="input-field w-full bg-slate-50 text-slate-500"
+                            value="{{ \Carbon\Carbon::parse($karyawan->tgl_mulai_kerja)->format('d/m/Y') }}" disabled readonly>
                     </div>
 
                     <div>

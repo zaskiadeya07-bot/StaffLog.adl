@@ -74,14 +74,10 @@
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">
-                            Tanggal Mulai Kerja <span class="text-red-500">*</span>
+                            Tanggal Mulai Kerja
                         </label>
-                        <input type="date" name="tgl_mulai_kerja"
-                            class="input-field w-full @error('tgl_mulai_kerja') border-red-500 @enderror"
-                            value="{{ old('tgl_mulai_kerja', date('Y-m-d')) }}" max="{{ date('Y-m-d') }}">
-                        @error('tgl_mulai_kerja')
-                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                        @enderror
+                        <input type="text" class="input-field w-full bg-slate-50 text-slate-500"
+                            value="{{ date('d/m/Y') }}" disabled readonly>
                     </div>
 
                     <div>

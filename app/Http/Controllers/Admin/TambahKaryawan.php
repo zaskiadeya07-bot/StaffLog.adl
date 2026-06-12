@@ -55,7 +55,7 @@ class TambahKaryawan extends Controller
     {
         $karyawan = Pengguna::findOrFail($id);
 
-        $updateData = $request->only(['nama_lengkap', 'username', 'alamat', 'nomor_hp', 'tgl_mulai_kerja', 'divisi']);
+        $updateData = $request->only(['nama_lengkap', 'username', 'alamat', 'nomor_hp', 'divisi']);
 
         if ($request->filled('password')) {
             $updateData['password'] = Hash::make($request->password);

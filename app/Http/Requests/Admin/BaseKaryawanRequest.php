@@ -17,7 +17,6 @@ abstract class BaseKaryawanRequest extends FormRequest
             'nama_lengkap'    => ['required', 'string', 'min:3', 'max:100', 'regex:/^[\pL\s]+$/u'],
             'alamat'          => ['nullable', 'string', 'max:255'],
             'nomor_hp'        => ['required', 'digits_between:10,15'],
-            'tgl_mulai_kerja' => ['required', 'date', 'before_or_equal:today'],
             'divisi'          => ['required', 'exists:devisi,id_devisi'],
         ];
     }
@@ -36,9 +35,7 @@ abstract class BaseKaryawanRequest extends FormRequest
             'username.unique'            => 'Username sudah digunakan.',
             'nomor_hp.required'          => 'Nomor HP wajib diisi.',
             'nomor_hp.digits_between'    => 'Nomor HP harus 10-15 digit angka.',
-            'tgl_mulai_kerja.required'   => 'Tanggal mulai kerja wajib diisi.',
-            'tgl_mulai_kerja.date'       => 'Format tanggal mulai kerja tidak valid.',
-            'tgl_mulai_kerja.before_or_equal' => 'Tanggal mulai kerja tidak boleh lebih dari hari ini.',
+
             'alamat.string'              => 'Format alamat tidak valid.',
             'alamat.max'                 => 'Alamat maksimal 255 karakter.',
             'divisi.required'            => 'Divisi wajib dipilih.',
