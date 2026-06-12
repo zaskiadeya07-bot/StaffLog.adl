@@ -1,18 +1,18 @@
 @extends('layouts.AdminLayout')
 
-@section('title', 'Ganti Password')
+@section('title', 'Ganti Kata Sandi')
 
 @section('content')
 <div>
     <div class="mb-6">
         <h1 class="text-2xl font-bold text-slate-800">Ganti Kata Sandi</h1>
-        <p class="text-slate-500 text-sm">Perbarui password akun admin Anda</p>
+        <p class="text-slate-500 text-sm">Perbarui kata sandi akun admin Anda</p>
     </div>
 
     <div class="card max-w-2xl">
         <div class="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
             <i class="bi bi-shield-lock text-slate-500"></i>
-            <h3 class="font-semibold text-slate-700">Ubah Password</h3>
+            <h3 class="font-semibold text-slate-700">Ubah Kata Sandi</h3>
         </div>
         <div class="p-5">
 
@@ -65,7 +65,7 @@
 
                 <button type="submit"
                     class="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2.5 px-6 rounded-xl text-sm transition flex items-center justify-center gap-2">
-                    <i class="bi bi-floppy"></i> Simpan Password Baru
+                    <i class="bi bi-floppy"></i> Simpan Kata Sandi Baru
                 </button>
             </form>
         </div>

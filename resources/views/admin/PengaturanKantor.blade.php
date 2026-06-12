@@ -25,7 +25,7 @@
     <div class="flex gap-1 -mb-px">
         <button onclick="switchTab('kantor')" id="tabBtn-kantor" class="tab-btn px-5 py-3 text-sm font-semibold border-b-2 border-slate-800 text-slate-800">Lokasi</button>
         <button onclick="switchTab('divisi')" id="tabBtn-divisi" class="tab-btn px-5 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600">Divisi</button>
-        <button onclick="switchTab('password')" id="tabBtn-password" class="tab-btn px-5 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600">Password</button>
+        <button onclick="switchTab('password')" id="tabBtn-password" class="tab-btn px-5 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600">Kata Sandi</button>
     </div>
 </div>
 
@@ -43,7 +43,7 @@
             <i class="bi bi-map text-blue-500 text-lg"></i>
             <h2 class="font-semibold text-slate-700">Lokasi Kantor di Peta</h2>
             <span class="ml-auto text-xs text-slate-400 hidden sm:block">
-                Drag marker atau klik peta untuk memindahkan posisi kantor
+                Seret penanda atau klik peta untuk memindahkan posisi kantor
             </span>
         </div>
 
@@ -75,7 +75,7 @@
         {{-- MAP HINT (mobile) --}}
         <div class="px-5 py-2 bg-blue-50 border-t border-blue-100 flex items-center gap-2 sm:hidden">
             <i class="bi bi-info-circle text-blue-400 text-sm"></i>
-            <p class="text-xs text-blue-600">Drag marker atau ketuk peta untuk memindahkan posisi kantor.</p>
+            <p class="text-xs text-blue-600">Seret penanda atau ketuk peta untuk memindahkan posisi kantor.</p>
         </div>
     </div>
 
@@ -151,7 +151,7 @@
                 <div class="flex flex-col gap-1.5">
                     <label for="latitude"
                            class="text-sm font-medium text-slate-600 flex items-center gap-1.5">
-                        <i class="bi bi-geo text-slate-400"></i> Latitude
+                        <i class="bi bi-geo text-slate-400"></i> Lintang
                         <span class="ml-auto text-xs text-blue-500 font-normal bg-blue-50 px-2 py-0.5 rounded-full">
                             Auto dari peta
                         </span>
@@ -172,7 +172,7 @@
                 <div class="flex flex-col gap-1.5">
                     <label for="longitude"
                            class="text-sm font-medium text-slate-600 flex items-center gap-1.5">
-                        <i class="bi bi-geo-alt text-slate-400"></i> Longitude
+                        <i class="bi bi-geo-alt text-slate-400"></i> Bujur
                         <span class="ml-auto text-xs text-blue-500 font-normal bg-blue-50 px-2 py-0.5 rounded-full">
                             Auto dari peta
                         </span>
@@ -363,7 +363,7 @@
     <div class="card max-w-2xl">
         <div class="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
             <i class="bi bi-shield-lock text-slate-500"></i>
-            <h3 class="font-semibold text-slate-700">Ubah Password Admin</h3>
+            <h3 class="font-semibold text-slate-700">Ubah Kata Sandi Admin</h3>
         </div>
         <div class="p-5">
             <form action="{{ route('admin.ganti-password.update') }}" method="POST">
@@ -372,12 +372,12 @@
 
                 <div class="mb-4">
                     <label class="block text-xs font-semibold text-slate-600 mb-1.5">
-                        <i class="bi bi-lock text-slate-400 mr-1"></i> Password Saat Ini
+                        <i class="bi bi-lock text-slate-400 mr-1"></i> Kata Sandi Saat Ini
                     </label>
                     <div class="relative">
                         <input type="password" name="password_lama" id="pwLama"
                             class="w-full px-4 py-2.5 pr-10 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-200"
-                            placeholder="Masukkan password saat ini">
+                            placeholder="Masukkan kata sandi saat ini">
                         <button type="button" onclick="togglePass('pwLama', 'eyeLama')"
                             class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                             <i class="bi bi-eye" id="eyeLama"></i>
@@ -387,7 +387,7 @@
 
                 <div class="mb-4">
                     <label class="block text-xs font-semibold text-slate-600 mb-1.5">
-                        <i class="bi bi-key text-slate-400 mr-1"></i> Password Baru
+                        <i class="bi bi-key text-slate-400 mr-1"></i> Kata Sandi Baru
                     </label>
                     <div class="relative">
                         <input type="password" name="password_baru" id="pwBaru"
@@ -402,12 +402,12 @@
 
                 <div class="mb-5">
                     <label class="block text-xs font-semibold text-slate-600 mb-1.5">
-                        <i class="bi bi-key-fill text-slate-400 mr-1"></i> Konfirmasi Password Baru
+                        <i class="bi bi-key-fill text-slate-400 mr-1"></i> Konfirmasi Kata Sandi Baru
                     </label>
                     <div class="relative">
                         <input type="password" name="password_baru_confirmation" id="pwKonfirmasi"
                             class="w-full px-4 py-2.5 pr-10 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-200"
-                            placeholder="Ulangi password baru">
+                            placeholder="Ulangi kata sandi baru">
                         <button type="button" onclick="togglePass('pwKonfirmasi', 'eyeKonfirmasi')"
                             class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                             <i class="bi bi-eye" id="eyeKonfirmasi"></i>
@@ -417,7 +417,7 @@
 
                 <button type="submit"
                     class="bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2.5 px-6 rounded-xl text-sm transition flex items-center gap-2">
-                    <i class="bi bi-floppy"></i> Simpan Password Baru
+                    <i class="bi bi-floppy"></i> Simpan Kata Sandi Baru
                 </button>
             </form>
         </div>
@@ -623,7 +623,7 @@
         var namaInput = document.getElementById('namaDivisiInput');
 
         if (id) {
-            title.textContent = 'Edit Divisi';
+            title.textContent = 'Ubah Divisi';
             btnSimpan.innerHTML = '<i class="bi bi-save"></i> Simpan';
             idInput.value = id;
             namaInput.value = nama;
@@ -659,7 +659,7 @@
         Swal.fire({
             icon: 'warning',
             title: 'Hapus Divisi?',
-            text: 'Divisi "' + nama + '" akan dihapus permanent.',
+            text: 'Divisi "' + nama + '" akan dihapus permanen.',
             showCancelButton: true,
             confirmButtonText: 'Ya, hapus!',
             cancelButtonText: 'Batal',
@@ -734,7 +734,7 @@
         Swal.fire({
             icon: 'question',
             title: 'Reset ke lokasi bawaan?',
-            text: 'Koordinat akan kembali ke lokasi default Jakarta.',
+            text: 'Koordinat akan kembali ke lokasi bawaan Jakarta.',
             showCancelButton: true,
             confirmButtonText: 'Ya, reset!',
             cancelButtonText: 'Batal'

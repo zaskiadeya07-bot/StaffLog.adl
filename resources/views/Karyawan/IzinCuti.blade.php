@@ -109,7 +109,7 @@
                             <div class="flex flex-col items-center justify-center gap-2">
                                 <i class="bi bi-cloud-upload text-3xl text-slate-400"></i>
                                 <p class="text-sm text-slate-600">Klik atau drag & drop file untuk upload</p>
-                                <p class="text-xs text-slate-400">Support: PDF, JPG, PNG, DOC (Max 5MB)</p>
+                                <p class="text-xs text-slate-400">Didukung: PDF, JPG, PNG, DOC (Maks. 5MB)</p>
                                 <input type="file" id="lampiran" name="file_surat" class="hidden" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
                                 <button type="button" onclick="document.getElementById('lampiran').click()" class="btn-secondary text-sm px-4 py-2">
                                     <i class="bi bi-folder2-open"></i> Pilih File
@@ -182,9 +182,9 @@
         if (!jenis) { info.classList.add('hidden'); return; }
 
         const aturan = {
-            'Cuti Tahunan': { min: 'Min. H-7', max: 'Maks. 7 hari', icon: 'bi-calendar-check', color: 'bg-blue-50 text-blue-700 border-blue-200' },
+            'Cuti Tahunan': { min: 'Minimal H-7', max: 'Maks. 7 hari', icon: 'bi-calendar-check', color: 'bg-blue-50 text-blue-700 border-blue-200' },
             'Cuti Sakit': { min: 'Bisa hari ini', max: 'Maks. 3 hari', icon: 'bi-thermometer-half', color: 'bg-red-50 text-red-700 border-red-200' },
-            'Izin': { min: 'Min. hari ini', max: 'Maks. 3 hari', icon: 'bi-pencil-square', color: 'bg-amber-50 text-amber-700 border-amber-200' }
+            'Izin': { min: 'Minimal hari ini', max: 'Maks. 3 hari', icon: 'bi-pencil-square', color: 'bg-amber-50 text-amber-700 border-amber-200' }
         };
 
         const r = aturan[jenis];

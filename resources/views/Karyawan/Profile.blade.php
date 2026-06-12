@@ -126,7 +126,7 @@
                 </div>
 
                 <div>
-                    <p class="text-xs text-slate-400 mb-1">Role</p>
+                    <p class="text-xs text-slate-400 mb-1">Peran</p>
                     <p class="font-semibold text-slate-800 capitalize">{{ $pengguna->role }}</p>
                 </div>
 
@@ -151,7 +151,7 @@
         <div class="card">
             <div class="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
                 <i class="bi bi-shield-lock text-slate-500"></i>
-                <h3 class="font-semibold text-slate-700">Ubah Password</h3>
+                <h3 class="font-semibold text-slate-700">Ubah Kata Sandi</h3>
             </div>
             <div class="p-5">
 
@@ -227,7 +227,7 @@
                         <div class="relative">
                             <input type="password" name="password_baru_confirmation" id="passwordKonfirmasi"
                                 class="w-full px-4 py-2.5 pr-10 border {{ $errors->has('password_baru_confirmation') ? 'border-red-400' : 'border-slate-200' }} rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-200"
-                                placeholder="Ulangi password baru" autocomplete="new-password">
+                                placeholder="Ulangi kata sandi baru" autocomplete="new-password">
                             <button type="button" onclick="togglePass('passwordKonfirmasi', 'eyeKonfirmasi')"
                                 class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                                 <i class="bi bi-eye" id="eyeKonfirmasi"></i>
@@ -240,7 +240,7 @@
 
                     <button type="submit"
                         class="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2">
-                        <i class="bi bi-floppy"></i> Simpan Password Baru
+                        <i class="bi bi-floppy"></i> Simpan Kata Sandi Baru
                     </button>
                 </form>
             </div>

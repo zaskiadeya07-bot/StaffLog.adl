@@ -101,7 +101,7 @@
                                     </a>
                                     <a href="{{ route('admin.edit-karyawan', $k->id_pengguna) }}"
                                        class="bg-amber-50 text-amber-600 p-2 rounded-lg hover:bg-amber-100 transition"
-                                       title="Edit Karyawan">
+                                       title="Ubah Karyawan">
                                         <i class="bi bi-pencil"></i>
                                     </a>
                                     @if($k->status === 'aktif')

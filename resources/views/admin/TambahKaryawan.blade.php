@@ -199,7 +199,7 @@
                         <i class="bi bi-save"></i> Tambah Karyawan
                     </button>
                     <button type="reset" class="btn-secondary">
-                        <i class="bi bi-arrow-repeat"></i> Reset Form
+                        <i class="bi bi-arrow-repeat"></i> Reset Formulir
                     </button>
                     <a href="{{ route('admin.rekap-karyawan') }}" class="btn-secondary">
                         <i class="bi bi-x-circle"></i> Batal

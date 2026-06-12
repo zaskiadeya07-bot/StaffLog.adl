@@ -131,7 +131,7 @@
             <ul class="space-y-2 mb-4">
                 <li class="flex gap-2"><i class="bi bi-fingerprint text-amber-500"></i> <span><strong>Cara Absen Masuk/Pulang:</strong> Klik tombol "Absen" pada dashboard</span></li>
                 <li class="flex gap-2"><i class="bi bi-calendar-plus text-amber-500"></i> <span><strong>Pengajuan Izin:</strong> Akses menu "Izin", isi form</span></li>
-                <li class="flex gap-2"><i class="bi bi-envelope text-amber-500"></i> <span><strong>Email:</strong> support@stafflog.adl</span></li>
+                <li class="flex gap-2"><i class="bi bi-envelope text-amber-500"></i> <span><strong>Surel:</strong> support@stafflog.adl</span></li>
             </ul>
             <button class="close-modal-btn w-full btn-primary py-2">Tutup</button>
         </div>

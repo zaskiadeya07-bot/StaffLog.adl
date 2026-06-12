@@ -133,7 +133,7 @@
         Swal.fire({
             icon: 'warning',
             title: 'Hapus Divisi?',
-            text: 'Divisi "' + nama + '" akan dihapus permanent.',
+            text: 'Divisi "' + nama + '" akan dihapus permanen.',
             showCancelButton: true,
             confirmButtonText: 'Ya, hapus!',
             cancelButtonText: 'Batal',

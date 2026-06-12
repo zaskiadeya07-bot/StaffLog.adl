@@ -231,8 +231,8 @@ function updateLocationStatus(position) {
     
     var coordsElement = document.getElementById('coordinates');
     if (coordsElement) {
-        coordsElement.innerHTML = '<strong>Latitude:</strong> ' + userLat.toFixed(6) +
-            '<br><strong>Longitude:</strong> ' + userLng.toFixed(6) +
+        coordsElement.innerHTML = '<strong>Lintang:</strong> ' + userLat.toFixed(6) +
+            '<br><strong>Bujur:</strong> ' + userLng.toFixed(6) +
             '<br><strong>Akurasi:</strong> ±' + accuracy.toFixed(1) + ' meter' +
             '<br><strong>Jarak ke Kantor:</strong> ' + distance.toFixed(2) + ' meter';
     }
@@ -324,7 +324,7 @@ function handleLocationError(error) {
     if (statusContainer) {
         statusContainer.innerHTML = '<div class="bg-red-100 text-red-700 p-3 rounded-xl">' +
             '<i class="bi bi-exclamation-triangle-fill mr-2"></i>' +
-            '<strong>Error</strong><br><small>' + errorMessage + '</small>' +
+            '<strong>Kesalahan</strong><br><small>' + errorMessage + '</small>' +
             '</div>';
     }
     enableButton(false, errorMessage);

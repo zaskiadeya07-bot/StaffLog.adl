@@ -156,7 +156,7 @@
                                 {{ ($p->menit_terlambat ?? 0) > 0 ? ($p->menit_terlambat ?? 0) . ' menit' : '-' }}
                             </td>
                             <td class="px-4 py-3">
-                                <button onclick="openEditModal({{ $p->id_presensi }}, '{{ $p->status }}', {{ $p->id_pengguna }})" class="bg-blue-50 text-blue-600 p-2 rounded-lg hover:bg-blue-100 transition" title="Edit Status">
+                                <button onclick="openEditModal({{ $p->id_presensi }}, '{{ $p->status }}', {{ $p->id_pengguna }})" class="bg-blue-50 text-blue-600 p-2 rounded-lg hover:bg-blue-100 transition" title="Ubah Status">
                                     <i class="bi bi-pencil"></i>
                                 </button>
                             </td>
@@ -242,7 +242,7 @@
     <div class="bg-white rounded-3xl max-w-md w-full mx-4">
         <div class="bg-slate-800 p-5 rounded-t-3xl">
             <div class="flex justify-between items-center">
-                <h3 class="text-xl font-bold text-white">Edit Status Kehadiran</h3>
+                <h3 class="text-xl font-bold text-white">Ubah Status Kehadiran</h3>
                 <button class="close-edit-modal text-slate-400 hover:text-white text-2xl">&times;</button>
             </div>
         </div>
