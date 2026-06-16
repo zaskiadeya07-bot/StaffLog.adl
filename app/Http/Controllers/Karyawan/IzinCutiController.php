@@ -42,39 +42,11 @@ class IzinCutiController extends Controller
         $tglSelesai = \Carbon\Carbon::parse($validated['tgl_selesai'])->startOfDay();
         $durasi = $tglMulai->diffInDays($tglSelesai) + 1;
 
-        // Validasi berdasarkan jenis
-        $minHariSebelum = match ($validated['jenis_izin']) {
-            'Cuti Tahunan' => 7,
-            default => 0,
-        };
-
-        $maksHari = match ($validated['jenis_izin']) {
-            'Cuti Tahunan' => 7,
-            'Izin' => 3,
-            'Cuti Sakit' => 3,
-            default => 30,
-        };
-
-        // Izin & Sakit tidak boleh sebelum hari ini
-        if ($validated['jenis_izin'] !== 'Cuti Tahunan' && $tglMulai->lessThan($hariIni)) {
+        // Tidak boleh sebelum hari ini
+        if ($tglMulai->lessThan($hariIni)) {
             return response()->json([
                 'success' => false,
                 'message' => "Tanggal mulai tidak boleh sebelum hari ini."
-            ], 422);
-        }
-
-        // Cuti Tahunan harus H-7
-        if ($minHariSebelum > 0 && $tglMulai->diffInDays($hariIni) < $minHariSebelum) {
-            return response()->json([
-                'success' => false,
-                'message' => "Cuti Tahunan harus diajukan minimal H-{$minHariSebelum}."
-            ], 422);
-        }
-
-        if ($durasi > $maksHari) {
-            return response()->json([
-                'success' => false,
-                'message' => "{$validated['jenis_izin']} maksimal {$maksHari} hari."
             ], 422);
         }
 
@@ -98,28 +70,26 @@ class IzinCutiController extends Controller
             ], 422);
         }
 
-        // Cek sisa cuti tahunan
-        if ($validated['jenis_izin'] === 'Cuti Tahunan') {
-            $setting = MasterData::first();
-            $jatahCuti = $setting ? $setting->jatah_cuti_tahunan : 12;
+        // Cek sisa cuti untuk semua jenis
+        $setting = MasterData::first();
+        $jatahCuti = $setting ? $setting->jatah_cuti_tahunan : 12;
 
-            $cutiTerpakai = Perizinan::where('id_pengguna_pengaju', $penggunaId)
-                ->where('jenis_izin', 'cuti_tahunan')
-                ->where('status_approval', 'disetujui')
-                ->get()
-                ->sum(function ($item) {
-                    $start = new \DateTime($item->tgl_mulai);
-                    $end = new \DateTime($item->tgl_selesai);
-                    return $start->diff($end)->days + 1;
-                });
+        $cutiTerpakai = Perizinan::where('id_pengguna_pengaju', $penggunaId)
+            ->where('jenis_izin', 'cuti_tahunan')
+            ->where('status_approval', 'disetujui')
+            ->get()
+            ->sum(function ($item) {
+                $start = new \DateTime($item->tgl_mulai);
+                $end = new \DateTime($item->tgl_selesai);
+                return $start->diff($end)->days + 1;
+            });
 
-            if ($cutiTerpakai + $durasi > $jatahCuti) {
-                $sisa = $jatahCuti - $cutiTerpakai;
-                return response()->json([
-                    'success' => false,
-                    'message' => "Sisa cuti tahunan Anda hanya $sisa hari."
-                ], 422);
-            }
+        $sisaCuti = $jatahCuti - $cutiTerpakai;
+        if ($durasi > $sisaCuti) {
+            return response()->json([
+                'success' => false,
+                'message' => "Sisa cuti Anda hanya {$sisaCuti} hari."
+            ], 422);
         }
 
         try {

@@ -181,15 +181,18 @@
         const info = document.getElementById('aturanInfo');
         if (!jenis) { info.classList.add('hidden'); return; }
 
+        const cutiApproved = allIzinData.filter(i => i.status === 'approved' && i.jenis === 'Cuti Tahunan').reduce((sum, i) => sum + i.durasi, 0);
+        const sisaCuti = Math.max(0, JATAH_CUTI - cutiApproved);
+
         const aturan = {
-            'Cuti Tahunan': { min: 'Minimal H-7', max: 'Maks. 7 hari', icon: 'bi-calendar-check', color: 'bg-blue-50 text-blue-700 border-blue-200' },
-            'Cuti Sakit': { min: 'Bisa hari ini', max: 'Maks. 3 hari', icon: 'bi-thermometer-half', color: 'bg-red-50 text-red-700 border-red-200' },
-            'Izin': { min: 'Minimal hari ini', max: 'Maks. 3 hari', icon: 'bi-pencil-square', color: 'bg-amber-50 text-amber-700 border-amber-200' }
+            'Cuti Tahunan': { icon: 'bi-calendar-check', color: 'bg-blue-50 text-blue-700 border-blue-200' },
+            'Cuti Sakit': { icon: 'bi-thermometer-half', color: 'bg-red-50 text-red-700 border-red-200' },
+            'Izin': { icon: 'bi-pencil-square', color: 'bg-amber-50 text-amber-700 border-amber-200' }
         };
 
         const r = aturan[jenis];
         if (r) {
-            info.innerHTML = `<div class="flex items-start gap-2 ${r.color} border p-3 rounded-xl"><i class="bi ${r.icon} mt-0.5"></i><div><strong class="text-sm">${jenis}</strong><br><span class="text-xs">Pengajuan: ${r.min} | Durasi: ${r.max}</span></div></div>`;
+            info.innerHTML = `<div class="flex items-start gap-2 ${r.color} border p-3 rounded-xl"><i class="bi ${r.icon} mt-0.5"></i><div><strong class="text-sm">${jenis}</strong><br><span class="text-xs">Sisa cuti Anda: <strong>${sisaCuti} hari</strong> | Bisa diajukan hari ini</span></div></div>`;
             info.classList.remove('hidden');
         }
     }
@@ -434,38 +437,18 @@
         const mulaiDate = new Date(tanggalMulai + 'T00:00:00');
         const durasi = hitungDurasi(tanggalMulai, tanggalSelesai);
 
-        // Cek min apply
-        const selisihHari = Math.round((mulaiDate - today) / (1000 * 60 * 60 * 24));
-        if (jenis === 'Cuti Tahunan' && selisihHari < 7) {
-            showToast('Cuti Tahunan harus diajukan minimal H-7.', 'danger');
-            return;
-        }
-        if (jenis !== 'Cuti Tahunan' && mulaiDate < today) {
+        // Cek backdate
+        if (mulaiDate < today) {
             showToast('Tanggal mulai tidak boleh sebelum hari ini.', 'danger');
             return;
         }
 
-        // Cek maks durasi
-        if (jenis === 'Cuti Tahunan' && durasi > 7) {
-            showToast('Cuti Tahunan maksimal 7 hari.', 'danger');
+        // Cek sisa cuti
+        const cutiApproved = allIzinData.filter(i => i.status === 'approved' && i.jenis === 'Cuti Tahunan').reduce((sum, i) => sum + i.durasi, 0);
+        const sisaCuti = Math.max(0, JATAH_CUTI - cutiApproved);
+        if (durasi > sisaCuti) {
+            showToast('Sisa cuti Anda hanya ' + sisaCuti + ' hari!', 'danger');
             return;
-        }
-        if (jenis === 'Izin' && durasi > 3) {
-            showToast('Izin maksimal 3 hari.', 'danger');
-            return;
-        }
-        if (jenis === 'Cuti Sakit' && durasi > 3) {
-            showToast('Cuti Sakit maksimal 3 hari.', 'danger');
-            return;
-        }
-
-        if (jenis === 'Cuti Tahunan') {
-            const cutiApproved = izinData.filter(i => i.status === 'approved' && i.jenis === 'Cuti Tahunan').reduce((sum, i) => sum + i.durasi, 0);
-            const sisaCuti = JATAH_CUTI - cutiApproved;
-            if (durasi > sisaCuti) {
-                showToast('Sisa cuti Anda hanya ' + sisaCuti + ' hari!', 'danger');
-                return;
-            }
         }
 
         const formData = new FormData(document.getElementById('izinForm'));

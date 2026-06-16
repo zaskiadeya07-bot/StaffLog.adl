@@ -89,7 +89,7 @@
                     <tbody class="divide-y divide-slate-100">
                         @forelse($presensi as $p)
                         <tr class="hover:bg-slate-50 transition">
-                            <td class="px-4 py-3 text-sm text-slate-600">
+                            <td class="px-4 py-3 text-sm text-slate-600" data-order="{{ $p->tanggal }}">
                                 {{ \Carbon\Carbon::parse($p->tanggal)->format('d/m/Y') }}
                             </td>
                             <td class="px-4 py-3 text-sm text-slate-600">
