@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('pengguna', function (Blueprint $table) {
             $table->increments('id_pengguna');
-            $table->string('nama_lengkap', 100)->notNullable();
-            $table->string('username', 50)->unique()->notNullable();
-            $table->string('password', 255)->notNullable();
-            $table->enum('role', ['admin', 'karyawan'])->notNullable();
-            $table->unsignedInteger('divisi')->notNullable();
+            $table->string('nama_lengkap', 100);
+            $table->string('username', 50)->unique();
+            $table->string('password', 255);
+            $table->enum('role', ['admin', 'karyawan']);
+            $table->unsignedInteger('divisi');
             $table->string('nomor_hp', 12)->nullable();
             $table->date('tgl_mulai_kerja')->nullable();
 

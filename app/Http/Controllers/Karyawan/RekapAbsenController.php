@@ -9,6 +9,10 @@ use Illuminate\Http\Request;
 
 class RekapAbsenController extends Controller
 {
+    public function __construct(
+        protected BulanHelper $bulanHelper
+    ) {}
+
     public function index(Request $request)
     {
         $idPengguna = $request->session()->get('pengguna_id');
@@ -19,7 +23,7 @@ class RekapAbsenController extends Controller
         $bulan = $request->get('bulan', date('m'));
         $tahun = $request->get('tahun', date('Y'));
 
-        $bulanNama = BulanHelper::getNamaBulanByAngka((int)$bulan);
+        $bulanNama = $this->bulanHelper->getNamaBulanByAngka((int)$bulan);
 
         $presensi = Presensi::where('id_pengguna', $idPengguna)
             ->whereMonth('tanggal', $bulan)
@@ -37,5 +41,24 @@ class RekapAbsenController extends Controller
             'bulanNama', 'statHadir', 'statTerlambat',
             'statIzin', 'statAlpha'
         ));
+    }
+
+    public function data(Request $request)
+    {
+        $penggunaId = session('pengguna_id');
+        if (!$penggunaId) {
+            return response()->json([], 401);
+        }
+
+        $bulan = $request->get('bulan', date('m'));
+        $tahun = $request->get('tahun', date('Y'));
+
+        $presensi = Presensi::where('id_pengguna', $penggunaId)
+            ->whereMonth('tanggal', $bulan)
+            ->whereYear('tanggal', $tahun)
+            ->orderBy('tanggal', 'desc')
+            ->get();
+
+        return response()->json($presensi);
     }
 }

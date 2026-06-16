@@ -13,16 +13,15 @@ return new class extends Migration
     {
         Schema::create('perizinan', function (Blueprint $table) {
             $table->increments('id_izin');
-            $table->unsignedInteger('id_pengguna_pengaju')->notNullable();
+            $table->unsignedInteger('id_pengguna_pengaju');
             $table->unsignedInteger('id_admin_validator')->nullable();
-            $table->enum('jenis_izin', ['sakit', 'cuti', 'dinas'])->notNullable();
-            $table->date('tgl_pengajuan')->notNullable();
-            $table->date('tgl_mulai')->notNullable();
-            $table->date('tgl_selesai')->notNullable();
-            $table->text('keterangan')->notNullable();
+            $table->enum('jenis_izin', ['sakit', 'cuti', 'dinas']);
+            $table->date('tgl_pengajuan');
+            $table->date('tgl_mulai');
+            $table->date('tgl_selesai');
+            $table->text('keterangan');
             $table->string('file_surat', 255)->nullable();
             $table->enum('status_approval', ['pending', 'disetujui', 'ditolak'])
-                  ->notNullable()
                   ->default('pending');
             $table->text('catatan_admin')->nullable();
             $table->dateTime('tgl_validasi')->nullable();

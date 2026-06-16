@@ -17,7 +17,7 @@ return new class extends Migration
                 END"),
             ]);
 
-        DB::statement("ALTER TABLE perizinan MODIFY COLUMN jenis_izin ENUM('cuti_tahunan','cuti_sakit','izin') NOT NULL");
+        DB::statement("ALTER TABLE perizinan MODIFY COLUMN jenis_izin ENUM('cuti_tahunan','cuti_sakit','izin')");
     }
 
     public function down(): void
@@ -32,6 +32,6 @@ return new class extends Migration
                 END"),
             ]);
 
-        DB::statement("ALTER TABLE perizinan MODIFY COLUMN jenis_izin ENUM('sakit','cuti','dinas') NOT NULL");
+        DB::statement("ALTER TABLE perizinan MODIFY COLUMN jenis_izin ENUM('sakit','cuti','dinas')");
     }
 };

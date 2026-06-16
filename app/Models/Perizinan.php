@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Perizinan extends Model
 {
@@ -33,6 +34,11 @@ class Perizinan extends Model
     public function adminValidator(): BelongsTo
     {
         return $this->belongsTo(Pengguna::class, 'id_admin_validator', 'id_pengguna');
+    }
+
+    public function presensis(): HasMany
+    {
+        return $this->hasMany(Presensi::class, 'id_izin', 'id_izin');
     }
 
 }

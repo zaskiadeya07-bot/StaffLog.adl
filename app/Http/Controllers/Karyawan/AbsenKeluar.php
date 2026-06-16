@@ -3,22 +3,21 @@
 namespace App\Http\Controllers\Karyawan;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Karyawan\AbsenKeluarRequest;
 use App\Models\MasterData;
 use App\Models\Pengguna;
 use App\Models\Presensi;
 use App\Services\PresensiService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\ValidationException;
+use Psr\Log\LoggerInterface;
 
 class AbsenKeluar extends Controller
 {
     public function __construct(
-        protected PresensiService $presensiService
+        protected PresensiService $presensiService,
+        protected LoggerInterface $logger
     ) {}
 
-    public function index(Request $request)
+    public function index(\Illuminate\Http\Request $request)
     {
         if (!$request->session()->has('pengguna_id')) {
             return redirect()->route('login')
@@ -37,7 +36,7 @@ class AbsenKeluar extends Controller
         return view('karyawan.Absen', ['mode' => 'pulang', 'setting' => $setting, 'pengguna' => $pengguna]);
     }
 
-    public function status(Request $request)
+    public function status(\Illuminate\Http\Request $request)
     {
         try {
             if (!$request->session()->has('pengguna_id')) {
@@ -51,7 +50,7 @@ class AbsenKeluar extends Controller
                 $this->presensiService->statusCheckOut($request->session()->get('pengguna_id'))
             );
         } catch (\Exception $e) {
-            Log::error('Error cek status check out: ' . $e->getMessage());
+            $this->logger->error('Error cek status check out: ' . $e->getMessage());
 
             return response()->json([
                 'hasCheckedOut' => false,
@@ -60,25 +59,15 @@ class AbsenKeluar extends Controller
         }
     }
 
-    public function store(Request $request)
+    public function store(AbsenKeluarRequest $request)
     {
-        DB::beginTransaction();
+        \Illuminate\Support\Facades\DB::beginTransaction();
 
         try {
-            $validated = $request->validate([
-                'latitude' => 'required|numeric|between:-90,90',
-                'longitude' => 'required|numeric|between:-180,180'
-            ], [
-                'latitude.required' => 'Latitude wajib diisi',
-                'latitude.numeric' => 'Latitude harus berupa angka',
-                'latitude.between' => 'Latitude harus antara -90 dan 90',
-                'longitude.required' => 'Longitude wajib diisi',
-                'longitude.numeric' => 'Longitude harus berupa angka',
-                'longitude.between' => 'Longitude harus antara -180 dan 180'
-            ]);
+            $validated = $request->validated();
 
             if (!$request->session()->has('pengguna_id')) {
-                DB::rollBack();
+                \Illuminate\Support\Facades\DB::rollBack();
                 return response()->json([
                     'success' => false,
                     'message' => 'Sesi login Anda telah berakhir. Silakan login kembali.',
@@ -91,7 +80,7 @@ class AbsenKeluar extends Controller
             $pengguna = Pengguna::find($penggunaId);
 
             if (!$pengguna) {
-                DB::rollBack();
+                \Illuminate\Support\Facades\DB::rollBack();
                 return response()->json([
                     'success' => false,
                     'message' => 'Data pengguna tidak ditemukan. Silakan hubungi administrator.',
@@ -104,7 +93,7 @@ class AbsenKeluar extends Controller
                 ->first();
 
             if (!$presensi) {
-                DB::rollBack();
+                \Illuminate\Support\Facades\DB::rollBack();
                 return response()->json([
                     'success' => false,
                     'message' => 'Anda belum absen masuk hari ini. Silakan absen masuk terlebih dahulu.',
@@ -113,7 +102,7 @@ class AbsenKeluar extends Controller
             }
 
             if (!is_null($presensi->check_out)) {
-                DB::rollBack();
+                \Illuminate\Support\Facades\DB::rollBack();
                 return response()->json([
                     'success' => false,
                     'message' => 'Anda sudah absen pulang hari ini pada pukul ' . $presensi->check_out,
@@ -123,7 +112,7 @@ class AbsenKeluar extends Controller
 
             $now = now();
             if ($now->hour >= 0 && $now->hour < 6) {
-                DB::rollBack();
+                \Illuminate\Support\Facades\DB::rollBack();
                 return response()->json([
                     'success' => false,
                     'message' => 'Batas absen pulang kemarin sudah lewat (23:59). Status anda akan otomatis alfa.',
@@ -141,7 +130,7 @@ class AbsenKeluar extends Controller
                 );
 
                 if (!$radiusCheck['di_dalam_radius']) {
-                    DB::rollBack();
+                    \Illuminate\Support\Facades\DB::rollBack();
                     return response()->json([
                         'success' => false,
                         'message' => 'Anda berada di luar radius kantor. Jarak: ' . round($radiusCheck['jarak']) . ' meter (Maks: ' . $setting->radius . ' meter)',
@@ -160,7 +149,7 @@ class AbsenKeluar extends Controller
                 'check_out_lng' => $request->longitude
             ]);
 
-            DB::commit();
+            \Illuminate\Support\Facades\DB::commit();
 
             return response()->json([
                 'success' => true,
@@ -174,8 +163,8 @@ class AbsenKeluar extends Controller
                 ]
             ]);
 
-        } catch (ValidationException $e) {
-            DB::rollBack();
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
 
             return response()->json([
                 'success' => false,
@@ -185,9 +174,9 @@ class AbsenKeluar extends Controller
             ], 422);
 
         } catch (\Illuminate\Database\QueryException $e) {
-            DB::rollBack();
+            \Illuminate\Support\Facades\DB::rollBack();
 
-            Log::error('Database error saat check out: ' . $e->getMessage());
+            $this->logger->error('Database error saat check out: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -196,9 +185,9 @@ class AbsenKeluar extends Controller
             ], 500);
 
         } catch (\Exception $e) {
-            DB::rollBack();
+            \Illuminate\Support\Facades\DB::rollBack();
 
-            Log::error('Error check out: ' . $e->getMessage());
+            $this->logger->error('Error check out: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,

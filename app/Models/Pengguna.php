@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Pengguna extends Model
 {
@@ -36,6 +37,16 @@ class Pengguna extends Model
     public function devisi(): BelongsTo
     {
         return $this->belongsTo(Devisi::class, 'divisi', 'id_devisi');
+    }
+
+    public function presensis(): HasMany
+    {
+        return $this->hasMany(Presensi::class, 'id_pengguna', 'id_pengguna');
+    }
+
+    public function perizinans(): HasMany
+    {
+        return $this->hasMany(Perizinan::class, 'id_pengguna_pengaju', 'id_pengguna');
     }
 
 }

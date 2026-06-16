@@ -7,21 +7,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Presensi extends Model
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Table Configuration
-    |--------------------------------------------------------------------------
-    */
-
     protected $table      = 'presensi';
     protected $primaryKey = 'id_presensi';
     public    $timestamps = true;
-
-    /*
-    |--------------------------------------------------------------------------
-    | Mass Assignable Attributes
-    |--------------------------------------------------------------------------
-    */
 
     protected $fillable = [
         'id_pengguna',
@@ -38,11 +26,6 @@ class Presensi extends Model
         'menit_terlambat',
         'catatan_keterlambatan',
     ];
-    /*
-    |--------------------------------------------------------------------------
-    | Attribute Casting
-    |--------------------------------------------------------------------------
-    */
 
     protected $casts = [
         'tanggal' => 'date',
@@ -53,19 +36,13 @@ class Presensi extends Model
         'menit_terlambat' => 'integer',
     ];
 
-    /*
-    |--------------------------------------------------------------------------
-    | Relationships
-    |--------------------------------------------------------------------------
-    */
-
-    /**
-     * Presensi ini milik seorang pengguna.
-     */
     public function pengguna(): BelongsTo
     {
         return $this->belongsTo(Pengguna::class, 'id_pengguna', 'id_pengguna');
     }
 
-
+    public function perizinan(): BelongsTo
+    {
+        return $this->belongsTo(Perizinan::class, 'id_izin', 'id_izin');
+    }
 }

@@ -4,7 +4,7 @@ namespace App\Helpers;
 
 class BulanHelper
 {
-    public static function getNamaBulan(): array
+    public function getNamaBulan(): array
     {
         return [
             1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
@@ -13,8 +13,8 @@ class BulanHelper
         ];
     }
 
-    public static function getNamaBulanByAngka(int $bulan): string
+    public function getNamaBulanByAngka(int $bulan): string
     {
-        return self::getNamaBulan()[$bulan] ?? '';
+        return $this->getNamaBulan()[$bulan] ?? '';
     }
 }

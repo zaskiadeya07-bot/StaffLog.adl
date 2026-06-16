@@ -36,6 +36,12 @@ class LoginController extends Controller
                 ->onlyInput('username');
         }
 
+        if (($pengguna->status ?? 'aktif') === 'nonaktif') {
+            return back()
+                ->withErrors(['username' => 'Akun Anda telah dinonaktifkan. Silakan hubungi administrator.'])
+                ->onlyInput('username');
+        }
+
         $request->session()->regenerate();
 
         $request->session()->put('pengguna_id',       $pengguna->id_pengguna);
@@ -55,9 +61,6 @@ class LoginController extends Controller
         return redirect()->route('login')->with('success', 'Anda berhasil keluar.');
     }
 
-    /**
-     * Redirect ke halaman sesuai role.
-     */
     private function redirectByRole(string $role): RedirectResponse
     {
         return match ($role) {

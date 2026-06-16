@@ -7,10 +7,15 @@ use App\Http\Requests\Admin\StoreKaryawanRequest;
 use App\Http\Requests\Admin\UpdateKaryawanRequest;
 use App\Models\Devisi;
 use App\Models\Pengguna;
+use App\Services\KaryawanService;
 use Illuminate\Support\Facades\Hash;
 
 class TambahKaryawan extends Controller
 {
+    public function __construct(
+        protected KaryawanService $karyawanService
+    ) {}
+
     public function index()
     {
         $divisis = Devisi::select('id_devisi as id', 'nama_devisi')->get();
@@ -19,17 +24,11 @@ class TambahKaryawan extends Controller
 
     public function store(StoreKaryawanRequest $request)
     {
-        $last = Pengguna::where('id_karyawan', 'like', 'EMP-%')
-            ->orderByRaw('CAST(SUBSTRING(id_karyawan, 5) AS UNSIGNED) DESC')
-            ->lockForUpdate()
-            ->first();
-
-        $nextNumber = $last ? (int) substr($last->id_karyawan, 4) + 1 : 1;
-        $id_karyawan = 'EMP-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+        $idKaryawan = $this->karyawanService->generateIdKaryawan();
 
         Pengguna::create([
             'nama_lengkap'    => $request->nama_lengkap,
-            'id_karyawan'     => $id_karyawan,
+            'id_karyawan'     => $idKaryawan,
             'username'        => $request->username,
             'alamat'          => $request->alamat,
             'nomor_hp'        => $request->nomor_hp,

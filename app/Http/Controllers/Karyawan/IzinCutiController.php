@@ -3,88 +3,54 @@
 namespace App\Http\Controllers\Karyawan;
 
 use App\Http\Controllers\Controller;
-use App\Models\Perizinan;
+use App\Http\Requests\Karyawan\StoreIzinCutiRequest;
 use App\Models\Pengguna;
-use App\Models\MasterData;
+use App\Models\Perizinan;
+use App\Services\PerizinanService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class IzinCutiController extends Controller
 {
+    public function __construct(
+        protected PerizinanService $perizinanService
+    ) {}
+
     public function index(Request $request)
     {
         if (!$request->session()->has('pengguna_id')) {
             return redirect()->route('login');
         }
         $pengguna = Pengguna::find($request->session()->get('pengguna_id'));
-        $setting = MasterData::first();
+        $setting = \App\Models\MasterData::first();
         $jatahCuti = $setting ? $setting->jatah_cuti_tahunan : 12;
         return view('karyawan.IzinCuti', compact('pengguna', 'jatahCuti'));
     }
 
-    public function store(Request $request)
+    public function store(StoreIzinCutiRequest $request)
     {
-        $validated = $request->validate([
-            'jenis_izin' => 'required|string',
-            'tgl_mulai' => 'required|date',
-            'tgl_selesai' => 'required|date|after_or_equal:tgl_mulai',
-            'keterangan' => 'required|string|min:5',
-            'file_surat' => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:5120',
-        ]);
-
-        if (!$request->session()->has('pengguna_id')) {
-            return response()->json(['success' => false, 'message' => 'Sesi login habis'], 401);
-        }
-
+        $validated = $request->validated();
         $penggunaId = $request->session()->get('pengguna_id');
         $hariIni = now()->startOfDay();
         $tglMulai = \Carbon\Carbon::parse($validated['tgl_mulai'])->startOfDay();
         $tglSelesai = \Carbon\Carbon::parse($validated['tgl_selesai'])->startOfDay();
-        $durasi = $tglMulai->diffInDays($tglSelesai) + 1;
+        $durasi = $this->perizinanService->hitungDurasi($validated['tgl_mulai'], $validated['tgl_selesai']);
 
-        // Tidak boleh sebelum hari ini
         if ($tglMulai->lessThan($hariIni)) {
             return response()->json([
                 'success' => false,
-                'message' => "Tanggal mulai tidak boleh sebelum hari ini."
+                'message' => 'Tanggal mulai tidak boleh sebelum hari ini.'
             ], 422);
         }
 
-        // Cek tumpang tindih tanggal dengan pengajuan lain (pending/disetujui)
-        $overlap = Perizinan::where('id_pengguna_pengaju', $penggunaId)
-            ->whereIn('status_approval', ['pending', 'disetujui'])
-            ->where(function ($q) use ($validated) {
-                $q->whereBetween('tgl_mulai', [$validated['tgl_mulai'], $validated['tgl_selesai']])
-                  ->orWhereBetween('tgl_selesai', [$validated['tgl_mulai'], $validated['tgl_selesai']])
-                  ->orWhere(function ($q2) use ($validated) {
-                      $q2->where('tgl_mulai', '<=', $validated['tgl_mulai'])
-                         ->where('tgl_selesai', '>=', $validated['tgl_selesai']);
-                  });
-            })
-            ->exists();
-
-        if ($overlap) {
+        if ($this->perizinanService->cekOverlap($penggunaId, $validated['tgl_mulai'], $validated['tgl_selesai'])) {
             return response()->json([
                 'success' => false,
                 'message' => 'Tanggal yang diajukan bertumpuk dengan pengajuan izin/cuti lain yang sudah ada.'
             ], 422);
         }
 
-        // Cek sisa cuti untuk semua jenis
-        $setting = MasterData::first();
-        $jatahCuti = $setting ? $setting->jatah_cuti_tahunan : 12;
-
-        $cutiTerpakai = Perizinan::where('id_pengguna_pengaju', $penggunaId)
-            ->where('jenis_izin', 'cuti_tahunan')
-            ->where('status_approval', 'disetujui')
-            ->get()
-            ->sum(function ($item) {
-                $start = new \DateTime($item->tgl_mulai);
-                $end = new \DateTime($item->tgl_selesai);
-                return $start->diff($end)->days + 1;
-            });
-
-        $sisaCuti = $jatahCuti - $cutiTerpakai;
+        $sisaCuti = $this->perizinanService->hitungSisaCuti($penggunaId);
         if ($durasi > $sisaCuti) {
             return response()->json([
                 'success' => false,
@@ -93,7 +59,7 @@ class IzinCutiController extends Controller
         }
 
         try {
-            $jenisDb = $this->konversiJenisIzin($validated['jenis_izin']);
+            $jenisDb = $this->perizinanService->konversiJenisIzin($validated['jenis_izin']);
 
             $filePath = null;
             if ($request->hasFile('file_surat')) {
@@ -157,16 +123,6 @@ class IzinCutiController extends Controller
                 'message' => 'Gagal membatalkan permohonan.'
             ], 500);
         }
-    }
-
-    private function konversiJenisIzin($jenis)
-    {
-        return match ($jenis) {
-            'Cuti Tahunan' => 'cuti_tahunan',
-            'Cuti Sakit' => 'cuti_sakit',
-            'Izin' => 'izin',
-            default => 'izin',
-        };
     }
 
     public function getData(Request $request)

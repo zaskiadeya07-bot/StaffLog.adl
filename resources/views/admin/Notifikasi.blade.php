@@ -68,6 +68,7 @@
 
 @push('scripts')
 <script>
+const STORAGE_URL = '{{ asset('storage') }}';
 let currentTab = 'semua';
 let currentPerizinanId = null;
 let allData = [];
@@ -182,10 +183,10 @@ function showDetail(id) {
             <div class="md:col-span-2">
                 <p class="text-xs text-slate-500">Lampiran</p>
                 <div class="mt-1 flex items-center gap-2">
-                    <a href="{{ asset('storage') }}/${item.file_surat}" target="_blank" class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 bg-blue-50 px-3 py-2 rounded-lg">
+                    <a href="${STORAGE_URL}/${item.file_surat}" target="_blank" class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 bg-blue-50 px-3 py-2 rounded-lg">
                         <i class="bi bi-file-earmark-text"></i> <span class="text-sm">${fileName}</span> <i class="bi bi-box-arrow-up-right ml-1"></i>
                     </a>
-                    <a href="{{ asset('storage') }}/${item.file_surat}" download="${fileName}" class="text-slate-500 hover:text-slate-700 p-2 rounded-lg hover:bg-slate-100" title="Unduh">
+                    <a href="${STORAGE_URL}/${item.file_surat}" download="${fileName}" class="text-slate-500 hover:text-slate-700 p-2 rounded-lg hover:bg-slate-100" title="Unduh">
                         <i class="bi bi-download"></i>
                     </a>
                 </div>

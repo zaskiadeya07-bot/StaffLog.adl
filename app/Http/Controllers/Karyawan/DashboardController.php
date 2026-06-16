@@ -7,11 +7,16 @@ use App\Models\Pengguna;
 use App\Models\Presensi;
 use App\Models\Perizinan;
 use App\Models\MasterData;
+use App\Services\PerizinanService;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
+    public function __construct(
+        protected PerizinanService $perizinanService
+    ) {}
+
     public function index(Request $request)
     {
         $idPengguna = $request->session()->get('pengguna_id');
@@ -29,20 +34,7 @@ class DashboardController extends Controller
             ->whereDate('tanggal', $today)
             ->first();
 
-        $masterData = MasterData::first();
-
-        $sisaCuti = 0;
-        if ($masterData && $pengguna->tgl_mulai_kerja) {
-            $cutiTahunanTotal = $masterData->jatah_cuti_tahunan ?? 0;
-
-            $cutiTerpakai = Perizinan::where('id_pengguna_pengaju', $idPengguna)
-                ->where('jenis_izin', 'cuti_tahunan')
-                ->where('status_approval', 'disetujui')
-                ->whereYear('tgl_mulai', $tahunIni)
-                ->count();
-
-            $sisaCuti = max(0, $cutiTahunanTotal - $cutiTerpakai);
-        }
+        $sisaCuti = $this->perizinanService->hitungSisaCuti($idPengguna, $tahunIni);
 
         $stats = Presensi::where('id_pengguna', $idPengguna)
             ->whereMonth('tanggal', $bulanIni)

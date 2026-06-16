@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('master_data', function (Blueprint $table) {
             $table->increments('id_pengaturan');
-            $table->time('jam_masuk_std')->notNullable();
-            $table->time('jam_pulang_std')->notNullable();
-            $table->decimal('lat_kantor', 10, 8)->notNullable();
-            $table->decimal('long_kantor', 11, 8)->notNullable();
-            $table->integer('radius')->notNullable()->comment('dalam meter');
-            $table->integer('toleransi')->notNullable()->comment('toleransi keterlambatan dalam menit');
+            $table->time('jam_masuk_std');
+            $table->time('jam_pulang_std');
+            $table->decimal('lat_kantor', 10, 8);
+            $table->decimal('long_kantor', 11, 8);
+            $table->integer('radius')->comment('dalam meter');
+            $table->integer('toleransi')->comment('toleransi keterlambatan dalam menit');
         });
     }
 

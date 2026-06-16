@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('devisi', function (Blueprint $table) {
             $table->increments('id_devisi');
-            $table->string('nama_devisi', 255)->notNullable();
+            $table->string('nama_devisi', 255);
         });
     }
 

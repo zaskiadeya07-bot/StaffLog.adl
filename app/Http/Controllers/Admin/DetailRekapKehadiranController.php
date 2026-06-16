@@ -6,12 +6,16 @@ use App\Helpers\BulanHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Pengguna;
 use App\Models\Presensi;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class DetailRekapKehadiranController extends Controller
 {
+    public function __construct(
+        protected BulanHelper $bulanHelper
+    ) {}
+
     public function index(Request $request, $id)
     {
         $karyawan = Pengguna::with('devisi')->find($id);
@@ -25,7 +29,7 @@ class DetailRekapKehadiranController extends Controller
         $bulan = $request->get('bulan', date('m'));
         $tahun = $request->get('tahun', date('Y'));
 
-        $bulanNama = BulanHelper::getNamaBulanByAngka((int)$bulan);
+        $bulanNama = $this->bulanHelper->getNamaBulanByAngka((int)$bulan);
 
         $presensi = Presensi::where('id_pengguna', $id)
             ->whereMonth('tanggal', $bulan)
@@ -57,7 +61,7 @@ class DetailRekapKehadiranController extends Controller
         $bulan = $request->get('bulan', date('m'));
         $tahun = $request->get('tahun', date('Y'));
 
-        $bulanNama = BulanHelper::getNamaBulanByAngka((int)$bulan);
+        $bulanNama = $this->bulanHelper->getNamaBulanByAngka((int)$bulan);
 
         $presensi = Presensi::where('id_pengguna', $id)
             ->whereMonth('tanggal', $bulan)
