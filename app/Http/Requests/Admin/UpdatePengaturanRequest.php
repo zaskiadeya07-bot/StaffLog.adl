@@ -20,7 +20,7 @@ class UpdatePengaturanRequest extends FormRequest
             'long_kantor'        => 'required|numeric|between:-180,180',
             'radius'             => 'required|integer|min:10|max:1000',
             'toleransi'          => 'required|integer|min:0|max:120',
-            'jatah_cuti_tahunan' => 'required|integer|min:0|max:365',
+            'jatah_cuti_bulanan' => 'required|integer|min:0|max:31',
         ];
     }
 }

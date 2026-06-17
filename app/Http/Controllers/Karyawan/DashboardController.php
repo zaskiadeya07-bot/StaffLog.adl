@@ -34,7 +34,7 @@ class DashboardController extends Controller
             ->whereDate('tanggal', $today)
             ->first();
 
-        $sisaCuti = $this->perizinanService->hitungSisaCuti($idPengguna, $tahunIni);
+        $sisaCuti = $this->perizinanService->hitungSisaCuti($idPengguna, $bulanIni, $tahunIni);
 
         $stats = Presensi::where('id_pengguna', $idPengguna)
             ->whereMonth('tanggal', $bulanIni)

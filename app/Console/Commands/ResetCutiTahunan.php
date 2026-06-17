@@ -8,22 +8,22 @@ use Illuminate\Console\Command;
 
 class ResetCutiTahunan extends Command
 {
-    protected $signature = 'cuti:reset-tahunan';
-    protected $description = 'Reset jatah cuti tahunan di awal tahun baru';
+    protected $signature = 'cuti:reset-bulanan';
+    protected $description = 'Catat jatah cuti bulanan di awal bulan baru';
 
     public function handle()
     {
         $pengaturan = MasterData::first();
-        $jatahCuti = $pengaturan?->jatah_cuti_tahunan ?? 12;
+        $jatahCuti = $pengaturan?->jatah_cuti_bulanan ?? 1;
 
         $totalKaryawan = Pengguna::where('role', 'karyawan')
             ->where('status', 'aktif')
             ->count();
 
-        $tahun = now()->year;
+        $bulan = now()->translatedFormat('F Y');
 
-        $this->info("Tahun {$tahun}: Jatah cuti tahunan {$jatahCuti} hari untuk {$totalKaryawan} karyawan aktif.");
-        $this->info('Reset jatah cuti tahunan selesai (perhitungan otomatis per tahun).');
+        $this->info("{$bulan}: Jatah cuti {$jatahCuti} hari untuk {$totalKaryawan} karyawan aktif.");
+        $this->info('Reset period cuti bulanan selesai.');
 
         return Command::SUCCESS;
     }

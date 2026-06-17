@@ -16,7 +16,7 @@ class MasterDataController extends Controller
                 'long_kantor'        => 106.84559300,
                 'radius'             => 100,
                 'toleransi'          => 15,
-                'jatah_cuti_tahunan' => 12,
+                'jatah_cuti_bulanan' => 1,
             ]);
         }
 
@@ -25,7 +25,7 @@ class MasterDataController extends Controller
             'long_kantor'        => (float) $setting->long_kantor,
             'radius'             => (int)   $setting->radius,
             'toleransi'          => (int)   $setting->toleransi,
-            'jatah_cuti_tahunan' => (int)   $setting->jatah_cuti_tahunan,
+            'jatah_cuti_bulanan' => (int)   $setting->jatah_cuti_bulanan,
         ]);
     }
 }

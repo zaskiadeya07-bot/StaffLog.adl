@@ -30,7 +30,7 @@ Route::get('/', function () {
 
 // Login
 Route::get('/login',  [LoginController::class, 'index'])->name('login');
-Route::post('/login', [LoginController::class, 'authenticate'])->name('login.post')->middleware('throttle:5,30');
+Route::post('/login', [LoginController::class, 'authenticate'])->name('login.post');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // API Publik — pengaturan kantor (dipakai oleh view karyawan via fetch/axios)

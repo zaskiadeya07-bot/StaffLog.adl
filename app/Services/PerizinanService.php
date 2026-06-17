@@ -9,15 +9,17 @@ use Carbon\Carbon;
 
 class PerizinanService
 {
-    public function hitungSisaCuti(int $penggunaId, ?int $tahun = null): int
+    public function hitungSisaCuti(int $penggunaId, ?int $bulan = null, ?int $tahun = null): int
     {
+        $bulan = $bulan ?: Carbon::now()->month;
         $tahun = $tahun ?: Carbon::now()->year;
         $setting = MasterData::first();
-        $jatahCuti = $setting ? $setting->jatah_cuti_tahunan : 12;
+        $jatahCuti = $setting ? $setting->jatah_cuti_bulanan : 1;
 
         $cutiTerpakai = Perizinan::where('id_pengguna_pengaju', $penggunaId)
             ->where('jenis_izin', 'cuti_tahunan')
             ->where('status_approval', 'disetujui')
+            ->whereMonth('tgl_mulai', $bulan)
             ->whereYear('tgl_mulai', $tahun)
             ->get()
             ->sum(function ($item) {

@@ -18,7 +18,7 @@
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
         <div class="card p-4 flex items-center gap-3">
             <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center"><i class="bi bi-calendar-check text-blue-600 text-xl"></i></div>
-            <div><small class="text-slate-500">Sisa Cuti</small><h3 class="text-2xl font-bold text-blue-600" id="sisaCuti">12</h3><small class="text-slate-400">Hari</small></div>
+            <div><small class="text-slate-500">Sisa Cuti (Bulan Ini)</small><h3 class="text-2xl font-bold text-blue-600" id="sisaCuti">1</h3><small class="text-slate-400">Hari</small></div>
         </div>
         <div class="card p-4 flex items-center gap-3">
             <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center"><i class="bi bi-clock-history text-amber-600 text-xl"></i></div>
@@ -151,7 +151,13 @@
 <script>
     const CSRF_TOKEN = '{{ csrf_token() }}';
     const STORAGE_URL = '{{ asset('storage') }}';
-    const JATAH_CUTI = {{ $jatahCuti ?? 12 }};
+    const JATAH_CUTI = {{ $jatahCuti ?? 1 }};
+    const BULAN_INI = {{ date('n') }};
+    const TAHUN_INI = {{ date('Y') }};
+
+    function getBulanIniKey() {
+        return `${TAHUN_INI}-${String(BULAN_INI).padStart(2, '0')}`;
+    }
 
     let izinData = [];
     let selectedFile = null;
@@ -181,7 +187,12 @@
         const info = document.getElementById('aturanInfo');
         if (!jenis) { info.classList.add('hidden'); return; }
 
-        const cutiApproved = allIzinData.filter(i => i.status === 'approved' && i.jenis === 'Cuti Tahunan').reduce((sum, i) => sum + i.durasi, 0);
+        const bulanKey = getBulanIniKey();
+        const cutiApproved = allIzinData.filter(i =>
+            i.status === 'approved' &&
+            i.jenis === 'Cuti Tahunan' &&
+            i.tanggalMulai && i.tanggalMulai.startsWith(bulanKey)
+        ).reduce((sum, i) => sum + i.durasi, 0);
         const sisaCuti = Math.max(0, JATAH_CUTI - cutiApproved);
 
         const aturan = {
@@ -310,7 +321,12 @@
         document.getElementById('totalPending').innerText = pending;
         document.getElementById('totalApproved').innerText = approved;
         document.getElementById('totalRejected').innerText = rejected;
-        const cutiApproved = data.filter(i => i.status === 'approved' && i.jenis === 'Cuti Tahunan').reduce((sum, i) => sum + i.durasi, 0);
+        const bulanKey = getBulanIniKey();
+        const cutiApproved = data.filter(i =>
+            i.status === 'approved' &&
+            i.jenis === 'Cuti Tahunan' &&
+            i.tanggalMulai && i.tanggalMulai.startsWith(bulanKey)
+        ).reduce((sum, i) => sum + i.durasi, 0);
         document.getElementById('sisaCuti').innerText = Math.max(0, JATAH_CUTI - cutiApproved);
     }
 
@@ -444,7 +460,12 @@
         }
 
         // Cek sisa cuti
-        const cutiApproved = allIzinData.filter(i => i.status === 'approved' && i.jenis === 'Cuti Tahunan').reduce((sum, i) => sum + i.durasi, 0);
+        const bulanKey = getBulanIniKey();
+        const cutiApproved = allIzinData.filter(i =>
+            i.status === 'approved' &&
+            i.jenis === 'Cuti Tahunan' &&
+            i.tanggalMulai && i.tanggalMulai.startsWith(bulanKey)
+        ).reduce((sum, i) => sum + i.durasi, 0);
         const sisaCuti = Math.max(0, JATAH_CUTI - cutiApproved);
         if (durasi > sisaCuti) {
             showToast('Sisa cuti Anda hanya ' + sisaCuti + ' hari!', 'danger');

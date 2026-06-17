@@ -29,7 +29,7 @@ class MasterData extends Model
         'long_kantor',
         'radius',
         'toleransi',
-        'jatah_cuti_tahunan',
+        'jatah_cuti_bulanan',
     ];
 
     /*

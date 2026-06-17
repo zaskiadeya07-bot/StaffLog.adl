@@ -9,4 +9,4 @@ Artisan::command('inspire', function () {
 
 Schedule::command('presensi:mark-alpha')->dailyAt('00:05');
 Schedule::command('presensi:mark-absent')->dailyAt('00:10');
-Schedule::command('cuti:reset-tahunan')->yearlyOn(1, 1, '00:01');
+Schedule::command('cuti:reset-bulanan')->monthlyOn(1, '00:01');

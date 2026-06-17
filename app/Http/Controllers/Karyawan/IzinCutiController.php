@@ -23,7 +23,7 @@ class IzinCutiController extends Controller
         }
         $pengguna = Pengguna::find($request->session()->get('pengguna_id'));
         $setting = \App\Models\MasterData::first();
-        $jatahCuti = $setting ? $setting->jatah_cuti_tahunan : 12;
+        $jatahCuti = $setting ? $setting->jatah_cuti_bulanan : 1;
         return view('karyawan.IzinCuti', compact('pengguna', 'jatahCuti'));
     }
 
@@ -50,7 +50,7 @@ class IzinCutiController extends Controller
             ], 422);
         }
 
-        $sisaCuti = $this->perizinanService->hitungSisaCuti($penggunaId);
+        $sisaCuti = $this->perizinanService->hitungSisaCuti($penggunaId, now()->month, now()->year);
         if ($durasi > $sisaCuti) {
             return response()->json([
                 'success' => false,
