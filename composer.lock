@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fbecf2392085afe08213044ca821b51f",
+    "content-hash": "14b488ebe1b8c16d10a2f82a9f00b023",
     "packages": [
         {
             "name": "barryvdh/laravel-dompdf",
@@ -18,7 +18,7 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/barryvdh/laravel-dompdf/zipball/ee3b72b19ccdf57d0243116ecb2b90261344dedc",
                 "reference": "ee3b72b19ccdf57d0243116ecb2b90261344dedc",
-                "shasum": ""        
+                "shasum": ""
             },
             "require": {
                 "dompdf/dompdf": "^3.0",
