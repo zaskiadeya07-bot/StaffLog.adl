@@ -107,7 +107,7 @@ class SampleDataSeeder extends Seeder
         $sampleIzin = [
             [
                 'id_pengguna' => $createdIds[0],
-                'jenis_izin' => 'cuti_sakit',
+                'jenis_izin' => 'sakit',
                 'tgl_mulai' => now()->subDays(5)->toDateString(),
                 'tgl_selesai' => now()->subDays(3)->toDateString(),
                 'keterangan' => 'Demam dan tidak bisa masuk kerja',
@@ -123,7 +123,7 @@ class SampleDataSeeder extends Seeder
             ],
             [
                 'id_pengguna' => $createdIds[4],
-                'jenis_izin' => 'cuti_tahunan',
+                'jenis_izin' => 'cuti',
                 'tgl_mulai' => now()->addDays(10)->toDateString(),
                 'tgl_selesai' => now()->addDays(12)->toDateString(),
                 'keterangan' => 'Cuti tahunan',

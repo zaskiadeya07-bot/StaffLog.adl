@@ -38,7 +38,7 @@
                 <div>
                     <label class="block text-xs text-slate-500 mb-1">Tahun</label>
                     <select name="tahun" class="input-field">
-                        @for($i = 2022; $i <= 2026; $i++)
+                        @for($i = date('Y') - 5; $i <= date('Y') + 1; $i++)
                             <option value="{{ $i }}" {{ ($tahun ?? date('Y')) == $i ? 'selected' : '' }}>{{ $i }}</option>
                         @endfor
                     </select>
@@ -84,7 +84,7 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
-                        @forelse($presensi as $p)
+                        @foreach($presensi as $p)
                         @php $status = $p->status ?? 'alpha'; @endphp
                         <tr class="hover:bg-slate-50 transition">
                             <td class="px-4 py-3 text-sm text-slate-600">{{ \Carbon\Carbon::parse($p->tanggal)->format('d/m/Y') }}</td>
@@ -105,16 +105,7 @@
                                 </button>
                             </td>
                         </tr>
-                        @empty
-                        <tr>
-                            <td colspan="7">
-                                <div class="flex flex-col items-center justify-center py-12 text-slate-500">
-                                    <i class="bi bi-inbox text-5xl mb-3"></i>
-                                    <p class="text-lg">Belum ada data kehadiran untuk periode ini</p>
-                                </div>
-                            </td>
-                        </tr>
-                        @endforelse
+                        @endforeach
                     </tbody>
                 </table>
             </div>
@@ -269,9 +260,15 @@
 
     $(document).ready(function() {
         $('#detailKehadiranTable').DataTable({
-            language: { url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json' },
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json',
+                emptyTable: 'Belum ada data kehadiran untuk periode ini'
+            },
             order: [[0, 'desc']],
-            columnDefs: [{ orderable: false, targets: [6] }]
+            columnDefs: [{ orderable: false, targets: [6] }],
+            drawCallback: function() {
+                $('.dataTables_empty').addClass('px-4 py-12 text-center text-slate-500');
+            }
         });
     });
 </script>

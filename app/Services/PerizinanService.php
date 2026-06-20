@@ -17,7 +17,7 @@ class PerizinanService
         $jatahCuti = $setting ? $setting->jatah_cuti_bulanan : 1;
 
         $cutiTerpakai = Perizinan::where('id_pengguna_pengaju', $penggunaId)
-            ->where('jenis_izin', 'cuti_tahunan')
+            ->where('jenis_izin', 'cuti')
             ->where('status_approval', 'disetujui')
             ->whereMonth('tgl_mulai', $bulan)
             ->whereYear('tgl_mulai', $tahun)
@@ -51,20 +51,20 @@ class PerizinanService
     public function konversiJenisIzin(string $jenis): string
     {
         return match ($jenis) {
-            'Cuti Tahunan' => 'cuti_tahunan',
-            'Cuti Sakit'   => 'cuti_sakit',
-            'Izin'         => 'izin',
-            default        => 'izin',
+            'Cuti'  => 'cuti',
+            'Sakit' => 'sakit',
+            'Izin'  => 'izin',
+            default => 'izin',
         };
     }
 
     public function getJenisDisplay(string $jenisDb): string
     {
         return match ($jenisDb) {
-            'cuti_tahunan' => 'Cuti Tahunan',
-            'cuti_sakit'   => 'Cuti Sakit',
-            'izin'         => 'Izin',
-            default        => $jenisDb,
+            'cuti'  => 'Cuti',
+            'sakit' => 'Sakit',
+            'izin'  => 'Izin',
+            default => $jenisDb,
         };
     }
 

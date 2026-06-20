@@ -20,7 +20,7 @@ class RekapKaryawanController extends Controller
             ->when($filter === 'nonaktif', fn($q) => $q->where('pengguna.status', 'nonaktif'))
             ->when($divisiId, fn($q) => $q->where('pengguna.divisi', $divisiId))
             ->orderBy('pengguna.nama_lengkap', 'asc')
-            ->get();
+            ->paginate(50);
 
         $divisis = Devisi::orderBy('nama_devisi')->get();
 

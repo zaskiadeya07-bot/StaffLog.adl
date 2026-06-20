@@ -16,7 +16,7 @@
     {{-- Tabs --}}
     <div class="border-b border-slate-200 mb-5">
         <nav class="flex gap-1">
-            @foreach([['semua', 'bi-envelope', 'Semua'], ['cuti_tahunan', 'bi-calendar-check', 'Cuti Tahunan'], ['izin', 'bi-pencil-square', 'Izin'], ['sakit', 'bi-thermometer-half', 'Cuti Sakit']] as [$tab, $icon, $label])
+            @foreach([['semua', 'bi-envelope', 'Semua'], ['cuti', 'bi-calendar-check', 'Cuti'], ['izin', 'bi-pencil-square', 'Izin'], ['sakit', 'bi-thermometer-half', 'Sakit']] as [$tab, $icon, $label])
             <button class="tab-btn px-5 py-2.5 text-sm font-medium rounded-t-lg {{ $loop->first ? 'active' : '' }}" data-tab="{{ $tab }}">
                 <i class="{{ $icon }}"></i> {{ $label }}
             </button>
@@ -82,8 +82,8 @@ function formatTanggal(tgl) {
 
 const BADGE_HTML = {
     'Izin': '<span class="bg-amber-100 text-amber-700 px-2 py-1 rounded-full text-xs"><i class="bi bi-pencil-square"></i> Izin</span>',
-    'Cuti Sakit': '<span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs"><i class="bi bi-thermometer-half"></i> Cuti Sakit</span>',
-    'Cuti Tahunan': '<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs"><i class="bi bi-calendar-check"></i> Cuti Tahunan</span>',
+    'Sakit': '<span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs"><i class="bi bi-thermometer-half"></i> Sakit</span>',
+    'Cuti': '<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs"><i class="bi bi-calendar-check"></i> Cuti</span>',
 };
 
 const STATUS_BADGE = {

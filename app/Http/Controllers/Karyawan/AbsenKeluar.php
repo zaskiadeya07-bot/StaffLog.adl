@@ -8,6 +8,7 @@ use App\Models\MasterData;
 use App\Models\Pengguna;
 use App\Models\Presensi;
 use App\Services\PresensiService;
+use Carbon\Carbon;
 use Psr\Log\LoggerInterface;
 
 class AbsenKeluar extends Controller
@@ -110,7 +111,18 @@ class AbsenKeluar extends Controller
                 ], 400);
             }
 
+            $setting = MasterData::first();
             $now = now();
+
+            if ($setting && $setting->jam_pulang_std && $now->lessThan(Carbon::parse($setting->jam_pulang_std))) {
+                \Illuminate\Support\Facades\DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Maaf, Anda belum bisa absen pulang. Jam pulang kantor pukul ' . $setting->jam_pulang_std . '.',
+                    'code' => 'TOO_EARLY'
+                ], 400);
+            }
+
             if ($now->hour >= 0 && $now->hour < 6) {
                 \Illuminate\Support\Facades\DB::rollBack();
                 return response()->json([
@@ -119,8 +131,6 @@ class AbsenKeluar extends Controller
                     'code' => 'DEADLINE_PASSED'
                 ], 400);
             }
-
-            $setting = MasterData::first();
 
             if ($setting) {
                 $radiusCheck = $this->presensiService->checkRadius(

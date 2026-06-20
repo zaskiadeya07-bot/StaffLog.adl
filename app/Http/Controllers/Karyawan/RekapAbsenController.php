@@ -25,7 +25,8 @@ class RekapAbsenController extends Controller
 
         $bulanNama = $this->bulanHelper->getNamaBulanByAngka((int)$bulan);
 
-        $presensi = Presensi::where('id_pengguna', $idPengguna)
+        $presensi = Presensi::with('perizinan')
+            ->where('id_pengguna', $idPengguna)
             ->whereMonth('tanggal', $bulan)
             ->whereYear('tanggal', $tahun)
             ->orderBy('tanggal', 'desc')

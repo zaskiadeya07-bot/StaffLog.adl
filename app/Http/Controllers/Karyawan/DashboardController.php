@@ -17,6 +17,63 @@ class DashboardController extends Controller
         protected PerizinanService $perizinanService
     ) {}
 
+    protected function isWeekend($date): bool
+    {
+        return in_array(Carbon::parse($date)->format('l'), ['Saturday', 'Sunday']);
+    }
+
+    protected function autoAlphaHariIni($idPengguna): void
+    {
+        $now = Carbon::now();
+        $today = $now->toDateString();
+
+        if ($this->isWeekend($today)) return;
+
+        $pengaturan = MasterData::first();
+        if (!$pengaturan || !$pengaturan->jam_pulang_std) return;
+
+        $jamPulang = Carbon::parse($pengaturan->jam_pulang_std);
+
+        if ($now->lessThan($jamPulang)) return;
+
+        $sudahAda = Presensi::where('id_pengguna', $idPengguna)
+            ->whereDate('tanggal', $today)
+            ->exists();
+
+        if ($sudahAda) {
+            $alphaCheckout = Presensi::where('id_pengguna', $idPengguna)
+                ->whereDate('tanggal', $today)
+                ->whereNotNull('check_in')
+                ->whereNull('check_out')
+                ->where('status', '!=', 'alpha')
+                ->first();
+
+            if ($alphaCheckout) {
+                $alphaCheckout->update([
+                    'status' => 'alpha',
+                    'catatan_keterlambatan' => 'Tidak melakukan check out',
+                ]);
+            }
+            return;
+        }
+
+        $adaIzin = Perizinan::where('id_pengguna_pengaju', $idPengguna)
+            ->where('status_approval', 'disetujui')
+            ->whereDate('tgl_mulai', '<=', $today)
+            ->whereDate('tgl_selesai', '>=', $today)
+            ->exists();
+
+        if ($adaIzin) return;
+
+        Presensi::create([
+            'id_pengguna' => $idPengguna,
+            'id_pengaturan' => $pengaturan->id_pengaturan,
+            'tanggal' => $today,
+            'status' => 'alpha',
+            'catatan_keterlambatan' => 'Tidak hadir tanpa keterangan',
+        ]);
+    }
+
     public function index(Request $request)
     {
         $idPengguna = $request->session()->get('pengguna_id');
@@ -25,6 +82,8 @@ class DashboardController extends Controller
         if (!$pengguna) {
             return redirect()->route('login')->with('error', 'Sesi tidak valid.');
         }
+
+        $this->autoAlphaHariIni($idPengguna);
 
         $today = Carbon::today();
         $bulanIni = $today->month;

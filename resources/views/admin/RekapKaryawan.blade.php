@@ -54,7 +54,7 @@
                     <tbody class="divide-y divide-slate-100">
                         @foreach($karyawan as $index => $k)
                         <tr class="hover:bg-slate-50 transition">
-                            <td class="px-4 py-3 text-sm text-slate-600">{{ $index + 1 }}</td>
+                            <td class="px-4 py-3 text-sm text-slate-600">{{ $karyawan->firstItem() + $index }}</td>
                             <td class="px-4 py-3 text-sm text-slate-600 font-mono">{{ $k->id_karyawan ?? '-' }}</td>
                             <td class="px-4 py-3 font-medium text-slate-800">{{ $k->nama_lengkap }}</td>
                             <td class="px-4 py-3 text-sm text-slate-600">{{ $k->username }}</td>
@@ -98,6 +98,9 @@
                         @endforeach
                     </tbody>
                 </table>
+                <div class="px-4 py-3 border-t border-slate-100">
+                    {{ $karyawan->links('pagination::tailwind') }}
+                </div>
                 @else
                 <div class="flex flex-col items-center justify-center py-12 text-slate-500">
                     <i class="bi bi-inbox text-5xl mb-3"></i>
@@ -164,6 +167,8 @@
         const table = document.getElementById('rekapKaryawanTable');
         if (table) {
             $(table).DataTable({
+                paging: false,
+                info: false,
                 language: { url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json' },
                 columnDefs: [{ orderable: false, targets: [0, 7] }]
             });

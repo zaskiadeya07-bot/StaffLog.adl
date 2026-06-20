@@ -29,12 +29,8 @@ class NotifikasiController extends Controller
             ->where('status_approval', 'pending')
             ->orderBy('tgl_pengajuan', 'desc');
 
-        if ($jenis == 'izin') {
-            $query->where('jenis_izin', 'izin');
-        } elseif ($jenis == 'sakit') {
-            $query->where('jenis_izin', 'cuti_sakit');
-        } elseif ($jenis == 'cuti_tahunan') {
-            $query->where('jenis_izin', 'cuti_tahunan');
+        if (in_array($jenis, ['izin', 'sakit', 'cuti'])) {
+            $query->where('jenis_izin', $jenis);
         }
 
         $perizinan = $query->paginate($perPage, ['*'], 'page', $page);

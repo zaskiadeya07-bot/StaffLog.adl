@@ -51,7 +51,7 @@
                 <div>
                     <label class="block text-xs text-slate-500 mb-1">Tahun</label>
                     <select name="tahun" id="filterTahun" class="input-field">
-                        @for($i = 2022; $i <= 2026; $i++)
+                        @for($i = date('Y') - 5; $i <= date('Y') + 1; $i++)
                             <option value="{{ $i }}" {{ date('Y') == $i ? 'selected' : '' }}>
                                 {{ $i }}
                             </option>
@@ -98,7 +98,7 @@
             <form id="izinForm">
                 @csrf
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div><label class="block text-sm font-semibold mb-1">Jenis Permohonan <span class="text-red-500">*</span></label><select id="jenisIzin" name="jenis_izin" class="input-field" required><option value="">Pilih jenis</option><option value="Cuti Tahunan">Cuti Tahunan</option><option value="Cuti Sakit">Cuti Sakit</option><option value="Izin">Izin</option></select></div>
+                    <div><label class="block text-sm font-semibold mb-1">Jenis Permohonan <span class="text-red-500">*</span></label><select id="jenisIzin" name="jenis_izin" class="input-field" required><option value="">Pilih jenis</option><option value="Cuti">Cuti</option><option value="Sakit">Sakit</option><option value="Izin">Izin</option></select></div>
                     <div><label class="block text-sm font-semibold mb-1">Tanggal Mulai <span class="text-red-500">*</span></label><input type="date" id="tanggalMulai" name="tgl_mulai" class="input-field" required></div>
                     <div><label class="block text-sm font-semibold mb-1">Tanggal Selesai <span class="text-red-500">*</span></label><input type="date" id="tanggalSelesai" name="tgl_selesai" class="input-field" required></div>
 
@@ -163,8 +163,8 @@
     let selectedFile = null;
 
     const JENIS_MAP = {
-        cuti_tahunan: 'Cuti Tahunan',
-        cuti_sakit: 'Cuti Sakit',
+        cuti: 'Cuti',
+        sakit: 'Sakit',
         izin: 'Izin'
     };
 
@@ -190,14 +190,14 @@
         const bulanKey = getBulanIniKey();
         const cutiApproved = allIzinData.filter(i =>
             i.status === 'approved' &&
-            i.jenis === 'Cuti Tahunan' &&
+            i.jenis === 'Cuti' &&
             i.tanggalMulai && i.tanggalMulai.startsWith(bulanKey)
         ).reduce((sum, i) => sum + i.durasi, 0);
         const sisaCuti = Math.max(0, JATAH_CUTI - cutiApproved);
 
         const aturan = {
-            'Cuti Tahunan': { icon: 'bi-calendar-check', color: 'bg-blue-50 text-blue-700 border-blue-200' },
-            'Cuti Sakit': { icon: 'bi-thermometer-half', color: 'bg-red-50 text-red-700 border-red-200' },
+            'Cuti': { icon: 'bi-calendar-check', color: 'bg-blue-50 text-blue-700 border-blue-200' },
+            'Sakit': { icon: 'bi-thermometer-half', color: 'bg-red-50 text-red-700 border-red-200' },
             'Izin': { icon: 'bi-pencil-square', color: 'bg-amber-50 text-amber-700 border-amber-200' }
         };
 
@@ -324,7 +324,7 @@
         const bulanKey = getBulanIniKey();
         const cutiApproved = data.filter(i =>
             i.status === 'approved' &&
-            i.jenis === 'Cuti Tahunan' &&
+            i.jenis === 'Cuti' &&
             i.tanggalMulai && i.tanggalMulai.startsWith(bulanKey)
         ).reduce((sum, i) => sum + i.durasi, 0);
         document.getElementById('sisaCuti').innerText = Math.max(0, JATAH_CUTI - cutiApproved);
@@ -451,7 +451,6 @@
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const mulaiDate = new Date(tanggalMulai + 'T00:00:00');
-        const durasi = hitungDurasi(tanggalMulai, tanggalSelesai);
 
         // Cek backdate
         if (mulaiDate < today) {
@@ -459,19 +458,7 @@
             return;
         }
 
-        // Cek sisa cuti
-        const bulanKey = getBulanIniKey();
-        const cutiApproved = allIzinData.filter(i =>
-            i.status === 'approved' &&
-            i.jenis === 'Cuti Tahunan' &&
-            i.tanggalMulai && i.tanggalMulai.startsWith(bulanKey)
-        ).reduce((sum, i) => sum + i.durasi, 0);
-        const sisaCuti = Math.max(0, JATAH_CUTI - cutiApproved);
-        if (durasi > sisaCuti) {
-            showToast('Sisa cuti Anda hanya ' + sisaCuti + ' hari!', 'danger');
-            return;
-        }
-
+        // Sisa cuti divalidasi oleh server
         const formData = new FormData(document.getElementById('izinForm'));
 
         fetch('{{ route('karyawan.izin-cuti.store') }}', {
@@ -511,27 +498,37 @@
     });
 
     function cancelIzin(id) {
-        if (!confirm('Yakin ingin membatalkan permohonan ini?')) return;
+        Swal.fire({
+            title: 'Konfirmasi',
+            text: 'Yakin ingin membatalkan permohonan ini?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, batalkan',
+            cancelButtonText: 'Tutup',
+            reverseButtons: true
+        }).then((result) => {
+            if (!result.isConfirmed) return;
 
-        fetch('{{ route('karyawan.izin-cuti.cancel', ':id') }}'.replace(':id', id), {
-            method: 'PUT',
-            headers: {
-                'X-CSRF-TOKEN': CSRF_TOKEN,
-                'Accept': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(result => {
-            if (result.success) {
-                showToast('Permohonan berhasil dibatalkan.');
-                loadAllData();
-            } else {
-                showToast(result.message, 'danger');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showToast('Gagal membatalkan permohonan', 'danger');
+            fetch('{{ route('karyawan.izin-cuti.cancel', ':id') }}'.replace(':id', id), {
+                method: 'PUT',
+                headers: {
+                    'X-CSRF-TOKEN': CSRF_TOKEN,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    showToast('Permohonan berhasil dibatalkan.');
+                    loadAllData();
+                } else {
+                    showToast(result.message, 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Gagal membatalkan permohonan', 'danger');
+            });
         });
     }
 

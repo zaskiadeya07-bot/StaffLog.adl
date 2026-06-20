@@ -81,6 +81,7 @@ var OFFICE_LOCATION = {
     lng: {{ $setting->long_kantor ?? 106.845593 }},
     radius: {{ $setting->radius ?? 100 }}
 };
+var JAM_PULANG_STD = '{{ $setting->jam_pulang_std ?? null }}';
 var STATUS_ROUTE = '{{ $mode === "masuk" ? route("karyawan.checkin.status") : route("karyawan.checkout.status") }}';
 var STORE_ROUTE = '{{ $mode === "masuk" ? route("karyawan.checkin.store") : route("karyawan.checkout.store") }}';
 
@@ -120,6 +121,9 @@ function checkTodayStatus() {
         else if (MODE === 'pulang' && !result.sudah_check_in && !result.data) {
             enableButton(false);
             showNotification('error', 'Anda belum absen masuk hari ini.');
+        }
+        else if (MODE === 'pulang' && !hasDoneToday) {
+            updateCheckoutBlock();
         }
     })
     .catch(function(error) { console.error('Error:', error); });
@@ -198,12 +202,32 @@ function enableButton(enabled) {
     else { btn.disabled = true; btn.style.opacity = '0.5'; btn.style.cursor = 'not-allowed'; }
 }
 
+function isBeforeJamPulang() {
+    if (MODE !== 'pulang' || !JAM_PULANG_STD) return false;
+    var now = new Date();
+    var parts = JAM_PULANG_STD.split(':');
+    var jamPulang = new Date(now.getFullYear(), now.getMonth(), now.getDate(), parseInt(parts[0]), parseInt(parts[1] || 0), 0);
+    return now < jamPulang;
+}
+
+function updateCheckoutBlock() {
+    if (MODE !== 'pulang' || !JAM_PULANG_STD || hasDoneToday) return;
+    if (isBeforeJamPulang()) {
+        enableButton(false);
+        document.getElementById('locationStatusContainer').innerHTML = '<div class="bg-amber-50 text-amber-700 p-3 rounded-xl border border-amber-200"><i class="bi bi-clock-history mr-2"></i><strong>Belum Waktunya Pulang</strong><br><small>Jam pulang kantor pukul ' + JAM_PULANG_STD + '. Silakan tunggu hingga jam pulang tiba.</small></div>';
+    }
+}
+
 function performAction() {
     if (!isWithinRadius) { showNotification('error', 'Anda berada di luar radius kantor'); return; }
     if (hasDoneToday) { showNotification('error', 'Anda sudah absen ' + MODE + ' hari ini'); return; }
     if (!currentPosition) { showNotification('error', 'Lokasi tidak terdeteksi'); return; }
 
     if (MODE === 'pulang') {
+        if (isBeforeJamPulang()) {
+            showNotification('error', 'Maaf, Anda belum bisa absen pulang. Jam pulang kantor pukul ' + JAM_PULANG_STD + '.');
+            return;
+        }
         var jamSekarang = new Date();
         if (jamSekarang.getHours() >= 0 && jamSekarang.getHours() < 6) {
             showNotification('error', 'Batas absen pulang kemarin sudah lewat (23:59).');
@@ -275,6 +299,7 @@ if (actionBtn) actionBtn.addEventListener('click', performAction);
 
 initMap();
 checkTodayStatus();
+updateCheckoutBlock();
 
 if (navigator.geolocation) {
     watchId = navigator.geolocation.watchPosition(updateLocationStatus, handleLocationError, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });

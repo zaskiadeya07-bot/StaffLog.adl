@@ -50,16 +50,19 @@ class IzinCutiController extends Controller
             ], 422);
         }
 
-        $sisaCuti = $this->perizinanService->hitungSisaCuti($penggunaId, now()->month, now()->year);
-        if ($durasi > $sisaCuti) {
-            return response()->json([
-                'success' => false,
-                'message' => "Sisa cuti Anda hanya {$sisaCuti} hari."
-            ], 422);
+        $jenisDb = $this->perizinanService->konversiJenisIzin($validated['jenis_izin']);
+
+        if ($jenisDb === 'cuti') {
+            $sisaCuti = $this->perizinanService->hitungSisaCuti($penggunaId, now()->month, now()->year);
+            if ($durasi > $sisaCuti) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Sisa cuti Anda hanya {$sisaCuti} hari."
+                ], 422);
+            }
         }
 
         try {
-            $jenisDb = $this->perizinanService->konversiJenisIzin($validated['jenis_izin']);
 
             $filePath = null;
             if ($request->hasFile('file_surat')) {
