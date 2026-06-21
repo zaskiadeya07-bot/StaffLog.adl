@@ -8,6 +8,7 @@ use App\Models\MasterData;
 use App\Models\Pengguna;
 use App\Models\Presensi;
 use App\Services\PresensiService;
+use Carbon\Carbon;
 use Psr\Log\LoggerInterface;
 
 class AbsenMasuk extends Controller
@@ -92,6 +93,18 @@ class AbsenMasuk extends Controller
                         'success' => false,
                         'message' => 'Anda berada di luar radius kantor! Jarak: ' . round($radiusCheck['jarak']) . ' meter'
                     ], 400);
+                }
+
+                if ($setting->jam_masuk_std) {
+                    $now = now();
+                    $bolehAbsen = Carbon::parse($setting->jam_masuk_std)->subMinutes(30);
+                    if ($now->lessThan($bolehAbsen)) {
+                        \Illuminate\Support\Facades\DB::rollBack();
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Belum bisa absen masuk. Absen dibuka mulai pukul ' . $bolehAbsen->format('H:i') . '.'
+                        ], 400);
+                    }
                 }
             }
 

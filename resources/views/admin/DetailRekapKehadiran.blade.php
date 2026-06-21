@@ -87,7 +87,7 @@
                         @foreach($presensi as $p)
                         @php $status = $p->status ?? 'alpha'; @endphp
                         <tr class="hover:bg-slate-50 transition">
-                            <td class="px-4 py-3 text-sm text-slate-600">{{ \Carbon\Carbon::parse($p->tanggal)->format('d/m/Y') }}</td>
+                            <td class="px-4 py-3 text-sm text-slate-600" data-order="{{ $p->tanggal }}">{{ \Carbon\Carbon::parse($p->tanggal)->format('d/m/Y') }}</td>
                             <td class="px-4 py-3 text-sm text-slate-600">{{ \Carbon\Carbon::parse($p->tanggal)->locale('id')->isoFormat('dddd') }}</td>
                             <td class="px-4 py-3 text-sm text-slate-600 font-mono">{{ $p->check_in ?? '-' }}</td>
                             <td class="px-4 py-3 text-sm text-slate-600 font-mono">{{ $p->check_out ?? '-' }}</td>

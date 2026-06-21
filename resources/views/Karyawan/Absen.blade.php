@@ -81,7 +81,16 @@ var OFFICE_LOCATION = {
     lng: {{ $setting->long_kantor ?? 106.845593 }},
     radius: {{ $setting->radius ?? 100 }}
 };
+var JAM_MASUK_STD = '{{ $setting->jam_masuk_std ?? null }}';
 var JAM_PULANG_STD = '{{ $setting->jam_pulang_std ?? null }}';
+function getJamBukaAbsen() {
+    if (!JAM_MASUK_STD) return '';
+    var parts = JAM_MASUK_STD.split(':');
+    var d = new Date();
+    d.setHours(parseInt(parts[0]), parseInt(parts[1] || 0), 0);
+    d.setMinutes(d.getMinutes() - 30);
+    return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+}
 var STATUS_ROUTE = '{{ $mode === "masuk" ? route("karyawan.checkin.status") : route("karyawan.checkout.status") }}';
 var STORE_ROUTE = '{{ $mode === "masuk" ? route("karyawan.checkin.store") : route("karyawan.checkout.store") }}';
 
@@ -104,6 +113,30 @@ function updateClock() {
     var now = new Date();
     document.getElementById('clock').textContent = now.toLocaleTimeString('id-ID', { hour12: false });
     document.getElementById('date').textContent = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    var container = document.getElementById('locationStatusContainer');
+    if (MODE === 'masuk' && isBeforeJamMasuk()) {
+        enableButton(false);
+        if (container && !container.querySelector('.bg-amber-50')) {
+            container.innerHTML = '<div class="bg-amber-50 text-amber-700 p-3 rounded-xl border border-amber-200"><i class="bi bi-clock-history mr-2"></i><strong>Belum Waktunya Absen Masuk</strong><br><small>Absen dibuka mulai pukul ' + getJamBukaAbsen() + ' (30 menit sebelum jam masuk ' + JAM_MASUK_STD + '). Silakan tunggu.</small></div>';
+        }
+    } else if (MODE === 'pulang' && isBeforeJamPulang()) {
+        enableButton(false);
+        if (container && !container.querySelector('.bg-amber-50')) {
+            container.innerHTML = '<div class="bg-amber-50 text-amber-700 p-3 rounded-xl border border-amber-200"><i class="bi bi-clock-history mr-2"></i><strong>Belum Waktunya Pulang</strong><br><small>Jam pulang kantor pukul ' + JAM_PULANG_STD + '. Silakan tunggu hingga jam pulang tiba.</small></div>';
+        }
+    } else if (container && container.querySelector('.bg-amber-50')) {
+        if (currentPosition) {
+            var distance = calculateDistance(currentPosition.lat, currentPosition.lng, OFFICE_LOCATION.lat, OFFICE_LOCATION.lng);
+            isWithinRadius = distance <= OFFICE_LOCATION.radius;
+            if (isWithinRadius) {
+                container.innerHTML = '<div class="bg-emerald-100 text-emerald-700 p-3 rounded-xl"><i class="bi bi-check-circle-fill mr-2"></i><strong>\u2705 Dalam Radius Kantor</strong><br><small>Jarak: ' + distance.toFixed(2) + ' meter (Maks: ' + OFFICE_LOCATION.radius + ' meter)</small></div>';
+                enableButton(true);
+            } else {
+                container.innerHTML = '<div class="bg-red-100 text-red-700 p-3 rounded-xl"><i class="bi bi-x-circle-fill mr-2"></i><strong>\u274c Di Luar Radius Kantor</strong><br><small>Jarak: ' + distance.toFixed(2) + ' meter (Maks: ' + OFFICE_LOCATION.radius + ' meter)</small></div>';
+                enableButton(false);
+            }
+        }
+    }
 }
 setInterval(updateClock, 1000);
 updateClock();
@@ -165,7 +198,17 @@ function updateLocationStatus(position) {
     }
 
     var statusContainer = document.getElementById('locationStatusContainer');
-    if (isWithinRadius) {
+    if (MODE === 'masuk' && isBeforeJamMasuk()) {
+        enableButton(false);
+        if (statusContainer && !statusContainer.querySelector('.bg-amber-50')) {
+            statusContainer.innerHTML = '<div class="bg-amber-50 text-amber-700 p-3 rounded-xl border border-amber-200"><i class="bi bi-clock-history mr-2"></i><strong>Belum Waktunya Absen Masuk</strong><br><small>Absen dibuka mulai pukul ' + getJamBukaAbsen() + ' (30 menit sebelum jam masuk ' + JAM_MASUK_STD + '). Silakan tunggu.</small></div>';
+        }
+    } else if (MODE === 'pulang' && isBeforeJamPulang()) {
+        enableButton(false);
+        if (statusContainer && !statusContainer.querySelector('.bg-amber-50')) {
+            statusContainer.innerHTML = '<div class="bg-amber-50 text-amber-700 p-3 rounded-xl border border-amber-200"><i class="bi bi-clock-history mr-2"></i><strong>Belum Waktunya Pulang</strong><br><small>Jam pulang kantor pukul ' + JAM_PULANG_STD + '. Silakan tunggu hingga jam pulang tiba.</small></div>';
+        }
+    } else if (isWithinRadius) {
         statusContainer.innerHTML = '<div class="bg-emerald-100 text-emerald-700 p-3 rounded-xl"><i class="bi bi-check-circle-fill mr-2"></i><strong>\u2705 Dalam Radius Kantor</strong><br><small>Jarak: ' + distance.toFixed(2) + ' meter (Maks: ' + OFFICE_LOCATION.radius + ' meter)</small></div>';
         enableButton(true);
     } else {
@@ -202,12 +245,29 @@ function enableButton(enabled) {
     else { btn.disabled = true; btn.style.opacity = '0.5'; btn.style.cursor = 'not-allowed'; }
 }
 
+function isBeforeJamMasuk() {
+    if (MODE !== 'masuk' || !JAM_MASUK_STD) return false;
+    var now = new Date();
+    var parts = JAM_MASUK_STD.split(':');
+    var jamMasuk = new Date(now.getFullYear(), now.getMonth(), now.getDate(), parseInt(parts[0]), parseInt(parts[1] || 0), 0);
+    var bolehAbsen = new Date(jamMasuk.getTime() - 30 * 60 * 1000);
+    return now < bolehAbsen;
+}
+
 function isBeforeJamPulang() {
     if (MODE !== 'pulang' || !JAM_PULANG_STD) return false;
     var now = new Date();
     var parts = JAM_PULANG_STD.split(':');
     var jamPulang = new Date(now.getFullYear(), now.getMonth(), now.getDate(), parseInt(parts[0]), parseInt(parts[1] || 0), 0);
     return now < jamPulang;
+}
+
+function updateCheckinBlock() {
+    if (MODE !== 'masuk' || !JAM_MASUK_STD || hasDoneToday) return;
+    if (isBeforeJamMasuk()) {
+        enableButton(false);
+        document.getElementById('locationStatusContainer').innerHTML = '<div class="bg-amber-50 text-amber-700 p-3 rounded-xl border border-amber-200"><i class="bi bi-clock-history mr-2"></i><strong>Belum Waktunya Absen Masuk</strong><br><small>Absen dibuka mulai pukul ' + getJamBukaAbsen() + ' (30 menit sebelum jam masuk ' + JAM_MASUK_STD + '). Silakan tunggu.</small></div>';
+    }
 }
 
 function updateCheckoutBlock() {
@@ -222,6 +282,13 @@ function performAction() {
     if (!isWithinRadius) { showNotification('error', 'Anda berada di luar radius kantor'); return; }
     if (hasDoneToday) { showNotification('error', 'Anda sudah absen ' + MODE + ' hari ini'); return; }
     if (!currentPosition) { showNotification('error', 'Lokasi tidak terdeteksi'); return; }
+
+    if (MODE === 'masuk') {
+        if (isBeforeJamMasuk()) {
+            showNotification('error', 'Belum bisa absen masuk. Absen dibuka mulai pukul ' + getJamBukaAbsen() + ' (30 menit sebelum jam masuk ' + JAM_MASUK_STD + ').');
+            return;
+        }
+    }
 
     if (MODE === 'pulang') {
         if (isBeforeJamPulang()) {
@@ -299,6 +366,7 @@ if (actionBtn) actionBtn.addEventListener('click', performAction);
 
 initMap();
 checkTodayStatus();
+updateCheckinBlock();
 updateCheckoutBlock();
 
 if (navigator.geolocation) {
