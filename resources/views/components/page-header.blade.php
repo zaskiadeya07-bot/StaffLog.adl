@@ -2,7 +2,7 @@
     <div>
         <h1 class="text-2xl font-bold text-slate-800">{{ $title }}</h1>
         @if(isset($description))
-            <p class="text-slate-500 text-sm">{{ $description }}</p>
+            <p class="text-slate-500 text-sm">{!! $description !!}</p>
         @endif
     </div>
     @if(isset($actionUrl) && isset($actionLabel))
