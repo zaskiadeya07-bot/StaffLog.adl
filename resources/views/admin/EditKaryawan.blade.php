@@ -32,10 +32,15 @@
                         @enderror
                     </div>
 
+                    {{-- ID Karyawan (Otomatis) --}}
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">ID Karyawan</label>
-                        <input type="text" class="input-field w-full bg-slate-50 text-slate-500"
-                            value="{{ $karyawan->id_karyawan }}" disabled readonly>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">
+                            ID Karyawan
+                        </label>
+                        <input type="text" 
+                               class="input-field w-full bg-slate-50 text-slate-400" 
+                               value="{{ $karyawan->id_karyawan }}" disabled readonly>
+                        <input type="hidden" name="id_karyawan" value="{{ $karyawan->id_karyawan }}">
                     </div>
 
                     <div>
@@ -70,12 +75,15 @@
                         @enderror
                     </div>
 
+                    {{-- Tanggal Mulai Kerja (Otomatis) --}}
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">
                             Tanggal Mulai Kerja
                         </label>
-                        <input type="text" class="input-field w-full bg-slate-50 text-slate-500"
-                            value="{{ \Carbon\Carbon::parse($karyawan->tgl_mulai_kerja)->format('d/m/Y') }}" disabled readonly>
+                        <input type="date" 
+                               class="input-field w-full bg-slate-50 text-slate-400" 
+                               value="{{ old('tgl_mulai_kerja', $karyawan->tgl_mulai_kerja ? \Carbon\Carbon::parse($karyawan->tgl_mulai_kerja)->format('Y-m-d') : '') }}" disabled readonly>
+                        <input type="hidden" name="tgl_mulai_kerja" value="{{ old('tgl_mulai_kerja', $karyawan->tgl_mulai_kerja ? \Carbon\Carbon::parse($karyawan->tgl_mulai_kerja)->format('Y-m-d') : '') }}">
                     </div>
 
                     <div>

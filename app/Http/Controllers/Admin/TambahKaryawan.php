@@ -19,28 +19,67 @@ class TambahKaryawan extends Controller
     public function index()
     {
         $divisis = Devisi::select('id_devisi as id', 'nama_devisi')->get();
-        return view('admin.TambahKaryawan', compact('divisis'));
+
+        $last = Pengguna::where('id_karyawan', 'like', 'EMP-%')
+            ->orderBy('id_karyawan', 'desc')
+            ->first();
+
+        if ($last) {
+            $lastNum = (int) substr($last->id_karyawan, 4);
+            $newId = 'EMP-' . str_pad($lastNum + 1, 3, '0', STR_PAD_LEFT);
+        } else {
+            $newId = 'EMP-001';
+        }
+
+        return view('admin.TambahKaryawan', compact('divisis', 'newId'));
     }
 
     public function store(StoreKaryawanRequest $request)
     {
-        $idKaryawan = $this->karyawanService->generateIdKaryawan();
-
-        Pengguna::create([
-            'nama_lengkap'    => $request->nama_lengkap,
-            'id_karyawan'     => $idKaryawan,
-            'username'        => $request->username,
-            'alamat'          => $request->alamat,
-            'nomor_hp'        => $request->nomor_hp,
-            'tgl_mulai_kerja' => $request->tgl_mulai_kerja ?? now()->toDateString(),
-            'divisi'          => $request->divisi,
-            'password'        => Hash::make($request->password),
-            'role'            => 'karyawan',
+        $validated = $request->validate([
+            'nama_lengkap' => 'required|string|max:100',
+            'username' => 'required|string|max:50|unique:pengguna,username',
+            'alamat' => 'nullable|string',
+            'nomor_hp' => 'nullable|string|max:15',
+            'tgl_mulai_kerja' => 'nullable|date',
+            'divisi' => 'required|exists:devisi,id_devisi',
+            'password' => 'required|min:6|confirmed',
         ]);
 
-        return redirect()
-            ->route('admin.rekap-karyawan')
-            ->with('success', 'Karyawan ' . $request->nama_lengkap . ' berhasil ditambahkan!');
+        $last = Pengguna::where('id_karyawan', 'like', 'EMP-%')
+            ->orderBy('id_karyawan', 'desc')
+            ->first();
+
+        if ($last) {
+            $lastNum = (int) substr($last->id_karyawan, 4);
+            $newId = 'EMP-' . str_pad($lastNum + 1, 3, '0', STR_PAD_LEFT);
+        } else {
+            $newId = 'EMP-001';
+        }
+
+        try {
+            Pengguna::create([
+                'nama_lengkap' => $validated['nama_lengkap'],
+                'id_karyawan' => $newId,
+                'username' => $validated['username'],
+                'alamat' => $validated['alamat'],
+                'nomor_hp' => $validated['nomor_hp'],
+                'tgl_mulai_kerja' => $validated['tgl_mulai_kerja'],
+                'divisi' => $validated['divisi'],
+                'password' => Hash::make($validated['password']),
+                'role' => 'karyawan',
+                'status' => 'aktif',
+            ]);
+
+            return redirect()
+                ->route('admin.rekap-karyawan')
+                ->with('success', 'Karyawan ' . $validated['nama_lengkap'] . ' berhasil ditambahkan!');
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Gagal menambahkan karyawan. Silakan coba lagi.')
+                ->withInput();
+        }
     }
 
     public function edit($id)
@@ -69,21 +108,33 @@ class TambahKaryawan extends Controller
 
     public function destroy($id)
     {
-        $karyawan = Pengguna::findOrFail($id);
-        $karyawan->update(['status' => 'nonaktif']);
+        try {
+            $karyawan = Pengguna::findOrFail($id);
+            $karyawan->update(['status' => 'nonaktif']);
 
-        return redirect()
-            ->route('admin.rekap-karyawan')
-            ->with('success', 'Karyawan ' . $karyawan->nama_lengkap . ' berhasil dinonaktifkan.');
+            return redirect()
+                ->route('admin.rekap-karyawan')
+                ->with('success', "Karyawan {$karyawan->nama_lengkap} berhasil dinonaktifkan!");
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Gagal menonaktifkan karyawan. Silakan coba lagi.');
+        }
     }
 
     public function activate($id)
     {
-        $karyawan = Pengguna::findOrFail($id);
-        $karyawan->update(['status' => 'aktif']);
+        try {
+            $karyawan = Pengguna::findOrFail($id);
+            $karyawan->update(['status' => 'aktif']);
 
-        return redirect()
-            ->route('admin.rekap-karyawan')
-            ->with('success', 'Karyawan ' . $karyawan->nama_lengkap . ' berhasil diaktifkan kembali.');
+            return redirect()
+                ->route('admin.rekap-karyawan')
+                ->with('success', "Karyawan {$karyawan->nama_lengkap} berhasil diaktifkan kembali!");
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Gagal mengaktifkan karyawan. Silakan coba lagi.');
+        }
     }
 }

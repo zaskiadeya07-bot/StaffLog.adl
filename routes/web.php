@@ -52,7 +52,7 @@ Route::prefix('admin')->name('admin.')->middleware(['session.check', 'role.check
     Route::get('/edit-karyawan/{id}', [TambahKaryawan::class, 'edit'])->name('edit-karyawan');
     Route::put('/edit-karyawan/{id}', [TambahKaryawan::class, 'update'])->name('edit-karyawan.update');
     
-    // Hapus (Nonaktifkan) & Aktifkan Karyawan
+    // Nonaktifkan / Aktifkan Karyawan
     Route::delete('/hapus-karyawan/{id}', [TambahKaryawan::class, 'destroy'])->name('hapus-karyawan');
     Route::put('/aktifkan-karyawan/{id}', [TambahKaryawan::class, 'activate'])->name('aktifkan-karyawan');
     

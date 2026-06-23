@@ -61,7 +61,15 @@
                             <td class="px-4 py-3 text-sm text-slate-600">{{ $k->divisi_nama ?? '-' }}</td>
                             <td class="px-4 py-3 text-sm text-slate-600">{{ $k->nomor_hp ?? '-' }}</td>
                             <td class="px-4 py-3">
-                                <x-badge type="{{ $k->status }}">{{ ucfirst($k->status) }}</x-badge>
+                                @if($k->status === 'nonaktif')
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                                        <i class="bi bi-dash-circle"></i> Nonaktif
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
+                                        <i class="bi bi-check-circle"></i> Aktif
+                                    </span>
+                                @endif
                             </td>
                             <td class="px-4 py-3">
                                 <div class="flex gap-2">
@@ -75,27 +83,38 @@
                                        title="Ubah Karyawan">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    @if($k->status === 'aktif')
-                                    <button data-id="{{ $k->id_pengguna }}" data-name="{{ $k->nama_lengkap }}"
-                                            onclick="showDeleteModal(this.dataset.id, this.dataset.name)"
-                                            class="bg-red-50 text-red-600 p-2 rounded-lg hover:bg-red-100 transition"
-                                            title="Nonaktifkan Karyawan">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
+                                    @if($k->status === 'nonaktif')
+                                        <form method="POST" action="{{ route('admin.aktifkan-karyawan', $k->id_pengguna) }}" onsubmit="return confirm('Aktifkan kembali {{ $k->nama_lengkap }}?')">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit"
+                                               class="bg-emerald-50 text-emerald-600 p-2 rounded-lg hover:bg-emerald-100 transition"
+                                               title="Aktifkan Karyawan">
+                                                <i class="bi bi-check-lg"></i>
+                                            </button>
+                                        </form>
                                     @else
-                                    <form action="{{ route('admin.aktifkan-karyawan', $k->id_pengguna) }}" method="POST" class="inline">
-                                        @csrf @method('PUT')
-                                        <button type="submit"
-                                                class="bg-blue-50 text-blue-600 p-2 rounded-lg hover:bg-blue-100 transition"
-                                                title="Aktifkan Kembali">
-                                            <i class="bi bi-arrow-counterclockwise"></i>
+                                        <button data-id="{{ $k->id_pengguna }}" data-name="{{ $k->nama_lengkap }}" 
+                                                onclick="showDeleteModal(this.dataset.id, this.dataset.name)" 
+                                                class="bg-red-50 text-red-600 p-2 rounded-lg hover:bg-red-100 transition"
+                                                title="Nonaktifkan Karyawan">
+                                            <i class="bi bi-slash-circle"></i>
                                         </button>
-                                    </form>
                                     @endif
                                 </div>
                             </td>
                         </tr>
-                        @endforeach
+                        @empty
+                        <tr>
+                            <td colspan="8" class="px-4 py-8 text-center text-slate-500">
+                                <i class="bi bi-inbox text-4xl"></i>
+                                <p class="mt-2">Belum ada data karyawan</p>
+                                <a href="{{ route('admin.tambah-karyawan') }}" class="text-blue-500 hover:underline mt-2 inline-block">
+                                    Tambah karyawan sekarang
+                                </a>
+                            </td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
                 <div class="px-4 py-3 border-t border-slate-100">
@@ -120,22 +139,23 @@
     <div class="bg-white rounded-2xl max-w-md w-full mx-4 shadow-xl">
         <div class="bg-amber-600 text-white p-4 rounded-t-2xl">
             <h3 class="font-bold text-lg flex items-center gap-2">
-                <i class="bi bi-exclamation-triangle-fill"></i>
+                <i class="bi bi-exclamation-triangle-fill"></i> 
                 Konfirmasi Nonaktifkan
             </h3>
         </div>
         <div class="p-6">
             <p class="text-slate-700">Apakah Anda yakin ingin menonaktifkan karyawan <strong id="deleteName"></strong>?</p>
-            <p class="text-slate-400 text-sm mt-2">Karyawan yang dinonaktifkan tidak bisa absen sampai diaktifkan kembali. Riwayat tetap tersimpan.</p>
+            <p class="text-slate-400 text-sm mt-2">Karyawan yang dinonaktifkan tidak bisa login sampai diaktifkan kembali.</p>
         </div>
         <div class="p-4 border-t border-slate-100 flex justify-end gap-3">
             <button onclick="closeDeleteModal()" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition">
                 Batal
             </button>
             <form id="deleteForm" method="POST">
-                @csrf @method('DELETE')
+                @csrf
+                @method('DELETE')
                 <button type="submit" class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition">
-                    <i class="bi bi-person-x"></i> Nonaktifkan
+                    <i class="bi bi-slash-circle"></i> Nonaktifkan
                 </button>
             </form>
         </div>

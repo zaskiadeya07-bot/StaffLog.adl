@@ -36,12 +36,14 @@ class LoginController extends Controller
                 ->onlyInput('username');
         }
 
-        if (($pengguna->status ?? 'aktif') === 'nonaktif') {
+        // Cek status nonaktif
+        if ($pengguna->status === 'nonaktif') {
             return back()
-                ->withErrors(['username' => 'Akun Anda telah dinonaktifkan. Silakan hubungi administrator.'])
+                ->withErrors(['username' => 'Akun Anda telah dinonaktifkan. Silakan hubungi admin.'])
                 ->onlyInput('username');
         }
 
+        // Regenerasi session untuk cegah session fixation
         $request->session()->regenerate();
 
         $request->session()->put('pengguna_id',       $pengguna->id_pengguna);
