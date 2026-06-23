@@ -5,25 +5,44 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Pengguna;
 use App\Models\Devisi;
+use Illuminate\Http\Request;
 
 class RekapKaryawanController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $filter = request('filter', 'aktif');
-        $divisiId = request('divisi');
-
-        $karyawan = Pengguna::where('role', 'karyawan')
+        $query = Pengguna::where('role', 'karyawan')
             ->leftJoin('devisi', 'pengguna.divisi', '=', 'devisi.id_devisi')
-            ->select('pengguna.*', 'devisi.nama_devisi as divisi_nama')
-            ->when($filter === 'aktif', fn($q) => $q->where('pengguna.status', 'aktif'))
-            ->when($filter === 'nonaktif', fn($q) => $q->where('pengguna.status', 'nonaktif'))
-            ->when($divisiId, fn($q) => $q->where('pengguna.divisi', $divisiId))
-            ->orderBy('pengguna.nama_lengkap', 'asc')
-            ->paginate(50);
+            ->select('pengguna.*', 'devisi.nama_devisi as divisi_nama');
 
-        $divisis = Devisi::orderBy('nama_devisi')->get();
+        // Filter status
+        if ($request->filled('status') && $request->status !== 'semua') {
+            $query->where('pengguna.status', $request->status);
+        }
 
-        return view('admin.RekapKaryawan', compact('karyawan', 'filter', 'divisis', 'divisiId'));
+        // Filter divisi
+        if ($request->filled('divisi')) {
+            $query->where('pengguna.divisi', $request->divisi);
+        }
+
+        // Pencarian
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('pengguna.nama_lengkap', 'like', "%{$search}%")
+                  ->orWhere('pengguna.username', 'like', "%{$search}%")
+                  ->orWhere('pengguna.id_karyawan', 'like', "%{$search}%")
+                  ->orWhere('pengguna.nomor_hp', 'like', "%{$search}%")
+                  ->orWhere('devisi.nama_devisi', 'like', "%{$search}%");
+            });
+        }
+
+        $karyawan = $query->orderBy('pengguna.nama_lengkap', 'asc')
+            ->paginate(50)
+            ->withQueryString();
+
+        $divisis = Devisi::select('id_devisi as id', 'nama_devisi')->get();
+
+        return view('admin.RekapKaryawan', compact('karyawan', 'divisis'));
     }
 }

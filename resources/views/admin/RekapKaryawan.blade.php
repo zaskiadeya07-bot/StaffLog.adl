@@ -25,11 +25,38 @@
             </a>
             @endforeach
         </div>
-        <select onchange="filterByDivisi(this.value)"
-                class="text-sm border border-slate-300 rounded-lg px-3 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-400">
+    @endif
+
+    {{-- Filter & Pencarian --}}
+    <div class="flex flex-wrap items-center gap-3 mb-4">
+        {{-- Search --}}
+        <div class="relative flex-1 min-w-[200px] max-w-sm">
+            <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input type="text" id="searchInput" placeholder="Cari karyawan..." 
+                   class="input-field w-full pl-10" value="{{ request('search') }}">
+        </div>
+
+        {{-- Filter Status --}}
+        <div class="flex gap-1 bg-slate-100 rounded-lg p-1">
+            <a href="{{ route('admin.rekap-karyawan', array_merge(request()->except(['status', 'page']), ['status' => 'semua'])) }}" 
+               class="px-3 py-1.5 text-xs font-semibold rounded-md transition {{ request('status', 'semua') === 'semua' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}">
+                Semua
+            </a>
+            <a href="{{ route('admin.rekap-karyawan', array_merge(request()->except(['status', 'page']), ['status' => 'aktif'])) }}" 
+               class="px-3 py-1.5 text-xs font-semibold rounded-md transition {{ request('status') === 'aktif' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}">
+                Aktif
+            </a>
+            <a href="{{ route('admin.rekap-karyawan', array_merge(request()->except(['status', 'page']), ['status' => 'nonaktif'])) }}" 
+               class="px-3 py-1.5 text-xs font-semibold rounded-md transition {{ request('status') === 'nonaktif' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}">
+                Nonaktif
+            </a>
+        </div>
+
+        {{-- Filter Divisi --}}
+        <select id="filterDivisi" class="input-field min-w-[140px]">
             <option value="">Semua Divisi</option>
             @foreach($divisis as $d)
-                <option value="{{ $d->id_devisi }}" {{ $divisiId == $d->id_devisi ? 'selected' : '' }}>{{ $d->nama_devisi }}</option>
+                <option value="{{ $d->id }}" {{ request('divisi') == $d->id ? 'selected' : '' }}>{{ $d->nama_devisi }}</option>
             @endforeach
         </select>
     </div>
@@ -58,7 +85,13 @@
                             <td class="px-4 py-3 text-sm text-slate-600 font-mono">{{ $k->id_karyawan ?? '-' }}</td>
                             <td class="px-4 py-3 font-medium text-slate-800">{{ $k->nama_lengkap }}</td>
                             <td class="px-4 py-3 text-sm text-slate-600">{{ $k->username }}</td>
-                            <td class="px-4 py-3 text-sm text-slate-600">{{ $k->divisi_nama ?? '-' }}</td>
+                            <td class="px-4 py-3 text-sm text-slate-600">
+                                @if($k->divisi_nama)
+                                    {{ $k->divisi_nama }}
+                                @else
+                                    <span class="text-slate-400">-</span>
+                                @endif
+                            </td>
                             <td class="px-4 py-3 text-sm text-slate-600">{{ $k->nomor_hp ?? '-' }}</td>
                             <td class="px-4 py-3">
                                 @if($k->status === 'nonaktif')
@@ -132,9 +165,14 @@
             </div>
         </div>
     </div>
+
+    {{-- Pagination --}}
+    <div class="mt-4">
+        {{ $karyawan->links() }}
+    </div>
 </div>
 
-{{-- Modal Konfirmasi Nonaktifkan --}}
+<!-- Modal Konfirmasi Nonaktifkan -->
 <div id="deleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center">
     <div class="bg-white rounded-2xl max-w-md w-full mx-4 shadow-xl">
         <div class="bg-amber-600 text-white p-4 rounded-t-2xl">
@@ -176,23 +214,28 @@
         document.getElementById('deleteModal').classList.remove('flex');
     }
 
-    function filterByDivisi(divisiId) {
-        const params = new URLSearchParams(window.location.search);
-        params.set('divisi', divisiId);
-        params.set('filter', '{{ $filter }}');
-        window.location.search = params.toString();
-    }
+    // Search dengan delay (300ms)
+    let searchTimeout;
+    document.getElementById('searchInput').addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            const url = new URL(window.location.href);
+            url.searchParams.set('search', this.value);
+            url.searchParams.delete('page');
+            window.location.href = url.toString();
+        }, 300);
+    });
 
-    $(document).ready(function() {
-        const table = document.getElementById('rekapKaryawanTable');
-        if (table) {
-            $(table).DataTable({
-                paging: false,
-                info: false,
-                language: { url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json' },
-                columnDefs: [{ orderable: false, targets: [0, 7] }]
-            });
+    // Filter Divisi
+    document.getElementById('filterDivisi').addEventListener('change', function() {
+        const url = new URL(window.location.href);
+        if (this.value) {
+            url.searchParams.set('divisi', this.value);
+        } else {
+            url.searchParams.delete('divisi');
         }
+        url.searchParams.delete('page');
+        window.location.href = url.toString();
     });
 </script>
 @endpush
