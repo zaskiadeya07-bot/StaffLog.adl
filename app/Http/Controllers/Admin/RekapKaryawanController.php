@@ -38,8 +38,7 @@ class RekapKaryawanController extends Controller
         }
 
         $karyawan = $query->orderBy('pengguna.nama_lengkap', 'asc')
-            ->paginate(50)
-            ->withQueryString();
+            ->get();
 
         $divisis = Devisi::select('id_devisi as id', 'nama_devisi')->get();
 

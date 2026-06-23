@@ -18,10 +18,14 @@
             <a href="{{ route('admin.rekap-karyawan') }}" class="btn-secondary inline-flex items-center gap-2">
                 <i class="bi bi-arrow-left"></i> Kembali
             </a>
+            <a href="{{ route('admin.detail-rekap-kehadiran.export-pdf', $karyawan->id_pengguna) }}?bulan={{ $bulan }}&tahun={{ $tahun }}"
+               class="btn-primary inline-flex items-center gap-2">
+                <i class="bi bi-filetype-pdf"></i> Export PDF
+            </a>
         </div>
     </div>
-    
-//Filter
+
+    {{-- Filter --}}
     <div class="card mb-6">
         <div class="p-4">
             <form method="GET" action="{{ route('admin.detail-rekap-kehadiran', $karyawan->id_pengguna) }}" class="flex flex-wrap items-end gap-4">
@@ -52,7 +56,7 @@
         </div>
     </div>
     
-//Statistik Cards
+{{-- Statistik Cards --}}
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         @php
             $stats = [
@@ -67,7 +71,7 @@
         @endforeach
     </div>
     
-//Table
+{{-- Table --}}
     <div class="card">
         <div class="p-0">
             <div class="table-responsive overflow-x-auto">
@@ -113,7 +117,7 @@
     </div>
 </div>
 
-//Modal Detail Absensi
+{{-- Modal Detail Absensi --}}
 <div id="detailModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
     <div class="bg-white rounded-3xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div class="bg-slate-800 p-5 rounded-t-3xl sticky top-0">
@@ -264,6 +268,7 @@
                 url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json',
                 emptyTable: 'Belum ada data kehadiran untuk periode ini'
             },
+            dom: '<"flex flex-wrap items-center justify-between gap-3 p-3"<"dataTables_length"l><"dataTables_filter"f>>t<"flex flex-wrap items-center justify-between gap-3 p-3"<"dataTables_info"i><"dataTables_paginate"p>>',
             order: [[0, 'desc']],
             columnDefs: [{ orderable: false, targets: [6] }],
             drawCallback: function() {
