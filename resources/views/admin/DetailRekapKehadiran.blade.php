@@ -4,24 +4,24 @@
 
 @section('content')
 <div>
-    <x-page-header
-        title="Detail Kehadiran: {{ $karyawan->nama_lengkap ?? 'Karyawan' }}"
-        description='<i class="bi bi-building"></i> {{ $karyawan->devisi->nama_devisi ?? "-" }} | Periode: {{ $bulanNama ?? date("F") }} {{ $tahun ?? date("Y") }}'
-    >
-        <x-slot:actionSlot>
-            <div class="flex gap-2">
-                <a href="{{ route('admin.detail-rekap-kehadiran.export-pdf', ['id' => $karyawan->id_pengguna, 'bulan' => $bulan, 'tahun' => $tahun]) }}"
-                   class="btn-primary inline-flex items-center gap-2" style="background:#2563eb;">
-                    <i class="bi bi-filetype-pdf"></i> Ekspor PDF
-                </a>
-                <a href="{{ route('admin.rekap-karyawan') }}" class="btn-secondary inline-flex items-center gap-2">
-                    <i class="bi bi-arrow-left"></i> Kembali
-                </a>
-            </div>
-        </x-slot:actionSlot>
-    </x-page-header>
-
-    {{-- Filter --}}
+    <div class="flex justify-between items-center flex-wrap gap-3 mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800" id="employeeName">
+                Detail Kehadiran: {{ $karyawan->nama_lengkap ?? 'Karyawan' }}
+            </h1>
+            <p class="text-slate-500 text-sm" id="employeeInfo">
+                <i class="bi bi-building"></i> 
+                {{ $karyawan->devisi->nama_devisi ?? '-' }} | Periode: {{ $bulanNama ?? date('F') }} {{ $tahun ?? date('Y') }}
+            </p>
+        </div>
+        <div class="flex gap-2">
+            <a href="{{ route('admin.rekap-karyawan') }}" class="btn-secondary inline-flex items-center gap-2">
+                <i class="bi bi-arrow-left"></i> Kembali
+            </a>
+        </div>
+    </div>
+    
+//Filter
     <div class="card mb-6">
         <div class="p-4">
             <form method="GET" action="{{ route('admin.detail-rekap-kehadiran', $karyawan->id_pengguna) }}" class="flex flex-wrap items-end gap-4">
@@ -51,8 +51,8 @@
             </form>
         </div>
     </div>
-
-    {{-- Stat Cards --}}
+    
+//Statistik Cards
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         @php
             $stats = [
@@ -66,8 +66,8 @@
             <x-stat-card color="{{ $s['color'] }}" icon="{{ $s['icon'] }}" value="{{ $s['value'] }}" label="{{ $s['label'] }}" />
         @endforeach
     </div>
-
-    {{-- Table --}}
+    
+//Table
     <div class="card">
         <div class="p-0">
             <div class="table-responsive overflow-x-auto">
@@ -113,8 +113,8 @@
     </div>
 </div>
 
-{{-- Modal Detail --}}
-<div id="detailModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center">
+//Modal Detail Absensi
+<div id="detailModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
     <div class="bg-white rounded-3xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div class="bg-slate-800 p-5 rounded-t-3xl sticky top-0">
             <div class="flex justify-between items-center">

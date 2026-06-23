@@ -25,11 +25,38 @@
             </a>
             @endforeach
         </div>
-        <select onchange="filterByDivisi(this.value)"
-                class="text-sm border border-slate-300 rounded-lg px-3 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-400">
+    @endif
+
+    {{-- Filter & Pencarian --}}
+    <div class="flex flex-wrap items-center gap-3 mb-4">
+        {{-- Search --}}
+        <div class="relative flex-1 min-w-[200px] max-w-sm">
+            <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input type="text" id="searchInput" placeholder="Cari karyawan..." 
+                   class="input-field w-full pl-10" value="{{ request('search') }}">
+        </div>
+
+        {{-- Filter Status --}}
+        <div class="flex gap-1 bg-slate-100 rounded-lg p-1">
+            <a href="{{ route('admin.rekap-karyawan', array_merge(request()->except(['status', 'page']), ['status' => 'semua'])) }}" 
+               class="px-3 py-1.5 text-xs font-semibold rounded-md transition {{ request('status', 'semua') === 'semua' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}">
+                Semua
+            </a>
+            <a href="{{ route('admin.rekap-karyawan', array_merge(request()->except(['status', 'page']), ['status' => 'aktif'])) }}" 
+               class="px-3 py-1.5 text-xs font-semibold rounded-md transition {{ request('status') === 'aktif' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}">
+                Aktif
+            </a>
+            <a href="{{ route('admin.rekap-karyawan', array_merge(request()->except(['status', 'page']), ['status' => 'nonaktif'])) }}" 
+               class="px-3 py-1.5 text-xs font-semibold rounded-md transition {{ request('status') === 'nonaktif' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}">
+                Nonaktif
+            </a>
+        </div>
+
+        {{-- Filter Divisi --}}
+        <select id="filterDivisi" class="input-field min-w-[140px]">
             <option value="">Semua Divisi</option>
             @foreach($divisis as $d)
-                <option value="{{ $d->id_devisi }}" {{ $divisiId == $d->id_devisi ? 'selected' : '' }}>{{ $d->nama_devisi }}</option>
+                <option value="{{ $d->id }}" {{ request('divisi') == $d->id ? 'selected' : '' }}>{{ $d->nama_devisi }}</option>
             @endforeach
         </select>
     </div>
@@ -58,10 +85,24 @@
                             <td class="px-4 py-3 text-sm text-slate-600 font-mono">{{ $k->id_karyawan ?? '-' }}</td>
                             <td class="px-4 py-3 font-medium text-slate-800">{{ $k->nama_lengkap }}</td>
                             <td class="px-4 py-3 text-sm text-slate-600">{{ $k->username }}</td>
-                            <td class="px-4 py-3 text-sm text-slate-600">{{ $k->divisi_nama ?? '-' }}</td>
+                            <td class="px-4 py-3 text-sm text-slate-600">
+                                @if($k->divisi_nama)
+                                    {{ $k->divisi_nama }}
+                                @else
+                                    <span class="text-slate-400">-</span>
+                                @endif
+                            </td>
                             <td class="px-4 py-3 text-sm text-slate-600">{{ $k->nomor_hp ?? '-' }}</td>
                             <td class="px-4 py-3">
-                                <x-badge type="{{ $k->status }}">{{ ucfirst($k->status) }}</x-badge>
+                                @if($k->status === 'nonaktif')
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                                        <i class="bi bi-dash-circle"></i> Nonaktif
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
+                                        <i class="bi bi-check-circle"></i> Aktif
+                                    </span>
+                                @endif
                             </td>
                             <td class="px-4 py-3">
                                 <div class="flex gap-2">
@@ -75,27 +116,38 @@
                                        title="Ubah Karyawan">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    @if($k->status === 'aktif')
-                                    <button data-id="{{ $k->id_pengguna }}" data-name="{{ $k->nama_lengkap }}"
-                                            onclick="showDeleteModal(this.dataset.id, this.dataset.name)"
-                                            class="bg-red-50 text-red-600 p-2 rounded-lg hover:bg-red-100 transition"
-                                            title="Nonaktifkan Karyawan">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
+                                    @if($k->status === 'nonaktif')
+                                        <form method="POST" action="{{ route('admin.aktifkan-karyawan', $k->id_pengguna) }}" onsubmit="return confirm('Aktifkan kembali {{ $k->nama_lengkap }}?')">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit"
+                                               class="bg-emerald-50 text-emerald-600 p-2 rounded-lg hover:bg-emerald-100 transition"
+                                               title="Aktifkan Karyawan">
+                                                <i class="bi bi-check-lg"></i>
+                                            </button>
+                                        </form>
                                     @else
-                                    <form action="{{ route('admin.aktifkan-karyawan', $k->id_pengguna) }}" method="POST" class="inline">
-                                        @csrf @method('PUT')
-                                        <button type="submit"
-                                                class="bg-blue-50 text-blue-600 p-2 rounded-lg hover:bg-blue-100 transition"
-                                                title="Aktifkan Kembali">
-                                            <i class="bi bi-arrow-counterclockwise"></i>
+                                        <button data-id="{{ $k->id_pengguna }}" data-name="{{ $k->nama_lengkap }}" 
+                                                onclick="showDeleteModal(this.dataset.id, this.dataset.name)" 
+                                                class="bg-red-50 text-red-600 p-2 rounded-lg hover:bg-red-100 transition"
+                                                title="Nonaktifkan Karyawan">
+                                            <i class="bi bi-slash-circle"></i>
                                         </button>
-                                    </form>
                                     @endif
                                 </div>
                             </td>
                         </tr>
-                        @endforeach
+                        @empty
+                        <tr>
+                            <td colspan="8" class="px-4 py-8 text-center text-slate-500">
+                                <i class="bi bi-inbox text-4xl"></i>
+                                <p class="mt-2">Belum ada data karyawan</p>
+                                <a href="{{ route('admin.tambah-karyawan') }}" class="text-blue-500 hover:underline mt-2 inline-block">
+                                    Tambah karyawan sekarang
+                                </a>
+                            </td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
                 <div class="px-4 py-3 border-t border-slate-100">
@@ -113,29 +165,35 @@
             </div>
         </div>
     </div>
+
+    {{-- Pagination --}}
+    <div class="mt-4">
+        {{ $karyawan->links() }}
+    </div>
 </div>
 
-{{-- Modal Konfirmasi Nonaktifkan --}}
+<!-- Modal Konfirmasi Nonaktifkan -->
 <div id="deleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center">
     <div class="bg-white rounded-2xl max-w-md w-full mx-4 shadow-xl">
         <div class="bg-amber-600 text-white p-4 rounded-t-2xl">
             <h3 class="font-bold text-lg flex items-center gap-2">
-                <i class="bi bi-exclamation-triangle-fill"></i>
+                <i class="bi bi-exclamation-triangle-fill"></i> 
                 Konfirmasi Nonaktifkan
             </h3>
         </div>
         <div class="p-6">
             <p class="text-slate-700">Apakah Anda yakin ingin menonaktifkan karyawan <strong id="deleteName"></strong>?</p>
-            <p class="text-slate-400 text-sm mt-2">Karyawan yang dinonaktifkan tidak bisa absen sampai diaktifkan kembali. Riwayat tetap tersimpan.</p>
+            <p class="text-slate-400 text-sm mt-2">Karyawan yang dinonaktifkan tidak bisa login sampai diaktifkan kembali.</p>
         </div>
         <div class="p-4 border-t border-slate-100 flex justify-end gap-3">
             <button onclick="closeDeleteModal()" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition">
                 Batal
             </button>
             <form id="deleteForm" method="POST">
-                @csrf @method('DELETE')
+                @csrf
+                @method('DELETE')
                 <button type="submit" class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition">
-                    <i class="bi bi-person-x"></i> Nonaktifkan
+                    <i class="bi bi-slash-circle"></i> Nonaktifkan
                 </button>
             </form>
         </div>
@@ -156,23 +214,28 @@
         document.getElementById('deleteModal').classList.remove('flex');
     }
 
-    function filterByDivisi(divisiId) {
-        const params = new URLSearchParams(window.location.search);
-        params.set('divisi', divisiId);
-        params.set('filter', '{{ $filter }}');
-        window.location.search = params.toString();
-    }
+    // Search dengan delay (300ms)
+    let searchTimeout;
+    document.getElementById('searchInput').addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            const url = new URL(window.location.href);
+            url.searchParams.set('search', this.value);
+            url.searchParams.delete('page');
+            window.location.href = url.toString();
+        }, 300);
+    });
 
-    $(document).ready(function() {
-        const table = document.getElementById('rekapKaryawanTable');
-        if (table) {
-            $(table).DataTable({
-                paging: false,
-                info: false,
-                language: { url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json' },
-                columnDefs: [{ orderable: false, targets: [0, 7] }]
-            });
+    // Filter Divisi
+    document.getElementById('filterDivisi').addEventListener('change', function() {
+        const url = new URL(window.location.href);
+        if (this.value) {
+            url.searchParams.set('divisi', this.value);
+        } else {
+            url.searchParams.delete('divisi');
         }
+        url.searchParams.delete('page');
+        window.location.href = url.toString();
     });
 </script>
 @endpush

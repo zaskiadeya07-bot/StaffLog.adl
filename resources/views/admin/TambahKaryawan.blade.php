@@ -34,10 +34,15 @@
                         @enderror
                     </div>
 
+                    {{-- ID Karyawan (Otomatis) --}}
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">ID Karyawan</label>
-                        <input type="text" class="input-field w-full bg-slate-50 text-slate-400"
-                            value="Otomatis (EMP-xxx)" disabled readonly>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">
+                            ID Karyawan
+                        </label>
+                        <input type="text"
+                               class="input-field w-full bg-slate-50 text-slate-400"
+                               value="{{ $newId }}" disabled readonly>
+                        <p class="text-xs text-slate-400 mt-1">ID otomatis dari sistem</p>
                     </div>
 
                     <div>
@@ -72,12 +77,15 @@
                         @enderror
                     </div>
 
+                    {{-- Tanggal Mulai Kerja (Otomatis) --}}
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">
                             Tanggal Mulai Kerja
                         </label>
-                        <input type="text" class="input-field w-full bg-slate-50 text-slate-500"
-                            value="{{ date('d/m/Y') }}" disabled readonly>
+                        <input type="date" 
+                               class="input-field w-full bg-slate-50 text-slate-400" 
+                               value="{{ date('Y-m-d') }}" disabled readonly>
+                        <input type="hidden" name="tgl_mulai_kerja" value="{{ date('Y-m-d') }}">
                     </div>
 
                     <div>

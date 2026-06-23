@@ -33,6 +33,16 @@ class ProfileController extends Controller
         $pengguna = Pengguna::findOrFail($request->session()->get('pengguna_id'));
         $pengguna->update($request->validated());
 
-        return back()->with('success', 'Profil berhasil diperbarui!');
+        $validated = $request->validate([
+            'nama_lengkap' => 'required|string|max:100',
+            'nomor_hp' => 'nullable|string|max:12',
+            'alamat' => 'nullable|string',
+        ], [
+            'nomor_hp.max' => 'Nomor HP maksimal 12 karakter.',
+        ]);
+
+        $pengguna->update($validated);
+
+        return back()->with('success', 'Profil berhasil diupdate!');
     }
 }
