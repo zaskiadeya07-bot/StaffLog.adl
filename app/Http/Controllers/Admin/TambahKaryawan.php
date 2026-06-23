@@ -40,10 +40,12 @@ class TambahKaryawan extends Controller
             'nama_lengkap' => 'required|string|max:100',
             'username' => 'required|string|max:50|unique:pengguna,username',
             'alamat' => 'nullable|string',
-            'nomor_hp' => 'nullable|string|max:15',
+            'nomor_hp' => 'nullable|string|max:12',
             'tgl_mulai_kerja' => 'nullable|date',
             'divisi' => 'required|exists:devisi,id_devisi',
             'password' => 'required|min:6|confirmed',
+        ], [
+            'nomor_hp.max' => 'Nomor HP maksimal 12 karakter.',
         ]);
 
         $last = Pengguna::where('id_karyawan', 'like', 'EMP-%')
@@ -93,7 +95,17 @@ class TambahKaryawan extends Controller
     {
         $karyawan = Pengguna::findOrFail($id);
 
-        $updateData = $request->only(['nama_lengkap', 'username', 'alamat', 'nomor_hp', 'divisi']);
+        $validated = $request->validate([
+            'nama_lengkap' => 'required|string|max:100',
+            'id_karyawan' => 'required|string|max:20|unique:pengguna,id_karyawan,' . $id . ',id_pengguna',
+            'username' => 'required|string|max:50|unique:pengguna,username,' . $id . ',id_pengguna',
+            'alamat' => 'nullable|string',
+            'nomor_hp' => 'nullable|string|max:12',
+            'tgl_mulai_kerja' => 'nullable|date',
+            'divisi' => 'required|exists:devisi,id_devisi',
+        ], [
+            'nomor_hp.max' => 'Nomor HP maksimal 12 karakter.',
+        ]);
 
         if ($request->filled('password')) {
             $updateData['password'] = Hash::make($request->password);
