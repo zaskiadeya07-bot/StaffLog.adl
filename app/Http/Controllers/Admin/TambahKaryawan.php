@@ -19,45 +19,15 @@ class TambahKaryawan extends Controller
     public function index()
     {
         $divisis = Devisi::select('id_devisi as id', 'nama_devisi')->get();
-
-        $last = Pengguna::where('id_karyawan', 'like', 'EMP-%')
-            ->orderBy('id_karyawan', 'desc')
-            ->first();
-
-        if ($last) {
-            $lastNum = (int) substr($last->id_karyawan, 4);
-            $newId = 'EMP-' . str_pad($lastNum + 1, 3, '0', STR_PAD_LEFT);
-        } else {
-            $newId = 'EMP-001';
-        }
+        $newId = $this->karyawanService->generateIdKaryawan();
 
         return view('admin.TambahKaryawan', compact('divisis', 'newId'));
     }
 
     public function store(StoreKaryawanRequest $request)
     {
-        $validated = $request->validate([
-            'nama_lengkap' => 'required|string|max:100',
-            'username' => 'required|string|max:50|unique:pengguna,username',
-            'alamat' => 'nullable|string',
-            'nomor_hp' => 'nullable|string|max:12',
-            'tgl_mulai_kerja' => 'nullable|date',
-            'divisi' => 'required|exists:devisi,id_devisi',
-            'password' => 'required|min:6|confirmed',
-        ], [
-            'nomor_hp.max' => 'Nomor HP maksimal 12 karakter.',
-        ]);
-
-        $last = Pengguna::where('id_karyawan', 'like', 'EMP-%')
-            ->orderBy('id_karyawan', 'desc')
-            ->first();
-
-        if ($last) {
-            $lastNum = (int) substr($last->id_karyawan, 4);
-            $newId = 'EMP-' . str_pad($lastNum + 1, 3, '0', STR_PAD_LEFT);
-        } else {
-            $newId = 'EMP-001';
-        }
+        $validated = $request->validated();
+        $newId = $this->karyawanService->generateIdKaryawan();
 
         try {
             Pengguna::create([
@@ -95,17 +65,9 @@ class TambahKaryawan extends Controller
     {
         $karyawan = Pengguna::findOrFail($id);
 
-        $validated = $request->validate([
-            'nama_lengkap' => 'required|string|max:100',
-            'id_karyawan' => 'required|string|max:20|unique:pengguna,id_karyawan,' . $id . ',id_pengguna',
-            'username' => 'required|string|max:50|unique:pengguna,username,' . $id . ',id_pengguna',
-            'alamat' => 'nullable|string',
-            'nomor_hp' => 'nullable|string|max:12',
-            'tgl_mulai_kerja' => 'nullable|date',
-            'divisi' => 'required|exists:devisi,id_devisi',
-        ], [
-            'nomor_hp.max' => 'Nomor HP maksimal 12 karakter.',
-        ]);
+        $validated = $request->validated();
+
+        $updateData = $validated;
 
         if ($request->filled('password')) {
             $updateData['password'] = Hash::make($request->password);

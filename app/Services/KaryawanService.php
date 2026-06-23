@@ -9,7 +9,7 @@ class KaryawanService
     public function generateIdKaryawan(): string
     {
         $last = Pengguna::where('id_karyawan', 'like', 'EMP-%')
-            ->orderByRaw('CAST(SUBSTRING(id_karyawan, 5) AS INTEGER) DESC')
+            ->orderByRaw('CAST(SUBSTRING(id_karyawan, 5) AS UNSIGNED) DESC')
             ->first();
 
         $nextNumber = $last ? (int) substr($last->id_karyawan, 4) + 1 : 1;

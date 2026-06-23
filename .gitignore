@@ -16,6 +16,7 @@
 Homestead.json
 Homestead.yaml
 auth.json
+bootstrap/cache/*.php
 Thumbs.db
 .DS_Store
 /.fleet

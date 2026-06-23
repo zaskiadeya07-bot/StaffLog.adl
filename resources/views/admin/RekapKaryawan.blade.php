@@ -15,18 +15,6 @@
         <x-alert type="error">{{ session('error') }}</x-alert>
     @endif
 
-    {{-- Filter --}}
-    <div class="flex flex-wrap items-center gap-2 mb-4">
-        <div class="flex gap-1 bg-slate-100 p-1 rounded-lg">
-            @foreach(['aktif' => 'Person-check', 'nonaktif' => 'Person-x', 'semua' => 'People'] as $f => $icon)
-            <a href="{{ route('admin.rekap-karyawan', array_merge(request()->query(), ['filter' => $f, 'page' => null])) }}"
-               class="px-4 py-2 text-sm font-medium rounded-md transition {{ $filter === $f ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}">
-                <i class="bi bi-{{ lcfirst(substr($icon, 1)) }}"></i> {{ ucfirst($f) }}
-            </a>
-            @endforeach
-        </div>
-    @endif
-
     {{-- Filter & Pencarian --}}
     <div class="flex flex-wrap items-center gap-3 mb-4">
         {{-- Search --}}
@@ -64,7 +52,6 @@
     <div class="card">
         <div class="p-0">
             <div class="table-responsive overflow-x-auto">
-                @if($karyawan->count() > 0)
                 <table id="rekapKaryawanTable" class="min-w-full divide-y divide-slate-200">
                     <thead class="bg-slate-50">
                         <tr>
@@ -79,7 +66,7 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
-                        @foreach($karyawan as $index => $k)
+                        @forelse($karyawan as $index => $k)
                         <tr class="hover:bg-slate-50 transition">
                             <td class="px-4 py-3 text-sm text-slate-600">{{ $karyawan->firstItem() + $index }}</td>
                             <td class="px-4 py-3 text-sm text-slate-600 font-mono">{{ $k->id_karyawan ?? '-' }}</td>
@@ -153,15 +140,6 @@
                 <div class="px-4 py-3 border-t border-slate-100">
                     {{ $karyawan->links('pagination::tailwind') }}
                 </div>
-                @else
-                <div class="flex flex-col items-center justify-center py-12 text-slate-500">
-                    <i class="bi bi-inbox text-5xl mb-3"></i>
-                    <p class="text-lg">Belum ada data karyawan</p>
-                    <a href="{{ route('admin.tambah-karyawan') }}" class="text-blue-500 hover:underline mt-2">
-                        Tambah karyawan sekarang
-                    </a>
-                </div>
-                @endif
             </div>
         </div>
     </div>

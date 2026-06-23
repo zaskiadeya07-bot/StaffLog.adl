@@ -9,6 +9,7 @@ class StoreKaryawanRequest extends BaseKaryawanRequest
         return array_merge($this->commonRules(), [
             'username' => ['required', 'string', 'min:5', 'max:30', 'regex:/^\S+$/', 'unique:pengguna,username'],
             'password' => ['required', 'min:8', 'confirmed'],
+            'tgl_mulai_kerja' => ['nullable', 'date'],
         ]);
     }
 
