@@ -21,12 +21,13 @@ class DatabaseSeeder extends Seeder
         }
 
         DB::table('master_data')->insert([
-            'jam_masuk_std'  => '08:00:00',
-            'jam_pulang_std' => '17:00:00',
-            'lat_kantor'     => -6.20876500,
-            'long_kantor'    => 106.84559300,
-            'radius'         => 100,
-            'toleransi'      => 15,
+            'jam_masuk_std'     => '08:00:00',
+            'jam_pulang_std'    => '17:00:00',
+            'lat_kantor'        => -6.20876500,
+            'long_kantor'       => 106.84559300,
+            'radius'            => 100,
+            'toleransi'         => 15,
+            'jatah_cuti_bulanan'=> 1,
         ]);
 
         Pengguna::create([

@@ -79,6 +79,7 @@ class AbsenMasuk extends Controller
             }
 
             $setting = MasterData::first();
+            $radiusCheck = ['jarak' => 0, 'di_dalam_radius' => true];
 
             if ($setting) {
                 $radiusCheck = $this->presensiService->checkRadius(
