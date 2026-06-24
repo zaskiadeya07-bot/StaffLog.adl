@@ -61,7 +61,7 @@
                                 <div class="flex gap-2">
                                     <a href="{{ route('admin.detail-rekap-kehadiran', $k->id_pengguna) }}"
                                        class="bg-emerald-50 text-emerald-600 p-2 rounded-lg hover:bg-emerald-100 transition"
-                                       title="Lihat Kehadiran">
+                                       title="Detail Absensi">
                                         <i class="bi bi-calendar-check"></i>
                                     </a>
                                     <a href="{{ route('admin.edit-karyawan', $k->id_pengguna) }}"
