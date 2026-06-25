@@ -71,6 +71,8 @@ class TambahKaryawan extends Controller
 
         if ($request->filled('password')) {
             $updateData['password'] = Hash::make($request->password);
+        } else {
+            unset($updateData['password']);
         }
 
         $karyawan->update($updateData);

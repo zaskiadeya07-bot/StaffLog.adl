@@ -143,20 +143,33 @@
             </div>
         </div>
 
-        {{-- Edit Profil --}}
+        {{-- Edit Profil & Keamanan Akun --}}
         <div class="card">
             <div class="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
                 <i class="bi bi-pencil-square text-blue-500"></i>
-                <h3 class="font-semibold text-slate-700">Edit Profil</h3>
+                <h3 class="font-semibold text-slate-700">Edit Profil & Keamanan Akun</h3>
             </div>
             <div class="p-5">
+
                 @if (session('success'))
                     <x-alert type="success" dismissible>{{ session('success') }}</x-alert>
+                @endif
+
+                @if (session('password_success'))
+                    <x-alert type="success" dismissible>{{ session('password_success') }}</x-alert>
+                @endif
+
+                @if (session('password_error'))
+                    <x-alert type="error" dismissible>{{ session('password_error') }}</x-alert>
                 @endif
 
                 <form action="{{ route('karyawan.profile.update') }}" method="POST">
                     @csrf
                     @method('PUT')
+
+                    <h4 class="text-sm font-semibold text-slate-600 mb-3 flex items-center gap-2">
+                        <i class="bi bi-person-lines-fill text-slate-400"></i> Data Diri
+                    </h4>
 
                     <div class="mb-4">
                         <label class="block text-xs font-semibold text-slate-600 mb-1.5">Nama Lengkap</label>
@@ -185,33 +198,12 @@
                         @endif
                     </div>
 
-                    <button type="submit"
-                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2">
-                        <i class="bi bi-floppy"></i> Simpan Perubahan
-                    </button>
-                </form>
-            </div>
-        </div>
+                    <hr class="my-5 border-slate-100">
 
-        {{-- Keamanan Akun --}}
-        <div class="card">
-            <div class="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
-                <i class="bi bi-shield-lock text-slate-500"></i>
-                <h3 class="font-semibold text-slate-700">Ubah Kata Sandi</h3>
-            </div>
-            <div class="p-5">
-
-                @if (session('password_success'))
-                    <x-alert type="success" dismissible>{{ session('password_success') }}</x-alert>
-                @endif
-
-                @if (session('password_error'))
-                    <x-alert type="error" dismissible>{{ session('password_error') }}</x-alert>
-                @endif
-
-                <form action="{{ route('karyawan.password.update') }}" method="POST" id="formPassword">
-                    @csrf
-                    @method('PUT')
+                    <h4 class="text-sm font-semibold text-slate-600 mb-3 flex items-center gap-2">
+                        <i class="bi bi-shield-lock text-slate-400"></i> Ubah Kata Sandi
+                    </h4>
+                    <p class="text-xs text-slate-400 mb-4">Kosongkan jika tidak ingin mengubah kata sandi.</p>
 
                     {{-- Password Lama --}}
                     <div class="mb-4">
@@ -271,8 +263,8 @@
                     </div>
 
                     <button type="submit"
-                        class="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2">
-                        <i class="bi bi-floppy"></i> Simpan Kata Sandi Baru
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2">
+                        <i class="bi bi-floppy"></i> Simpan Perubahan
                     </button>
                 </form>
             </div>

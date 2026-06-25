@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Karyawan;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\UpdatePasswordRequest;
 use App\Http\Requests\Karyawan\UpdateProfileRequest;
 use App\Models\Pengguna;
 use Illuminate\Http\Request;
@@ -17,22 +16,21 @@ class ProfileController extends Controller
         return view('karyawan.Profile', compact('pengguna'));
     }
 
-    public function updatePassword(UpdatePasswordRequest $request)
-    {
-        $pengguna = Pengguna::find($request->session()->get('pengguna_id'));
-
-        $pengguna->update([
-            'password' => Hash::make($request->password_baru),
-        ]);
-
-        return back()->with('password_success', 'Password berhasil diubah!');
-    }
-
     public function updateProfile(UpdateProfileRequest $request)
     {
         $pengguna = Pengguna::findOrFail($request->session()->get('pengguna_id'));
-        $pengguna->update($request->validated());
 
-        return back()->with('success', 'Profil berhasil diupdate!');
+        $data = $request->validated();
+
+        if ($request->filled('password_baru')) {
+            $data['password'] = Hash::make($request->password_baru);
+        }
+
+        unset($data['password_lama'], $data['password_baru'], $data['password_baru_confirmation']);
+
+        $pengguna->update($data);
+
+        $message = $request->filled('password_baru') ? 'Profil dan password berhasil diperbarui!' : 'Profil berhasil diperbarui!';
+        return back()->with('success', $message);
     }
 }

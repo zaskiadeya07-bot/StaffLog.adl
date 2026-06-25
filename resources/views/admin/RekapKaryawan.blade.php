@@ -61,7 +61,7 @@
                                 <div class="flex gap-2">
                                     <a href="{{ route('admin.detail-rekap-kehadiran', $k->id_pengguna) }}"
                                        class="bg-emerald-50 text-emerald-600 p-2 rounded-lg hover:bg-emerald-100 transition"
-                                       title="Detail Absensi">
+                                       title="Lihat Kehadiran">
                                         <i class="bi bi-calendar-check"></i>
                                     </a>
                                     <a href="{{ route('admin.edit-karyawan', $k->id_pengguna) }}"
@@ -70,15 +70,12 @@
                                         <i class="bi bi-pencil"></i>
                                     </a>
                                     @if($k->status === 'nonaktif')
-                                        <form method="POST" action="{{ route('admin.aktifkan-karyawan', $k->id_pengguna) }}" onsubmit="return confirm('Aktifkan kembali {{ $k->nama_lengkap }}?')">
-                                            @csrf
-                                            @method('PUT')
-                                            <button type="submit"
-                                               class="bg-emerald-50 text-emerald-600 p-2 rounded-lg hover:bg-emerald-100 transition"
-                                               title="Aktifkan Karyawan">
-                                                <i class="bi bi-check-lg"></i>
-                                            </button>
-                                        </form>
+                                        <button data-id="{{ $k->id_pengguna }}" data-name="{{ $k->nama_lengkap }}" 
+                                                onclick="showAktifkanModal(this.dataset.id, this.dataset.name)" 
+                                                class="bg-emerald-50 text-emerald-600 p-2 rounded-lg hover:bg-emerald-100 transition"
+                                                title="Aktifkan Karyawan">
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
                                     @else
                                         <button data-id="{{ $k->id_pengguna }}" data-name="{{ $k->nama_lengkap }}" 
                                                 onclick="showDeleteModal(this.dataset.id, this.dataset.name)" 
@@ -126,6 +123,34 @@
     </div>
 </div>
 
+{{-- Modal Konfirmasi Aktifkan --}}
+<div id="aktifkanModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center">
+    <div class="bg-white rounded-2xl max-w-md w-full mx-4 shadow-xl">
+        <div class="bg-emerald-600 text-white p-4 rounded-t-2xl">
+            <h3 class="font-bold text-lg flex items-center gap-2">
+                <i class="bi bi-check-circle-fill"></i> 
+                Konfirmasi Aktifkan
+            </h3>
+        </div>
+        <div class="p-6">
+            <p class="text-slate-700">Aktifkan kembali karyawan <strong id="aktifkanName"></strong>?</p>
+            <p class="text-slate-400 text-sm mt-2">Karyawan yang diaktifkan dapat login kembali.</p>
+        </div>
+        <div class="p-4 border-t border-slate-100 flex justify-end gap-3">
+            <button onclick="closeAktifkanModal()" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition">
+                Batal
+            </button>
+            <form id="aktifkanForm" method="POST">
+                @csrf
+                @method('PUT')
+                <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">
+                    <i class="bi bi-check-lg"></i> Aktifkan
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script>
     function showDeleteModal(id, name) {
@@ -138,6 +163,18 @@
     function closeDeleteModal() {
         document.getElementById('deleteModal').classList.add('hidden');
         document.getElementById('deleteModal').classList.remove('flex');
+    }
+
+    function showAktifkanModal(id, name) {
+        document.getElementById('aktifkanName').innerText = name;
+        document.getElementById('aktifkanForm').action = '{{ route('admin.aktifkan-karyawan', ':id') }}'.replace(':id', id);
+        document.getElementById('aktifkanModal').classList.remove('hidden');
+        document.getElementById('aktifkanModal').classList.add('flex');
+    }
+
+    function closeAktifkanModal() {
+        document.getElementById('aktifkanModal').classList.add('hidden');
+        document.getElementById('aktifkanModal').classList.remove('flex');
     }
 
     $(document).ready(function() {

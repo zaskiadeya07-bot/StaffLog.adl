@@ -122,13 +122,14 @@
                         <div class="relative">
                             <input type="password" name="password_confirmation" id="pwEditKonfirmasi"
                                 class="input-field w-full pr-10"
-                                placeholder="Konfirmasi kata sandi baru" minlength="8">
+                                placeholder="Kosongkan jika tidak ingin mengubah" minlength="8">
                             <button type="button" onclick="togglePass('pwEditKonfirmasi', 'eyeEditKonfirmasi')"
                                 class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                                 <i class="bi bi-eye" id="eyeEditKonfirmasi"></i>
                             </button>
                         </div>
                     </div>
+
                 </div>
 
                 <div class="flex gap-3 mt-8 pt-4 border-t border-slate-100">

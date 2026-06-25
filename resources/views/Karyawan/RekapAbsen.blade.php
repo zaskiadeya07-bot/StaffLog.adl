@@ -118,10 +118,10 @@
                             </td>
                             <td class="px-4 py-3 text-center">
                                 <button type="button"
-                                    class="btn-detail bg-blue-50 text-blue-600 p-2 rounded-lg hover:bg-blue-100 transition text-sm font-medium inline-flex items-center gap-1"
-                                    title="Detail Absensi"
+                                    class="btn-detail text-blue-600 hover:text-blue-800 transition text-lg"
+                                    title="Lihat detail"
                                     data-id="{{ $p->id_presensi }}">
-                                    <i class="bi bi-eye"></i> 
+                                    <i class="bi bi-eye"></i>
                                 </button>
                             </td>
                         </tr>
@@ -153,10 +153,7 @@
 <script>
     const rekapDetailData = {
         @forelse($presensi as $p)
-        {{ $p->id_presensi }}: Object.assign(@json($p->toArray()), {
-            _tgl: '{{ \Carbon\Carbon::parse($p->tanggal)->locale('id')->isoFormat('D MMMM YYYY') }}',
-            _hari: '{{ \Carbon\Carbon::parse($p->tanggal)->locale('id')->isoFormat('dddd') }}',
-        }),
+        {{ $p->id_presensi }}: @json($p->toArray()),
         @empty
         @endforelse
     };
@@ -164,10 +161,7 @@
     const rekapIzinData = {
         @forelse($presensi as $p)
         @if($p->perizinan)
-        {{ $p->id_presensi }}: Object.assign(@json($p->perizinan->toArray()), {
-            _tglMulai: '{{ \Carbon\Carbon::parse($p->perizinan->tgl_mulai)->locale('id')->isoFormat('D MMMM YYYY') }}',
-            _tglSelesai: '{{ \Carbon\Carbon::parse($p->perizinan->tgl_selesai)->locale('id')->isoFormat('D MMMM YYYY') }}',
-        }),
+        {{ $p->id_presensi }}: @json($p->perizinan->toArray()),
         @endif
         @empty
         @endforelse
@@ -213,16 +207,16 @@
         const izin = rekapIzinData[id] || null;
         if (!d) return;
 
-        const tgl = d._tgl || '-';
-        const hari = d._hari || '-';
+        const tgl = d.tanggal ? new Date(d.tanggal + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
+        const hari = d.tanggal ? new Date(d.tanggal + 'T00:00:00').toLocaleDateString('id-ID', { weekday: 'long' }) : '-';
 
         const checkIn = d.check_in || '<span class="text-slate-300">—</span>';
         const checkOut = d.check_out || '<span class="text-slate-300">—</span>';
 
         let izinSection = '';
         if (d.status === 'izin' && izin) {
-            const tglMulai = izin._tglMulai || '-';
-            const tglSelesai = izin._tglSelesai || '-';
+            const tglMulai = izin.tgl_mulai ? new Date(izin.tgl_mulai + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
+            const tglSelesai = izin.tgl_selesai ? new Date(izin.tgl_selesai + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
             izinSection = `
                 <div class="border-t border-slate-200 pt-5 mt-3">
                     <h4 class="font-semibold text-slate-800 mb-4 flex items-center gap-2">

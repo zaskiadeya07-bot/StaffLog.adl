@@ -11,7 +11,7 @@ class UpdateKaryawanRequest extends BaseKaryawanRequest
         return array_merge($this->commonRules(), [
             'id_karyawan' => ['required', 'string', 'max:20', Rule::unique('pengguna', 'id_karyawan')->ignore($this->route('id'), 'id_pengguna')],
             'username' => ['required', 'string', 'min:5', 'max:30', 'regex:/^\S+$/', Rule::unique('pengguna', 'username')->ignore($this->route('id'), 'id_pengguna')],
-            'password' => ['nullable', 'min:8', 'confirmed'],
+            'password' => ['nullable', 'min:8'],
             'tgl_mulai_kerja' => ['nullable', 'date'],
         ]);
     }

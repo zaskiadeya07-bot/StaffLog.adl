@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Karyawan;
 
+use App\Rules\CurrentPassword;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateProfileRequest extends FormRequest
@@ -13,19 +14,30 @@ class UpdateProfileRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
+        $rules = [
             'nama_lengkap' => 'required|string|max:100',
             'nomor_hp'     => 'nullable|string|max:15',
             'alamat'       => 'nullable|string',
         ];
+
+        if ($this->filled('password_lama') || $this->filled('password_baru')) {
+            $rules['password_lama'] = ['required', new CurrentPassword($this->session()->get('pengguna_id'))];
+            $rules['password_baru'] = ['required', 'min:6', 'confirmed'];
+        }
+
+        return $rules;
     }
 
     public function messages(): array
     {
         return [
-            'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
-            'nama_lengkap.max'      => 'Nama lengkap maksimal 100 karakter.',
-            'nomor_hp.max'          => 'Nomor HP maksimal 15 karakter.',
+            'nama_lengkap.required'   => 'Nama lengkap wajib diisi.',
+            'nama_lengkap.max'        => 'Nama lengkap maksimal 100 karakter.',
+            'nomor_hp.max'            => 'Nomor HP maksimal 15 karakter.',
+            'password_baru.confirmed' => 'Konfirmasi password tidak cocok.',
+            'password_baru.min'       => 'Password baru minimal 6 karakter.',
+            'password_lama.required'  => 'Password saat ini wajib diisi.',
+            'password_baru.required'  => 'Password baru wajib diisi.',
         ];
     }
 }

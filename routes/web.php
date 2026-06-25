@@ -100,9 +100,8 @@ Route::prefix('karyawan')->name('karyawan.')->middleware(['session.check', 'role
     Route::get('/izin-cuti/data', [IzinCutiController::class, 'getData'])->name('izin-cuti.data');
     Route::put('/izin-cuti/cancel/{id}', [IzinCutiController::class, 'cancel'])->name('izin-cuti.cancel');
 
-    // Profile & Ganti Password
+    // Profile
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
-    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('password.update');
     Route::put('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
 
     // CHECK IN
