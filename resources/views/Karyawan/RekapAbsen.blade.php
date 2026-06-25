@@ -181,6 +181,22 @@
         document.body.style.overflow = '';
     }
 
+    function formatDateID(dateStr) {
+        if (!dateStr) return '-';
+        const p = dateStr.split(' ')[0].split('-');
+        if (p.length !== 3) return dateStr;
+        const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+        return parseInt(p[2]) + ' ' + months[parseInt(p[1]) - 1] + ' ' + p[0];
+    }
+
+    function formatDayID(dateStr) {
+        if (!dateStr) return '-';
+        const p = dateStr.split(' ')[0].split('-');
+        if (p.length !== 3) return dateStr;
+        const days = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+        return days[new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2])).getDay()];
+    }
+
     function statusBadgeHTML(status) {
         const map = {
             hadir:     '<span class="inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700"><i class="bi bi-check-circle mr-1"></i> Hadir</span>',
@@ -207,16 +223,16 @@
         const izin = rekapIzinData[id] || null;
         if (!d) return;
 
-        const tgl = d.tanggal ? new Date(d.tanggal + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
-        const hari = d.tanggal ? new Date(d.tanggal + 'T00:00:00').toLocaleDateString('id-ID', { weekday: 'long' }) : '-';
+        const tgl = formatDateID(d.tanggal);
+        const hari = formatDayID(d.tanggal);
 
         const checkIn = d.check_in || '<span class="text-slate-300">—</span>';
         const checkOut = d.check_out || '<span class="text-slate-300">—</span>';
 
         let izinSection = '';
         if (d.status === 'izin' && izin) {
-            const tglMulai = izin.tgl_mulai ? new Date(izin.tgl_mulai + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
-            const tglSelesai = izin.tgl_selesai ? new Date(izin.tgl_selesai + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
+            const tglMulai = formatDateID(izin.tgl_mulai);
+            const tglSelesai = formatDateID(izin.tgl_selesai);
             izinSection = `
                 <div class="border-t border-slate-200 pt-5 mt-3">
                     <h4 class="font-semibold text-slate-800 mb-4 flex items-center gap-2">

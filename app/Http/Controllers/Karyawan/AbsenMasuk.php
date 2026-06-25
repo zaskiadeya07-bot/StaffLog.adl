@@ -42,8 +42,12 @@ class AbsenMasuk extends Controller
                 return response()->json(['sudah_check_in' => false, 'error' => 'Sesi tidak valid'], 401);
             }
 
+            $penggunaId = $request->session()->get('pengguna_id');
+            $setting = MasterData::first();
+            $this->presensiService->tandaiAlphaJikaTerlewat($penggunaId, $setting);
+
             return response()->json(
-                $this->presensiService->statusCheckIn($request->session()->get('pengguna_id'))
+                $this->presensiService->statusCheckIn($penggunaId)
             );
         } catch (\Exception $e) {
             $this->logger->error('Error cek status check in: ' . $e->getMessage());
@@ -104,6 +108,19 @@ class AbsenMasuk extends Controller
                         return response()->json([
                             'success' => false,
                             'message' => 'Belum bisa absen masuk. Absen dibuka mulai pukul ' . $bolehAbsen->format('H:i') . '.'
+                        ], 400);
+                    }
+                }
+
+                if ($setting->jam_pulang_std) {
+                    $sekarang = now();
+                    $jamPulang = Carbon::parse($setting->jam_pulang_std);
+                    if ($sekarang->greaterThanOrEqualTo($jamPulang)) {
+                        \Illuminate\Support\Facades\DB::rollBack();
+                        $this->presensiService->tandaiAlphaJikaTerlewat($penggunaId, $setting);
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Sudah melewati jam pulang. Anda ditandai sebagai alpha hari ini.'
                         ], 400);
                     }
                 }

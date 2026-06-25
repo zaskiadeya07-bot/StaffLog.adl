@@ -16,7 +16,7 @@ class UpdateProfileRequest extends FormRequest
     {
         $rules = [
             'nama_lengkap' => 'required|string|max:100',
-            'nomor_hp'     => 'nullable|string|max:15',
+            'nomor_hp'     => 'nullable|string|max:12',
             'alamat'       => 'nullable|string',
         ];
 
@@ -33,7 +33,7 @@ class UpdateProfileRequest extends FormRequest
         return [
             'nama_lengkap.required'   => 'Nama lengkap wajib diisi.',
             'nama_lengkap.max'        => 'Nama lengkap maksimal 100 karakter.',
-            'nomor_hp.max'            => 'Nomor HP maksimal 15 karakter.',
+            'nomor_hp.max'            => 'Nomor HP maksimal 12 karakter.',
             'password_baru.confirmed' => 'Konfirmasi password tidak cocok.',
             'password_baru.min'       => 'Password baru minimal 6 karakter.',
             'password_lama.required'  => 'Password saat ini wajib diisi.',

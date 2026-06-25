@@ -714,6 +714,22 @@
         });
     }
 
+    @if ($errors->any())
+    var validationErrors = @json($errors->toArray());
+    Object.keys(validationErrors).forEach(function(key) {
+        var messages = validationErrors[key];
+        Swal.fire({
+            icon: 'error',
+            title: messages[0],
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 5000,
+            timerProgressBar: true
+        });
+    });
+    @endif
+
     /* ── 11. NILAI AWAL UNTUK DETEKSI PERUBAHAN ─────────────────────────── */
     var ORIGINAL = {
         lat      : parseFloat(document.getElementById('latitude').value)      || DEFAULTS.lat,
@@ -819,18 +835,16 @@
             return;
         }
 
-        /* ── Peringatan: jam pulang sebelum jam masuk ────────────────── */
+        /* ── Validasi: jam pulang sebelum jam masuk ──────────────────── */
         if (jamPulang < jamMasuk) {
             e.preventDefault();
             Swal.fire({
-                icon: 'warning',
-                title: 'Jam Pulang sebelum Jam Masuk?',
-                html: 'Jam pulang <strong>' + jamPulang + '</strong> lebih awal dari jam masuk <strong>' + jamMasuk + '</strong>. Tetap simpan?',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, simpan',
-                cancelButtonText: 'Perbaiki'
-            }).then(function (result) {
-                if (result.isConfirmed) submitWithConfirm(changes);
+                icon: 'error',
+                title: 'Jam pulang tidak boleh mendahului jam masuk.',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 4000
             });
             return;
         }

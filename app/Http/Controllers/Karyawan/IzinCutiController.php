@@ -110,10 +110,11 @@ class IzinCutiController extends Controller
                 ->where('status_approval', 'pending')
                 ->firstOrFail();
 
-            $perizinan->update([
-                'status_approval' => 'dibatalkan',
-                'tgl_validasi' => now(),
-            ]);
+            if ($perizinan->file_surat) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($perizinan->file_surat);
+            }
+
+            $perizinan->delete();
 
             return response()->json([
                 'success' => true,

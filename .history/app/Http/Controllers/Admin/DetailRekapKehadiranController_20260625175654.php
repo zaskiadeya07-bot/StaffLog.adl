@@ -26,7 +26,7 @@ class DetailRekapKehadiranController extends Controller
                 ->with('error', 'Karyawan tidak ditemukan');
         }
 
-        $bulan = $request->get('bulan', date('m'));
+        $bulan = $request->get('b   ulan', date('m'));
         $tahun = $request->get('tahun', date('Y'));
 
         $bulanNama = $this->bulanHelper->getNamaBulanByAngka((int)$bulan);
@@ -90,12 +90,14 @@ class DetailRekapKehadiranController extends Controller
         try {
             $validated = $request->validate([
                 'status' => 'required|in:hadir,terlambat,izin,alpha',
+                'keterangan' => 'nullable|string|max:255',
             ]);
 
             $presensi = Presensi::findOrFail($id);
 
             $presensi->update([
                 'status' => $validated['status'],
+                'catatan_keterlambatan' => $validated['keterangan'] ?? $presensi->catatan_keterlambatan,
             ]);
 
             return response()->json([

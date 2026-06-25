@@ -36,6 +36,7 @@ class PengaturanKantorController extends Controller
         $data['jam_masuk_std']  = date('H:i:s', strtotime($data['jam_masuk_std']));
         $data['jam_pulang_std'] = date('H:i:s', strtotime($data['jam_pulang_std']));
 
+
         $setting = MasterData::first();
 
         if ($setting) {

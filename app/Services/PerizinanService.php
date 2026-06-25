@@ -18,7 +18,7 @@ class PerizinanService
 
         $cutiTerpakai = Perizinan::where('id_pengguna_pengaju', $penggunaId)
             ->where('jenis_izin', 'cuti')
-            ->where('status_approval', 'disetujui')
+            ->whereIn('status_approval', ['disetujui', 'pending'])
             ->whereMonth('tgl_mulai', $bulan)
             ->whereYear('tgl_mulai', $tahun)
             ->get()

@@ -191,14 +191,10 @@
                 <div class="mb-4">
                     <label class="block text-sm font-semibold mb-2">Status</label>
                     <select id="editStatusSelect" class="input-field w-full">
-                        @foreach(['hadir', 'terlambat', 'izin', 'alpha'] as $s)
+                        @foreach(['terlambat', 'izin', 'alpha'] as $s)
                             <option value="{{ $s }}">{{ ucfirst($s) }}</option>
                         @endforeach
                     </select>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-semibold mb-2">Keterangan</label>
-                    <textarea id="editKeterangan" class="input-field w-full" rows="2" placeholder="Opsional"></textarea>
                 </div>
             </form>
         </div>
@@ -221,7 +217,6 @@
     function openEditModal(id, status) {
         document.getElementById('editPresensiId').value = id;
         document.getElementById('editStatusSelect').value = status;
-        document.getElementById('editKeterangan').value = '';
         document.getElementById('editStatusModal').classList.remove('hidden');
         document.getElementById('editStatusModal').classList.add('flex');
     }
@@ -229,7 +224,6 @@
     function saveEditStatus() {
         const id = document.getElementById('editPresensiId').value;
         const status = document.getElementById('editStatusSelect').value;
-        const keterangan = document.getElementById('editKeterangan').value;
 
         fetch('{{ route('admin.detail-rekap-kehadiran.update-status', ':id') }}'.replace(':id', id), {
             method: 'PUT',
@@ -237,7 +231,7 @@
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
-            body: JSON.stringify({ status, keterangan })
+            body: JSON.stringify({ status })
         })
         .then(res => res.json())
         .then(result => {

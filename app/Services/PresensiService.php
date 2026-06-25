@@ -7,6 +7,35 @@ use App\Models\Presensi;
 
 class PresensiService
 {
+    public function tandaiAlphaJikaTerlewat(int $penggunaId, ?MasterData $setting = null): ?Presensi
+    {
+        $setting = $setting ?? MasterData::first();
+        if (!$setting || !$setting->jam_pulang_std) return null;
+
+        $now = now();
+        $jamPulang = \Carbon\Carbon::parse($setting->jam_pulang_std);
+
+        if ($now->lessThan($jamPulang)) return null;
+
+        $sudahCheckIn = $this->cekSudahCheckIn($penggunaId);
+        if ($sudahCheckIn) return null;
+
+        $adaIzin = \App\Models\Perizinan::where('id_pengguna_pengaju', $penggunaId)
+            ->where('status_approval', 'disetujui')
+            ->whereDate('tgl_mulai', '<=', today())
+            ->whereDate('tgl_selesai', '>=', today())
+            ->exists();
+
+        if ($adaIzin) return null;
+
+        return Presensi::create([
+            'id_pengguna' => $penggunaId,
+            'tanggal' => today()->toDateString(),
+            'status' => 'alpha',
+            'catatan_keterlambatan' => 'Tidak check-in sampai jam pulang',
+        ]);
+    }
+
     public function calculateDistance(float $lat1, float $lon1, float $lat2, float $lon2): float
     {
         $earthRadius = 6371000;

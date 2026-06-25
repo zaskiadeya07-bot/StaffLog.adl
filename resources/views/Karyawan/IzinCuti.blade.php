@@ -189,7 +189,7 @@
 
         const bulanKey = getBulanIniKey();
         const cutiApproved = allIzinData.filter(i =>
-            i.status === 'approved' &&
+            (i.status === 'approved' || i.status === 'pending') &&
             i.jenis === 'Cuti' &&
             i.tanggalMulai && i.tanggalMulai.startsWith(bulanKey)
         ).reduce((sum, i) => sum + i.durasi, 0);
@@ -323,7 +323,7 @@
         document.getElementById('totalRejected').innerText = rejected;
         const bulanKey = getBulanIniKey();
         const cutiApproved = data.filter(i =>
-            i.status === 'approved' &&
+            (i.status === 'approved' || i.status === 'pending') &&
             i.jenis === 'Cuti' &&
             i.tanggalMulai && i.tanggalMulai.startsWith(bulanKey)
         ).reduce((sum, i) => sum + i.durasi, 0);
