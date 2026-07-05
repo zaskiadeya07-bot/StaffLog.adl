@@ -23,6 +23,7 @@ class Pengguna extends Model
         'alamat',
         'id_karyawan',
         'status',
+        'alasan_nonaktif',
     ];
 
     protected $hidden = [

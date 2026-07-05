@@ -27,7 +27,6 @@ class DatabaseSeeder extends Seeder
             'long_kantor'       => 106.84559300,
             'radius'            => 100,
             'toleransi'         => 15,
-            'jatah_cuti_bulanan'=> 1,
         ]);
 
         Pengguna::create([

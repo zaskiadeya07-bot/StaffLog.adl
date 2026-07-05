@@ -86,11 +86,20 @@ class TambahKaryawan extends Controller
     {
         try {
             $karyawan = Pengguna::findOrFail($id);
-            $karyawan->update(['status' => 'nonaktif']);
+            $karyawan->update([
+                'status' => 'nonaktif',
+                'alasan_nonaktif' => request('alasan_nonaktif'),
+            ]);
+
+            $alasan = request('alasan_nonaktif');
+            $pesan = "Karyawan {$karyawan->nama_lengkap} berhasil dinonaktifkan!";
+            if ($alasan) {
+                $pesan .= " Alasan: {$alasan}";
+            }
 
             return redirect()
                 ->route('admin.rekap-karyawan')
-                ->with('success', "Karyawan {$karyawan->nama_lengkap} berhasil dinonaktifkan!");
+                ->with('success', $pesan);
         } catch (\Exception $e) {
             return redirect()
                 ->back()
@@ -102,7 +111,10 @@ class TambahKaryawan extends Controller
     {
         try {
             $karyawan = Pengguna::findOrFail($id);
-            $karyawan->update(['status' => 'aktif']);
+            $karyawan->update([
+                'status' => 'aktif',
+                'alasan_nonaktif' => null,
+            ]);
 
             return redirect()
                 ->route('admin.rekap-karyawan')

@@ -28,21 +28,26 @@ class DetailRekapKehadiranController extends Controller
 
         $bulan = $request->get('bulan', date('m'));
         $tahun = $request->get('tahun', date('Y'));
+        $status = $request->get('status', '');
 
         $bulanNama = $this->bulanHelper->getNamaBulanByAngka((int)$bulan);
 
-        $presensi = Presensi::where('id_pengguna', $id)
+        $query = Presensi::where('id_pengguna', $id)
             ->whereMonth('tanggal', $bulan)
-            ->whereYear('tanggal', $tahun)
-            ->orderBy('tanggal', 'desc')
-            ->get();
+            ->whereYear('tanggal', $tahun);
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        $presensi = $query->orderBy('tanggal', 'desc')->get();
         $statHadir = $presensi->where('status', 'hadir')->count();
         $statTerlambat = $presensi->where('status', 'terlambat')->count();
         $statIzin = $presensi->where('status', 'izin')->count();
         $statAlpha = $presensi->where('status', 'alpha')->count();
 
         return view('admin.DetailRekapKehadiran', compact(
-            'karyawan', 'presensi', 'bulan', 'tahun',
+            'karyawan', 'presensi', 'bulan', 'tahun', 'status',
             'bulanNama', 'statHadir', 'statTerlambat',
             'statIzin', 'statAlpha'
         ));

@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\MasterData;
 use App\Models\Pengguna;
+use App\Services\PerizinanService;
 use Illuminate\Console\Command;
 
 class ResetCutiTahunan extends Command
@@ -13,8 +13,7 @@ class ResetCutiTahunan extends Command
 
     public function handle()
     {
-        $pengaturan = MasterData::first();
-        $jatahCuti = $pengaturan?->jatah_cuti_bulanan ?? 1;
+        $jatahCuti = PerizinanService::JATAH_CUTI_BULANAN;
 
         $totalKaryawan = Pengguna::where('role', 'karyawan')
             ->where('status', 'aktif')

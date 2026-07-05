@@ -15,6 +15,43 @@
         <x-alert type="error">{{ session('error') }}</x-alert>
     @endif
 
+    {{-- Filter --}}
+    <div class="card mb-6">
+        <div class="p-4">
+            <form method="GET" action="{{ route('admin.rekap-karyawan') }}" class="flex flex-wrap items-end gap-4">
+                <div>
+                    <label class="block text-xs text-slate-500 mb-1">Status Akun</label>
+                    <select name="status" class="input-field">
+                        <option value="">Semua</option>
+                        <option value="aktif" {{ $filterStatus == 'aktif' ? 'selected' : '' }}>Aktif</option>
+                        <option value="nonaktif" {{ $filterStatus == 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-500 mb-1">Divisi</label>
+                    <select name="divisi" class="input-field">
+                        <option value="">Semua</option>
+                        @foreach($divisis as $d)
+                            <option value="{{ $d->id }}" {{ $filterDivisi == $d->id ? 'selected' : '' }}>{{ $d->nama_devisi }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-500 mb-1">Cari</label>
+                    <input type="text" name="search" class="input-field" placeholder="Nama, username, dll..." value="{{ $filterSearch }}">
+                </div>
+                <div>
+                    <button type="submit" class="btn-primary py-2.5">
+                        <i class="bi bi-search"></i> Filter
+                    </button>
+                    <a href="{{ route('admin.rekap-karyawan') }}" class="btn-secondary py-2.5 px-4">
+                        <i class="bi bi-x-circle"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="card">
         <div class="p-0">
             <div class="table-responsive overflow-x-auto">
@@ -28,6 +65,7 @@
                             <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Divisi</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Nomor HP</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Status</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Keterangan</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Aksi</th>
                         </tr>
                     </thead>
@@ -48,7 +86,8 @@
                             <td class="px-4 py-3 text-sm text-slate-600">{{ $k->nomor_hp ?? '-' }}</td>
                             <td class="px-4 py-3">
                                 @if($k->status === 'nonaktif')
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700 cursor-default"
+                                          title="{{ $k->alasan_nonaktif ? 'Alasan: ' . $k->alasan_nonaktif : 'Tidak ada keterangan' }}">
                                         <i class="bi bi-dash-circle"></i> Nonaktif
                                     </span>
                                 @else
@@ -56,6 +95,9 @@
                                         <i class="bi bi-check-circle"></i> Aktif
                                     </span>
                                 @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-slate-600 max-w-[200px] truncate" title="{{ $k->alasan_nonaktif ?? '-' }}">
+                                {{ $k->alasan_nonaktif ?? '-' }}
                             </td>
                             <td class="px-4 py-3">
                                 <div class="flex gap-2">
@@ -107,6 +149,10 @@
         <div class="p-6">
             <p class="text-slate-700">Apakah Anda yakin ingin menonaktifkan karyawan <strong id="deleteName"></strong>?</p>
             <p class="text-slate-400 text-sm mt-2">Karyawan yang dinonaktifkan tidak bisa login sampai diaktifkan kembali.</p>
+            <div class="mt-4">
+                <label class="block text-sm font-semibold text-slate-600 mb-1.5">Keterangan</label>
+                <textarea id="deleteAlasan" name="alasan_nonaktif" rows="3" class="input-field w-full" placeholder="Alasan penonaktifan..."></textarea>
+            </div>
         </div>
         <div class="p-4 border-t border-slate-100 flex justify-end gap-3">
             <button onclick="closeDeleteModal()" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition">
@@ -115,6 +161,7 @@
             <form id="deleteForm" method="POST">
                 @csrf
                 @method('DELETE')
+                <input type="hidden" name="alasan_nonaktif" id="deleteAlasanInput">
                 <button type="submit" class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition">
                     <i class="bi bi-slash-circle"></i> Nonaktifkan
                 </button>
@@ -155,10 +202,15 @@
 <script>
     function showDeleteModal(id, name) {
         document.getElementById('deleteName').innerText = name;
+        document.getElementById('deleteAlasan').value = '';
         document.getElementById('deleteForm').action = '{{ route('admin.hapus-karyawan', ':id') }}'.replace(':id', id);
         document.getElementById('deleteModal').classList.remove('hidden');
         document.getElementById('deleteModal').classList.add('flex');
     }
+
+    document.getElementById('deleteForm').addEventListener('submit', function() {
+        document.getElementById('deleteAlasanInput').value = document.getElementById('deleteAlasan').value;
+    });
 
     function closeDeleteModal() {
         document.getElementById('deleteModal').classList.add('hidden');
@@ -185,7 +237,7 @@
             },
             dom: '<"flex flex-wrap items-center justify-between gap-3 p-3"<"dataTables_length"l><"dataTables_filter"f>>t<"flex flex-wrap items-center justify-between gap-3 p-3"<"dataTables_info"i><"dataTables_paginate"p>>',
             order: [[2, 'asc']],
-            columnDefs: [{ orderable: false, targets: [0, 7] }],
+            columnDefs: [{ orderable: false, targets: [0, 8] }],
             drawCallback: function() {
                 $('.dataTables_empty').addClass('px-4 py-12 text-center text-slate-500');
             }

@@ -48,6 +48,16 @@
                     </select>
                 </div>
                 <div>
+                    <label class="block text-xs text-slate-500 mb-1">Status</label>
+                    <select name="status" class="input-field">
+                        <option value="">Semua</option>
+                        <option value="hadir" {{ ($status ?? '') == 'hadir' ? 'selected' : '' }}>Hadir</option>
+                        <option value="terlambat" {{ ($status ?? '') == 'terlambat' ? 'selected' : '' }}>Terlambat</option>
+                        <option value="izin" {{ ($status ?? '') == 'izin' ? 'selected' : '' }}>Izin</option>
+                        <option value="alpha" {{ ($status ?? '') == 'alpha' ? 'selected' : '' }}>Alpha</option>
+                    </select>
+                </div>
+                <div>
                     <button type="submit" class="btn-primary py-2.5">
                         <i class="bi bi-search"></i> Tampilkan
                     </button>

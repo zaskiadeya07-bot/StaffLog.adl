@@ -172,15 +172,6 @@
                     </h4>
 
                     <div class="mb-4">
-                        <label class="block text-xs font-semibold text-slate-600 mb-1.5">Nama Lengkap</label>
-                        <input type="text" name="nama_lengkap" value="{{ old('nama_lengkap', $pengguna->nama_lengkap) }}"
-                            class="w-full px-4 py-2.5 border {{ $errors->has('nama_lengkap') ? 'border-red-400' : 'border-slate-200' }} rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-200">
-                        @if ($errors->has('nama_lengkap'))
-                            <p class="text-xs text-red-500 mt-1">{{ $errors->first('nama_lengkap') }}</p>
-                        @endif
-                    </div>
-
-                    <div class="mb-4">
                         <label class="block text-xs font-semibold text-slate-600 mb-1.5">Nomor HP</label>
                         <input type="text" name="nomor_hp" value="{{ old('nomor_hp', $pengguna->nomor_hp) }}"
                             class="w-full px-4 py-2.5 border {{ $errors->has('nomor_hp') ? 'border-red-400' : 'border-slate-200' }} rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-200">

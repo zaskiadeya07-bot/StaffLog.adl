@@ -9,12 +9,13 @@ use Carbon\Carbon;
 
 class PerizinanService
 {
+    public const JATAH_CUTI_BULANAN = 4;
+    public const JARAK_HARI_CUTI = 7;
+
     public function hitungSisaCuti(int $penggunaId, ?int $bulan = null, ?int $tahun = null): int
     {
         $bulan = $bulan ?: Carbon::now()->month;
         $tahun = $tahun ?: Carbon::now()->year;
-        $setting = MasterData::first();
-        $jatahCuti = $setting ? $setting->jatah_cuti_bulanan : 1;
 
         $cutiTerpakai = Perizinan::where('id_pengguna_pengaju', $penggunaId)
             ->where('jenis_izin', 'cuti')
@@ -26,7 +27,30 @@ class PerizinanService
                 return $this->hitungDurasi($item->tgl_mulai, $item->tgl_selesai);
             });
 
-        return max(0, $jatahCuti - $cutiTerpakai);
+        return max(0, self::JATAH_CUTI_BULANAN - $cutiTerpakai);
+    }
+
+    public function cekJarakCuti(int $penggunaId): ?string
+    {
+        $cutiTerakhir = Perizinan::where('id_pengguna_pengaju', $penggunaId)
+            ->where('jenis_izin', 'cuti')
+            ->whereIn('status_approval', ['disetujui', 'pending'])
+            ->orderBy('tgl_pengajuan', 'desc')
+            ->first();
+
+        if (!$cutiTerakhir) {
+            return null;
+        }
+
+        $tglTerakhir = Carbon::parse($cutiTerakhir->tgl_pengajuan)->startOfDay();
+        $selisihHari = (int) $tglTerakhir->diffInDays(now()->startOfDay());
+
+        if ($selisihHari < self::JARAK_HARI_CUTI) {
+            $sisaHari = self::JARAK_HARI_CUTI - $selisihHari;
+            return "Anda sudah mengajukan cuti pada {$cutiTerakhir->tgl_pengajuan}. Silakan tunggu {$sisaHari} hari lagi sebelum mengajukan cuti baru.";
+        }
+
+        return null;
     }
 
     public function cekOverlap(int $penggunaId, string $tglMulai, string $tglSelesai, ?int $kecualikanId = null): bool

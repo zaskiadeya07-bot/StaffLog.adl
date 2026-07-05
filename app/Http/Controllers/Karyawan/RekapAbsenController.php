@@ -22,15 +22,20 @@ class RekapAbsenController extends Controller
 
         $bulan = $request->get('bulan', date('m'));
         $tahun = $request->get('tahun', date('Y'));
+        $status = $request->get('status', '');
 
         $bulanNama = $this->bulanHelper->getNamaBulanByAngka((int)$bulan);
 
-        $presensi = Presensi::with('perizinan')
+        $query = Presensi::with('perizinan')
             ->where('id_pengguna', $idPengguna)
             ->whereMonth('tanggal', $bulan)
-            ->whereYear('tanggal', $tahun)
-            ->orderBy('tanggal', 'desc')
-            ->get();
+            ->whereYear('tanggal', $tahun);
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        $presensi = $query->orderBy('tanggal', 'desc')->get();
 
         $statHadir = $presensi->where('status', 'hadir')->count();
         $statTerlambat = $presensi->where('status', 'terlambat')->count();
@@ -38,7 +43,7 @@ class RekapAbsenController extends Controller
         $statAlpha = $presensi->where('status', 'alpha')->count();
 
         return view('karyawan.RekapAbsen', compact(
-            'presensi', 'bulan', 'tahun',
+            'presensi', 'bulan', 'tahun', 'status',
             'bulanNama', 'statHadir', 'statTerlambat',
             'statIzin', 'statAlpha'
         ));
@@ -54,11 +59,17 @@ class RekapAbsenController extends Controller
         $bulan = $request->get('bulan', date('m'));
         $tahun = $request->get('tahun', date('Y'));
 
-        $presensi = Presensi::where('id_pengguna', $penggunaId)
+        $status = $request->get('status', '');
+
+        $query = Presensi::where('id_pengguna', $penggunaId)
             ->whereMonth('tanggal', $bulan)
-            ->whereYear('tanggal', $tahun)
-            ->orderBy('tanggal', 'desc')
-            ->get();
+            ->whereYear('tanggal', $tahun);
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        $presensi = $query->orderBy('tanggal', 'desc')->get();
 
         return response()->json($presensi);
     }

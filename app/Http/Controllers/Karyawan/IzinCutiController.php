@@ -22,8 +22,7 @@ class IzinCutiController extends Controller
             return redirect()->route('login');
         }
         $pengguna = Pengguna::find($request->session()->get('pengguna_id'));
-        $setting = \App\Models\MasterData::first();
-        $jatahCuti = $setting ? $setting->jatah_cuti_bulanan : 1;
+        $jatahCuti = \App\Services\PerizinanService::JATAH_CUTI_BULANAN;
         return view('karyawan.IzinCuti', compact('pengguna', 'jatahCuti'));
     }
 
@@ -53,11 +52,26 @@ class IzinCutiController extends Controller
         $jenisDb = $this->perizinanService->konversiJenisIzin($validated['jenis_izin']);
 
         if ($jenisDb === 'cuti') {
+            if ($durasi > 1) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Pengajuan cuti maksimal 1 hari. Pisahkan menjadi beberapa pengajuan.'
+                ], 422);
+            }
+
             $sisaCuti = $this->perizinanService->hitungSisaCuti($penggunaId, now()->month, now()->year);
             if ($durasi > $sisaCuti) {
                 return response()->json([
                     'success' => false,
                     'message' => "Sisa cuti Anda hanya {$sisaCuti} hari."
+                ], 422);
+            }
+
+            $pesanJarak = $this->perizinanService->cekJarakCuti($penggunaId);
+            if ($pesanJarak) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $pesanJarak
                 ], 422);
             }
         }

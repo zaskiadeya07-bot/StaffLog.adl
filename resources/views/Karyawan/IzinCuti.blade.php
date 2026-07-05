@@ -18,7 +18,7 @@
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
         <div class="card p-4 flex items-center gap-3">
             <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center"><i class="bi bi-calendar-check text-blue-600 text-xl"></i></div>
-            <div><small class="text-slate-500">Sisa Cuti (Bulan Ini)</small><h3 class="text-2xl font-bold text-blue-600" id="sisaCuti">1</h3><small class="text-slate-400">Hari</small></div>
+            <div><small class="text-slate-500">Sisa Cuti (Bulan Ini)</small><h3 class="text-2xl font-bold text-blue-600" id="sisaCuti">4</h3><small class="text-slate-400">Hari</small></div>
         </div>
         <div class="card p-4 flex items-center gap-3">
             <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center"><i class="bi bi-clock-history text-amber-600 text-xl"></i></div>
@@ -203,7 +203,7 @@
 
         const r = aturan[jenis];
         if (r) {
-            info.innerHTML = `<div class="flex items-start gap-2 ${r.color} border p-3 rounded-xl"><i class="bi ${r.icon} mt-0.5"></i><div><strong class="text-sm">${jenis}</strong><br><span class="text-xs">Sisa cuti Anda: <strong>${sisaCuti} hari</strong> | Bisa diajukan hari ini</span></div></div>`;
+            info.innerHTML = `<div class="flex items-start gap-2 ${r.color} border p-3 rounded-xl"><i class="bi ${r.icon} mt-0.5"></i><div><strong class="text-sm">${jenis}</strong><br><span class="text-xs">Sisa cuti bulan ini: <strong>${sisaCuti} hari</strong> | Maksimal 1x seminggu</span></div></div>`;
             info.classList.remove('hidden');
         }
     }
@@ -456,6 +456,16 @@
         if (mulaiDate < today) {
             showToast('Tanggal mulai tidak boleh sebelum hari ini.', 'danger');
             return;
+        }
+
+        // Cuti maksimal 1 hari
+        if (jenis === 'Cuti') {
+            const selesaiDate = new Date(tanggalSelesai + 'T00:00:00');
+            const durasiCuti = Math.round((selesaiDate - mulaiDate) / (1000 * 60 * 60 * 24)) + 1;
+            if (durasiCuti > 1) {
+                showToast('Pengajuan cuti maksimal 1 hari. Pisahkan menjadi beberapa pengajuan.', 'danger');
+                return;
+            }
         }
 
         // Sisa cuti divalidasi oleh server

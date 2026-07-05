@@ -21,7 +21,6 @@ class PengaturanKantorController extends Controller
                 'long_kantor' => 106.84559300,
                 'radius' => 100,
                 'toleransi' => 15,
-                'jatah_cuti_bulanan' => 1,
             ]);
         }
 

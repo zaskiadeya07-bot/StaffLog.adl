@@ -41,7 +41,10 @@ class RekapKaryawanController extends Controller
             ->get();
 
         $divisis = Devisi::select('id_devisi as id', 'nama_devisi')->get();
+        $filterStatus = $request->get('status', '');
+        $filterDivisi = $request->get('divisi', '');
+        $filterSearch = $request->get('search', '');
 
-        return view('admin.RekapKaryawan', compact('karyawan', 'divisis'));
+        return view('admin.RekapKaryawan', compact('karyawan', 'divisis', 'filterStatus', 'filterDivisi', 'filterSearch'));
     }
 }

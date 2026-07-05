@@ -184,30 +184,6 @@
                     <p class="text-xs text-slate-400">Bisa diisi manual atau otomatis dari peta.</p>
                 </div>
 
-                {{-- JATAH CUTI BULANAN --}}
-                <div class="flex flex-col gap-1.5">
-                    <label for="jatah_cuti_bulanan"
-                           class="text-sm font-medium text-slate-600 flex items-center gap-1.5">
-                        <i class="bi bi-calendar-month text-slate-400"></i> Jatah Cuti Bulanan
-                    </label>
-                    <div class="relative">
-                        <input
-                            type="number"
-                            id="jatah_cuti_bulanan"
-                            name="jatah_cuti_bulanan"
-                            class="input-field w-full pr-14"
-                            min="0"
-                            step="1"
-                            value="{{ old('jatah_cuti_bulanan', $setting->jatah_cuti_bulanan ?? 1) }}"
-                            required
-                        >
-                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 pointer-events-none">
-                            hari
-                        </span>
-                    </div>
-                    <p class="text-xs text-slate-400">Jumlah hari cuti per karyawan per bulan.</p>
-                </div>
-
                 {{-- RADIUS --}}
                 <div class="flex flex-col gap-1.5">
                     <label for="radius_meter"
