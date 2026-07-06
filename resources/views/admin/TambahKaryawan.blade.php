@@ -51,8 +51,8 @@
                         </label>
                         <input type="text" name="username"
                             class="input-field w-full @error('username') border-red-500 @enderror"
-                            placeholder="Masukkan nama pengguna untuk login" value="{{ old('username') }}"
-                            minlength="5" maxlength="30" pattern="\S+" required>
+                            placeholder="Masukkan nama pengguna untuk login" value=""
+                            minlength="5" maxlength="30" pattern="\S+" autocomplete="off" required>
                         @error('username')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
@@ -112,7 +112,7 @@
                         <div class="relative">
                             <input type="password" name="password" id="pwTambah"
                                 class="input-field w-full pr-10 @error('password') border-red-500 @enderror"
-                                placeholder="Buat kata sandi akun" minlength="8" required>
+                                placeholder="Buat kata sandi akun" minlength="8" autocomplete="new-password" required>
                             <button type="button" onclick="togglePass('pwTambah', 'eyeTambah')"
                                 class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                                 <i class="bi bi-eye" id="eyeTambah"></i>
@@ -130,7 +130,7 @@
                         <div class="relative">
                             <input type="password" name="password_confirmation" id="pwTambahKonfirmasi"
                                 class="input-field w-full pr-10"
-                                placeholder="Konfirmasi kata sandi" minlength="8" required>
+                                placeholder="Konfirmasi kata sandi" minlength="8" autocomplete="new-password" required>
                             <button type="button" onclick="togglePass('pwTambahKonfirmasi', 'eyeTambahKonfirmasi')"
                                 class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                                 <i class="bi bi-eye" id="eyeTambahKonfirmasi"></i>

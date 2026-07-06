@@ -104,7 +104,7 @@
 
                     <!-- Upload File Section -->
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-semibold mb-1">Lampiran Dokumen</label>
+                        <label class="block text-sm font-semibold mb-1">Lampiran Dokumen <span id="lampiranRequiredLabel" class="text-red-500 hidden">*</span> <span id="lampiranRequiredInfo" class="text-xs text-red-500 hidden">(wajib untuk Sakit)</span></label>
                         <div class="border-2 border-dashed border-slate-200 rounded-xl p-4 hover:border-blue-400 transition-colors">
                             <div class="flex flex-col items-center justify-center gap-2">
                                 <i class="bi bi-cloud-upload text-3xl text-slate-400"></i>
@@ -185,6 +185,17 @@
     function updateAturan() {
         const jenis = document.getElementById('jenisIzin').value;
         const info = document.getElementById('aturanInfo');
+        const lampiranLabel = document.getElementById('lampiranRequiredLabel');
+        const lampiranInfo = document.getElementById('lampiranRequiredInfo');
+
+        if (jenis === 'Sakit') {
+            lampiranLabel.classList.remove('hidden');
+            lampiranInfo.classList.remove('hidden');
+        } else {
+            lampiranLabel.classList.add('hidden');
+            lampiranInfo.classList.add('hidden');
+        }
+
         if (!jenis) { info.classList.add('hidden'); return; }
 
         const bulanKey = getBulanIniKey();
@@ -203,7 +214,11 @@
 
         const r = aturan[jenis];
         if (r) {
-            info.innerHTML = `<div class="flex items-start gap-2 ${r.color} border p-3 rounded-xl"><i class="bi ${r.icon} mt-0.5"></i><div><strong class="text-sm">${jenis}</strong><br><span class="text-xs">Sisa cuti bulan ini: <strong>${sisaCuti} hari</strong> | Maksimal 1x seminggu</span></div></div>`;
+            let extraInfo = '';
+            if (jenis === 'Sakit') {
+                extraInfo = '<br><span class="text-xs font-semibold text-red-600"><i class="bi bi-file-earmark"></i> Lampiran dokumen WAJIB dilampirkan</span>';
+            }
+            info.innerHTML = `<div class="flex items-start gap-2 ${r.color} border p-3 rounded-xl"><i class="bi ${r.icon} mt-0.5"></i><div><strong class="text-sm">${jenis}</strong><br><span class="text-xs">Sisa cuti bulan ini: <strong>${sisaCuti} hari</strong> | Maksimal 1x seminggu</span>${extraInfo}</div></div>`;
             info.classList.remove('hidden');
         }
     }
@@ -458,6 +473,12 @@
             return;
         }
 
+        // Sakit wajib lampirkan file
+        if (jenis === 'Sakit' && !selectedFile) {
+            showToast('Lampiran dokumen wajib diisi untuk permohonan Sakit.', 'danger');
+            return;
+        }
+
         // Cuti maksimal 1 hari
         if (jenis === 'Cuti') {
             const selesaiDate = new Date(tanggalSelesai + 'T00:00:00');
@@ -485,6 +506,8 @@
                 showToast('Permohonan berhasil dikirim!');
                 document.getElementById('izinForm').reset();
                 removeFile();
+                document.getElementById('lampiranRequiredLabel').classList.add('hidden');
+                document.getElementById('lampiranRequiredInfo').classList.add('hidden');
                 document.getElementById('formModal').classList.add('hidden');
                 loadAllData();
             } else {

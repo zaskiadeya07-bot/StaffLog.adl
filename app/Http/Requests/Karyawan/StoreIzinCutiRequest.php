@@ -18,7 +18,9 @@ class StoreIzinCutiRequest extends FormRequest
             'tgl_mulai'   => 'required|date',
             'tgl_selesai' => 'required|date|after_or_equal:tgl_mulai',
             'keterangan'  => 'required|string|min:5',
-            'file_surat'  => 'nullable|file|mimes:pdf,png,doc,docx|max:5120',
+            'file_surat'  => ($this->input('jenis_izin') === 'Sakit')
+                ? 'required|file|mimes:pdf,png,doc,docx|max:5120'
+                : 'nullable|file|mimes:pdf,png,doc,docx|max:5120',
         ];
     }
 
@@ -33,6 +35,7 @@ class StoreIzinCutiRequest extends FormRequest
             'tgl_selesai.after_or_equal' => 'Tanggal selesai harus setelah atau sama dengan tanggal mulai.',
             'keterangan.required'  => 'Alasan wajib diisi.',
             'keterangan.min'       => 'Alasan minimal 5 karakter.',
+            'file_surat.required'  => 'Lampiran dokumen wajib diisi untuk permohonan Sakit.',
             'file_surat.mimes'     => 'Format file harus PDF, PNG, atau DOC.',
             'file_surat.max'       => 'Ukuran file maksimal 5MB.',
         ];
