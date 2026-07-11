@@ -9,6 +9,7 @@ use App\Models\Devisi;
 use App\Models\Pengguna;
 use App\Services\KaryawanService;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class TambahKaryawan extends Controller
 {
@@ -47,6 +48,10 @@ class TambahKaryawan extends Controller
                 ->route('admin.rekap-karyawan')
                 ->with('success', 'Karyawan ' . $validated['nama_lengkap'] . ' berhasil ditambahkan!');
         } catch (\Exception $e) {
+            Log::error('Gagal menambahkan karyawan: ' . $e->getMessage(), [
+                'exception' => $e,
+                'input' => $validated,
+            ]);
             return redirect()
                 ->back()
                 ->with('error', 'Gagal menambahkan karyawan. Silakan coba lagi.')

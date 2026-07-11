@@ -28,7 +28,7 @@
                         <input type="text" name="nama_lengkap"
                             class="input-field w-full @error('nama_lengkap') border-red-500 @enderror"
                             placeholder="Masukkan nama lengkap" value="{{ old('nama_lengkap') }}"
-                            minlength="3" maxlength="100" pattern="[\pL\s]+" required>
+                            minlength="3" maxlength="100" required>
                         @error('nama_lengkap')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
