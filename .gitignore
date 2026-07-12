@@ -25,6 +25,7 @@ Thumbs.db
 /.phpunit.cache
 /.vscode
 /.zed
+/.history
 /StaffLog.adl
 /public/css/app.css
 scheduler.bat
