@@ -17,8 +17,8 @@
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
 
-    <!-- Tailwind CSS CDN -->
-   <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    @vite('resources/css/app.css')
 
     <style>
         * {
